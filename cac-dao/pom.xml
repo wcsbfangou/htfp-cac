@@ -4,18 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.htfp.service</groupId>
-    <artifactId>cac</artifactId>
+    <artifactId>cac-dao</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>cac</name>
+    <packaging>jar</packaging>
+    <name>cac-dao</name>
 
-    <modules>
-        <module>cac-app</module>
-        <module>cac-command-biz</module>
-        <module>cac-router-biz</module>
-        <module>cac-dao</module>
-        <module>cac-common</module>
-    </modules>
+    <parent>
+        <groupId>com.htfp.service</groupId>
+        <artifactId>cac</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath/>
+    </parent>
 
     <properties>
         <java.version>1.8</java.version>
@@ -26,8 +25,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.2</version>
         </dependency>
 
         <dependency>
@@ -41,24 +41,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-        </dependency>
     </dependencies>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <build>
         <plugins>
