@@ -3,7 +3,7 @@ package com.htfp.service.cac.router.biz.service;
 import com.htfp.service.cac.router.biz.model.request.RcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.request.SignInRequest;
 import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
-import com.htfp.service.cac.router.biz.model.response.GcsControlUavResponse;
+import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.response.SignOutResponse;
 
@@ -33,5 +33,5 @@ public interface IRcsService {
      * @param rcsControlUavRequest
      * @return
      */
-    GcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest);
+    RcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest);
 }

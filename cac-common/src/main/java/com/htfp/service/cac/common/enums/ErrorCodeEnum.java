@@ -19,13 +19,14 @@ public enum ErrorCodeEnum {
     LACK_OF_HEADER_GCS_ID(2007, "请求方编号缺失"),
 
     REQUEST_PARSE_FAIL(3001, "请求体解析失败"),
-    LACK_OF_GCS_ID(3002, "地面站编号缺失"),
+    LACK_OF_OTHER_FILED(3002, "其他字段缺失"),
     LACK_OF_UAV_ID(3003, "无人机编号缺失"),
     LACK_OF_PILOT_ID(3004, "驾驶员编号缺失"),
     LACK_OF_UAV_STATUS(3005, "无人机状态缺失"),
     LACK_OF_COMMAND_CODE(3006, "指控命令码缺失"),
     LACK_OF_COMMAND_RESULT(3007, "指控结果缺失"),
-    LACK_OF_OTHER_FILED(3008, "其他字段缺失"),
+    LACK_OF_GCS_ID(3008, "地面站编号缺失"),
+    LACK_OF_GCS_IP(3009, "地面站IP缺失"),
 
     SYSTEM_UNAVAILABLE(4001, "系统暂时不可用"),
     SYSTEM_ERROR(4002, "系统错误"),

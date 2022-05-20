@@ -6,14 +6,14 @@ import com.htfp.service.cac.common.enums.ErrorCodeEnum;
  * @Author sunjipeng
  * @Date 2022-05-18 14:55
  */
-public class BaseHttpResponse<T> {
+public class BaseHttpResponse {
 
     private boolean success;
     private Integer code;
     private String message;
-    private T data;
+    private String data;
 
-    public BaseHttpResponse(boolean success, Integer code, String message, T data) {
+    public BaseHttpResponse(boolean success, Integer code, String message, String data) {
         this.success = success;
         this.code = code;
         this.message = message;
@@ -34,14 +34,14 @@ public class BaseHttpResponse<T> {
     }
 
 
-    public BaseHttpResponse(boolean success, ErrorCodeEnum errorCodeEnum, T data) {
+    public BaseHttpResponse(boolean success, ErrorCodeEnum errorCodeEnum, String data) {
         this.success = success;
         this.code = errorCodeEnum.getCode();
         this.message = errorCodeEnum.getDesc();
         this.data = data;
     }
 
-    public BaseHttpResponse(boolean success, T data) {
+    public BaseHttpResponse(boolean success, String data) {
         this.success = success;
         this.data = data;
     }
@@ -74,40 +74,39 @@ public class BaseHttpResponse<T> {
         this.message = message;
     }
 
-    public T getData() {
+    public String getData() {
         return data;
     }
 
-    public void setData(T data) {
+    public void setData(String data) {
         this.data = data;
     }
 
-    public static <T> BaseHttpResponse<T> success() {
-        return new BaseHttpResponse<T>(true);
+    public static  BaseHttpResponse success() {
+        return new BaseHttpResponse(true);
     }
 
-    public static <T> BaseHttpResponse<T> success(T data) {
-        return new BaseHttpResponse<T>(true, data);
+    public static  BaseHttpResponse success(String data) {
+        return new BaseHttpResponse(true, data);
     }
 
-    public static <T> BaseHttpResponse<T> fail(ErrorCodeEnum errorCodeEnum) {
-        return new BaseHttpResponse<T>(false, errorCodeEnum);
+    public static BaseHttpResponse fail(ErrorCodeEnum errorCodeEnum) {
+        return new BaseHttpResponse(false, errorCodeEnum);
     }
 
-    public static <T> BaseHttpResponse<T> fail(ErrorCodeEnum errorCodeEnum, T data) {
-        return new BaseHttpResponse<T>(false, errorCodeEnum, data);
+    public static  BaseHttpResponse fail(ErrorCodeEnum errorCodeEnum, String data) {
+        return new BaseHttpResponse(false, errorCodeEnum, data);
     }
 
-    public static <T> BaseHttpResponse<T> fail(int code, String msg) {
-        return new BaseHttpResponse<T>(false, code, msg);
+    public static BaseHttpResponse fail(int code, String msg) {
+        return new BaseHttpResponse(false, code, msg);
     }
 
-    public static <T> BaseHttpResponse<T> fail(int code, String msg, T data) {
-        return new BaseHttpResponse<T>(false, code, msg, data);
+    public static BaseHttpResponse fail(int code, String msg, String data) {
+        return new BaseHttpResponse(false, code, msg, data);
     }
 
-    public static <T> BaseHttpResponse<T> fail(T data) {
-        return new BaseHttpResponse<T>(false, ErrorCodeEnum.UNKNOWN_ERROR, data);
+    public static BaseHttpResponse fail(String data) {
+        return new BaseHttpResponse(false, ErrorCodeEnum.UNKNOWN_ERROR, data);
     }
-
 }
