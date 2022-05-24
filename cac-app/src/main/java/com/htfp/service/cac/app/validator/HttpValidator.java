@@ -1,9 +1,7 @@
 package com.htfp.service.cac.app.validator;
 
 import com.htfp.service.cac.common.constant.HttpHeaderConstant;
-import com.htfp.service.cac.common.constant.HttpValidatorConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
-import com.htfp.service.cac.common.utils.AuthorizationUtils;
 import com.htfp.service.cac.router.biz.model.request.BaseRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;

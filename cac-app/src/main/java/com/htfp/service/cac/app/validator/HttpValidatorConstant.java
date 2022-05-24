@@ -1,4 +1,4 @@
-package com.htfp.service.cac.common.constant;
+package com.htfp.service.cac.app.validator;
 
 /**
  * @Author sunjipeng
