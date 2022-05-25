@@ -136,7 +136,7 @@ public interface GcsIpMappingMapper {
     int insertGcsIpMapping(@Param(value = "gcsIpMapping") GcsIpMappingDO gcsIpMapping);
 
     /**
-     * 根据gcsId逻辑删除一条记录
+     * 根据gcsId逻辑删除一条mapping记录
      *
      * @param gcsId
      * @return
@@ -145,7 +145,7 @@ public interface GcsIpMappingMapper {
     int deleteByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
-     * 根据id逻辑删除一条记录
+     * 根据id逻辑删除一条mapping记录
      *
      * @param id
      * @return

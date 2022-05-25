@@ -136,7 +136,7 @@ public interface UavGcsMappingMapper {
     int insertUavGcsMapping(@Param(value = "uavGcsMapping") UavGcsMappingDO uavGcsMapping);
 
     /**
-     * 根据uavId逻辑删除一条地面站记录
+     * 根据uavId逻辑删除一条mapping记录
      *
      * @param uavId
      * @return
@@ -145,7 +145,7 @@ public interface UavGcsMappingMapper {
     int deleteByUavId(@Param(value = "uavId") Long uavId);
 
     /**
-     * 根据id逻辑删除一条地面站记录
+     * 根据id逻辑删除一条mapping记录
      *
      * @param id
      * @return

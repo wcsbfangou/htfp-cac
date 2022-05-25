@@ -24,7 +24,7 @@ public interface UavNavigationMappingMapper {
     String TABLE = "uav_navigation_mapping";
 
     /**
-     * 根据Id查询
+     * 根据id查询
      *
      * @param id
      * @return
@@ -54,7 +54,7 @@ public interface UavNavigationMappingMapper {
             + "</foreach>"
             + "</if>"
             + "</where></script>")
-    List<UavNavigationMappingInfoDO> getUavGcsMappingByUavIdList(@Param(value = "uavIdList") List<Long> uavIdList);
+    List<UavNavigationMappingInfoDO> getUavNavigationMappingByUavIdList(@Param(value = "uavIdList") List<Long> uavIdList);
 
     /**
      * 根据navigationId查询
@@ -137,7 +137,7 @@ public interface UavNavigationMappingMapper {
     int insertUavNavigationMapping(@Param(value = "uavNavigationMapping") UavNavigationMappingInfoDO uavNavigationMapping);
 
     /**
-     * 根据uavId逻辑删除一条地面站记录
+     * 根据uavId逻辑删除一条mapping记录
      *
      * @param uavId
      * @return
@@ -146,7 +146,7 @@ public interface UavNavigationMappingMapper {
     int deleteByUavId(@Param(value = "uavId") Long uavId);
 
     /**
-     * 根据id逻辑删除一条地面站记录
+     * 根据id逻辑删除一条mapping记录
      *
      * @param id
      * @return
@@ -161,11 +161,11 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
-            + "<if test=\"uavNavigationMappingInfo.navigationId != null\"> gcs_ip = #{uavNavigationMappingInfo.navigationId}, </if>"
+            + "<if test=\"uavNavigationMappingInfo.navigationId != null\"> navigation_id = #{uavNavigationMappingInfo.navigationId}, </if>"
             + "<if test=\"uavNavigationMappingInfo.status != null\"> status = #{uavNavigationMappingInfo.status}, </if>"
             + "<if test=\"uavNavigationMappingInfo.isDel != null\"> is_del = #{uavNavigationMappingInfo.isDel}, </if>"
             + "<if test=\"uavNavigationMappingInfo.gmtModify != null\"> gmt_modify = #{uavNavigationMappingInfo.gmtModify} </if>"
             + "</set>"
             + "WHERE uav_id = #{uavNavigationMappingInfo.uavId} </script>")
-    int updateByUavNavigationMapping(@Param(value = "uavGcsMapping") UavNavigationMappingInfoDO uavNavigationMappingInfo);
+    int updateByUavNavigationMapping(@Param(value = "uavNavigationMappingInfo") UavNavigationMappingInfoDO uavNavigationMappingInfo);
 }
