@@ -12,7 +12,7 @@ public enum ErrorCodeEnum {
 
     AUTHORIZATION_VALIDATE_FAIL(2001, "校验码认证失败"),
     DATE_VALIDATE_FAIL(2002, "时间校验失败"),
-    GCS_ID_VALIDATE_FAIL(2003, "时间校验失败"),
+    GCS_ID_VALIDATE_FAIL(2003, "地面站编码校验失败"),
     VALIDATE_TIMEOUT(2004, "认证超时"),
     LACK_OF_AUTHORIZATION(2005, "验证码缺失"),
     LACK_OF_DATA(2006, "时间缺失"),
@@ -27,6 +27,9 @@ public enum ErrorCodeEnum {
     LACK_OF_COMMAND_RESULT(3007, "指控结果缺失"),
     LACK_OF_GCS_ID(3008, "地面站编号缺失"),
     LACK_OF_GCS_IP(3009, "地面站IP缺失"),
+    WRONG_UAV_ID(3010, "无人机编号错误"),
+    WRONG_GCS_ID(3011, "地面站编号错误"),
+    WRONG_PILOT_ID(3012, "飞行员编号错误"),
 
     SYSTEM_UNAVAILABLE(4001, "系统暂时不可用"),
     SYSTEM_ERROR(4002, "系统错误"),
