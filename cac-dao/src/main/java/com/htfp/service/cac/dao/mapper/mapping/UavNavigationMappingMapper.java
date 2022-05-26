@@ -102,7 +102,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByUavIpAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
+    List<UavNavigationMappingInfoDO> selectByUavIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
 
 
     /**

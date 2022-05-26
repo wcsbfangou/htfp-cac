@@ -1,19 +1,16 @@
 package com.htfp.service.cac.router.biz.service.impl;
 
+import com.htfp.service.cac.command.biz.model.response.UavChangeStatusResponse;
+import com.htfp.service.cac.command.biz.model.resquest.UavChangeStatusRequest;
+import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnums;
-import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
-import com.htfp.service.cac.dao.mapper.entity.PilotInfoMapper;
-import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
-import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
-import com.htfp.service.cac.dao.mapper.log.NavigationLogMapper;
-import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
-import com.htfp.service.cac.dao.mapper.mapping.GcsIpMappingMapper;
-import com.htfp.service.cac.dao.mapper.mapping.UavGcsMappingMapper;
-import com.htfp.service.cac.dao.mapper.mapping.UavNavigationMappingMapper;
-import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
+import com.htfp.service.cac.common.enums.UavStatusEnum;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
+import com.htfp.service.cac.dao.service.GcsDalService;
+import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.cac.router.biz.model.request.ChangeUavStatusParam;
 import com.htfp.service.cac.router.biz.model.request.GcsChangeUavRequest;
 import com.htfp.service.cac.router.biz.model.request.GcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.request.SignInRequest;
@@ -42,23 +39,13 @@ import java.util.List;
 public class GcsServiceImpl implements IGcsService {
 
     @Resource
-    GcsInfoMapper gcsInfoMapper;
+    UavDalService uavDalService;
+
     @Resource
-    PilotInfoMapper pilotInfoMapper;
-    @Resource
-    UavInfoMapper uavInfoMapper;
-    @Resource
-    GcsIpMappingMapper gcsIpMappingMapper;
-    @Resource
-    UavGcsMappingMapper uavGcsMappingMapper;
-    @Resource
-    UavNavigationMappingMapper uavNavigationMappingMapper;
-    @Resource
-    CommandAndControlLogMapper commandAndControlLogMapper;
-    @Resource
-    NavigationLogMapper navigationLogMapper;
-    @Resource
-    UavStatusLogMapper uavStatusLogMapper;
+    GcsDalService gcsDalService;
+
+    @Resource(name = "uavServiceImpl")
+    IUavService uavService;
 
     /**
      * 地面站注册
@@ -72,17 +59,16 @@ public class GcsServiceImpl implements IGcsService {
         signInResponse.fail();
         try {
             final Long gcsId = Long.getLong(signInRequest.getGcsId());
-            List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-            if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-                List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
-                if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
-                    GcsIpMappingDO gcsIpMappingDO = gcsIpMappingDOList.get(0);
+            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
+            if (validateGcsIdResult) {
+                GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
+                if (gcsIpMappingDO != null) {
                     gcsIpMappingDO.setGcsIp(signInRequest.getGcsIp());
                     gcsIpMappingDO.setGmtModify(new Date());
-                    gcsIpMappingMapper.updateByGcsIpMapping(gcsIpMappingDO);
+                    gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
                 } else {
-                    GcsIpMappingDO gcsIpMappingDO = buildGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
-                    gcsIpMappingMapper.insertGcsIpMapping(gcsIpMappingDO);
+                    gcsIpMappingDO = gcsDalService.buildNewGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
+                    gcsDalService.insertGcsIpMapping(gcsIpMappingDO);
                 }
                 signInResponse.success();
             } else {
@@ -107,21 +93,20 @@ public class GcsServiceImpl implements IGcsService {
         signOutResponse.fail();
         try {
             final Long gcsId = Long.getLong(signOutRequest.getGcsId());
-            List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-            if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-                List<UavGcsMappingDO> uavGcsMappingDOList = uavGcsMappingMapper.selectByGcsIdAndStatus(gcsId, MappingStatusEnums.EFFECTIVE.getCode());
+            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
+            if (validateGcsIdResult) {
+                List<UavGcsMappingDO> uavGcsMappingDOList = uavDalService.queryUavGcsMapping(gcsId, MappingStatusEnums.VALID);
                 if (CollectionUtils.isNotEmpty(uavGcsMappingDOList)) {
                     signOutResponse.setMessage("地面站绑定的无人机还未完成航行，不可下线");
                 } else {
-                    List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
-                    if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
-                        GcsIpMappingDO gcsIpMappingDO = gcsIpMappingDOList.get(0);
+                    GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
+                    if (gcsIpMappingDO != null) {
                         if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
                             signOutResponse.setMessage("地面站注销时IP与注册时IP不一致，不可下线");
                         } else {
                             gcsIpMappingDO.setStatus(MappingStatusEnums.INVALID.getCode());
                             gcsIpMappingDO.setGmtModify(new Date());
-                            gcsIpMappingMapper.updateByGcsIpMapping(gcsIpMappingDO);
+                            gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
                             signOutResponse.success();
                         }
                     } else {
@@ -157,7 +142,53 @@ public class GcsServiceImpl implements IGcsService {
      */
     @Override
     public UavStatusChangeResponse uavStatusChange(UavStatusChangeRequest uavStatusChangeRequest) {
-        return null;
+        UavStatusChangeResponse uavStatusChangeResponse = new UavStatusChangeResponse();
+        uavStatusChangeResponse.fail();
+        try {
+            final Long gcsId = Long.getLong(uavStatusChangeRequest.getGcsId());
+            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
+            if (validateGcsIdResult) {
+                List<ChangeUavStatusParam> uavList = uavStatusChangeRequest.getUavList();
+                for (ChangeUavStatusParam changeUavStatusParam : uavList) {
+                    Long uavId = Long.valueOf(changeUavStatusParam.getUavId());
+                    Integer uavStatus = changeUavStatusParam.getUavStatus();
+                    boolean validateUavIdResult = uavDalService.validateUavId(uavId);
+                    if (validateUavIdResult) {
+                        List<UavGcsMappingDO> uavGcsMappingDOList = uavDalService.queryValidUavGcsMapping(uavId, gcsId);
+                        if (CollectionUtils.isNotEmpty(uavGcsMappingDOList)) {
+                            // 无人机状态更新
+                            UavChangeStatusRequest uavChangeStatusRequest = new UavChangeStatusRequest();
+                            uavChangeStatusRequest.setGcsId(gcsId);
+                            uavChangeStatusRequest.setUavId(uavId);
+                            uavChangeStatusRequest.setUavStatus(uavStatus);
+                            UavChangeStatusResponse uavChangeStatusResponse = uavService.uavChangeStatus(uavChangeStatusRequest);;
+                            if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(uavChangeStatusResponse.getCode()))){
+                                uavStatusChangeResponse.success();
+                                // 更新uav和gcs的mapping关系表的状态
+                                if(UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavStatus))){
+                                    uavDalService.updateUavGcsMappingStatus(uavGcsMappingDOList.get(0), MappingStatusEnums.INVALID);
+                                }
+                            } else {
+                                uavChangeStatusResponse.fail(uavChangeStatusResponse.getCode(), uavChangeStatusResponse.getMessage());
+                                break;
+                            }
+                        } else {
+                            uavStatusChangeResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
+                            break;
+                        }
+                    } else {
+                        uavStatusChangeResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);
+                        break;
+                    }
+                }
+            } else {
+                uavStatusChangeResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
+            }
+        } catch (Exception e) {
+            log.error("无人机状态变更异常，uavStatusChangeRequest={}", uavStatusChangeRequest, e);
+            uavStatusChangeResponse.fail(e.getMessage());
+        }
+        return uavStatusChangeResponse;
     }
 
     /**
@@ -171,13 +202,4 @@ public class GcsServiceImpl implements IGcsService {
         return null;
     }
 
-    private GcsIpMappingDO buildGcsIpMappingDO(Long gcsId, String gcsIp) {
-        GcsIpMappingDO gcsIpMappingDO = new GcsIpMappingDO();
-        gcsIpMappingDO.setGcsId(gcsId);
-        gcsIpMappingDO.setGcsIp(gcsIp);
-        gcsIpMappingDO.setStatus(MappingStatusEnums.EFFECTIVE.getCode());
-        gcsIpMappingDO.setGmtCreate(new Date());
-        gcsIpMappingDO.setGmtModify(new Date());
-        return gcsIpMappingDO;
-    }
 }

@@ -6,7 +6,7 @@ package com.htfp.service.cac.common.enums;
  */
 public enum MappingStatusEnums {
 
-    EFFECTIVE(0, "生效"),
+    VALID(0, "生效"),
     INVALID(1, "失效"),
     ;
 
