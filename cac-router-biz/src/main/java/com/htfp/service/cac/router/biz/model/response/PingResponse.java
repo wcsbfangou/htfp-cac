@@ -2,15 +2,13 @@ package com.htfp.service.cac.router.biz.model.response;
 
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @Author sunjipeng
- * @Date 2022-05-19 20:00
+ * @Date 2022-06-01 22:59
  */
 
 @Data
-public class RcsControlUavResponse extends BaseResponse {
+public class PingResponse extends BaseResponse{
 
     private String data;
 }
