@@ -1,11 +1,14 @@
 package com.htfp.service.cac.dao.service;
 
-import com.htfp.service.cac.common.enums.MappingStatusEnums;
+import com.htfp.service.cac.common.enums.CommandResultEnum;
+import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
+import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavGcsMappingMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavNavigationMappingMapper;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
+import com.htfp.service.cac.dao.model.log.CommandAndControlLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
@@ -37,7 +40,10 @@ public class UavDalService {
     @Resource
     UavStatusLogMapper uavStatusLogMapper;
 
-    public List<UavGcsMappingDO> queryUavGcsMapping(Long gcsId, MappingStatusEnums status){
+    @Resource
+    CommandAndControlLogMapper commandAndControlLogMapper;
+
+    public List<UavGcsMappingDO> queryUavGcsMapping(Long gcsId, MappingStatusEnum status){
         return uavGcsMappingMapper.selectByGcsIdAndStatus(gcsId, status.getCode());
     }
 
@@ -59,21 +65,21 @@ public class UavDalService {
         }
     }
 
-    public List<UavGcsMappingDO> queryValidUavGcsMapping(Long uavId, Long gcsId){
-        return uavGcsMappingMapper.selectByUavIdAndGcsIdAndStatus(uavId, gcsId, MappingStatusEnums.VALID.getCode());
-    }
-
-    public boolean validateUavGcsMapping(Long uavId, Long gcsId){
-        List<UavGcsMappingDO> uavGcsMappingDOList = queryValidUavGcsMapping(uavId, gcsId);
-        return CollectionUtils.isNotEmpty(uavGcsMappingDOList);
+    public UavGcsMappingDO queryValidUavGcsMapping(Long uavId, Long gcsId){
+        List<UavGcsMappingDO> uavGcsMappingDOList = uavGcsMappingMapper.selectByUavIdAndGcsIdAndStatus(uavId, gcsId, MappingStatusEnum.VALID.getCode());
+        if(CollectionUtils.isNotEmpty(uavGcsMappingDOList)){
+            return uavGcsMappingDOList.get(0);
+        } else {
+            return null;
+        }
     }
 
     public int updateUavGcsMapping(UavGcsMappingDO uavGcsMappingDO){
         return uavGcsMappingMapper.updateByUavGcsMapping(uavGcsMappingDO);
     }
 
-    public void updateUavGcsMappingStatus(UavGcsMappingDO uavGcsMappingDO, MappingStatusEnums mappingStatusEnums){
-        uavGcsMappingDO.setStatus(mappingStatusEnums.getCode());
+    public void updateUavGcsMappingStatus(UavGcsMappingDO uavGcsMappingDO, MappingStatusEnum mappingStatusEnum){
+        uavGcsMappingDO.setStatus(mappingStatusEnum.getCode());
         uavGcsMappingDO.setGmtModify(new Date());
         updateUavGcsMapping(uavGcsMappingDO);
     }
@@ -82,8 +88,8 @@ public class UavDalService {
         return uavGcsMappingMapper.insertUavGcsMapping(uavGcsMappingDO);
     }
 
-    public void updateUavGcsMappingGcsId(UavGcsMappingDO uavGcsMappingDO, Long gcsId, MappingStatusEnums mappingStatusEnums){
-        uavGcsMappingDO.setStatus(mappingStatusEnums.getCode());
+    public void updateUavGcsMappingGcsId(UavGcsMappingDO uavGcsMappingDO, Long gcsId, MappingStatusEnum mappingStatusEnum){
+        uavGcsMappingDO.setStatus(mappingStatusEnum.getCode());
         uavGcsMappingDO.setGcsId(gcsId);
         uavGcsMappingDO.setGmtModify(new Date());
         updateUavGcsMapping(uavGcsMappingDO);
@@ -116,8 +122,8 @@ public class UavDalService {
         return uavNavigationMappingMapper.insertUavNavigationMapping(uavNavigationMappingDO);
     }
 
-    public void updateUavNavigationMappingNavigationId(UavNavigationMappingDO uavNavigationMappingDO, Long navigationId, MappingStatusEnums mappingStatusEnums){
-        uavNavigationMappingDO.setStatus(mappingStatusEnums.getCode());
+    public void updateUavNavigationMappingNavigationId(UavNavigationMappingDO uavNavigationMappingDO, Long navigationId, MappingStatusEnum mappingStatusEnum){
+        uavNavigationMappingDO.setStatus(mappingStatusEnum.getCode());
         uavNavigationMappingDO.setNavigationId(navigationId);
         uavNavigationMappingDO.setGmtModify(new Date());
         updateUavNavigationMapping(uavNavigationMappingDO);
@@ -127,14 +133,18 @@ public class UavDalService {
         return uavNavigationMappingMapper.updateByUavNavigationMapping(uavNavigationMappingDO);
     }
 
-    public void updateUavNavigationMappingStatus(UavNavigationMappingDO uavNavigationMappingInfo, MappingStatusEnums mappingStatusEnums){
-        uavNavigationMappingInfo.setStatus(mappingStatusEnums.getCode());
+    public void updateUavNavigationMappingStatus(UavNavigationMappingDO uavNavigationMappingInfo, MappingStatusEnum mappingStatusEnum){
+        uavNavigationMappingInfo.setStatus(mappingStatusEnum.getCode());
         uavNavigationMappingInfo.setGmtModify(new Date());
         updateUavNavigationMapping(uavNavigationMappingInfo);
     }
 
     public int insertUavStatusLog (UavStatusLogDO uavStatusLogDO){
         return uavStatusLogMapper.insertUavStatusLogDO(uavStatusLogDO);
+    }
+
+    public int insertCommandAndControlLog (CommandAndControlLogDO commandAndControlLogDO){
+        return commandAndControlLogMapper.insertCommandAndControlLog(commandAndControlLogDO);
     }
 
     public UavStatusLogDO buildNewUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {
@@ -147,7 +157,7 @@ public class UavDalService {
         return uavStatusLogDO;
     }
 
-    public UavGcsMappingDO buildNewUavGcsMappingDO(Long uavId, Long gcsId, MappingStatusEnums status) {
+    public UavGcsMappingDO buildNewUavGcsMappingDO(Long uavId, Long gcsId, MappingStatusEnum status) {
         UavGcsMappingDO uavGcsMappingDO  = new UavGcsMappingDO();
         uavGcsMappingDO.setUavId(uavId);
         uavGcsMappingDO.setGcsId(gcsId);
@@ -158,7 +168,7 @@ public class UavDalService {
     }
 
 
-    public UavNavigationMappingDO buildUavNavigationMappingDO(Long uavId, Long navigationId, MappingStatusEnums status) {
+    public UavNavigationMappingDO buildUavNavigationMappingDO(Long uavId, Long navigationId, MappingStatusEnum status) {
         UavNavigationMappingDO uavNavigationMappingDO = new UavNavigationMappingDO();
         uavNavigationMappingDO.setUavId(uavId);
         uavNavigationMappingDO.setNavigationId(navigationId);
@@ -166,5 +176,19 @@ public class UavDalService {
         uavNavigationMappingDO.setGmtCreate(new Date());
         uavNavigationMappingDO.setGmtModify(new Date());
         return uavNavigationMappingDO;
+    }
+
+    public CommandAndControlLogDO buildCommandAndControlLogDO(Long uavId, Long navigationId, Long gcsId, Long rcsId, Long pilotId, Integer commandCode, CommandResultEnum commandResultEnum) {
+        CommandAndControlLogDO commandAndControlLogDO = new CommandAndControlLogDO();
+        commandAndControlLogDO.setUavId(uavId);
+        commandAndControlLogDO.setNavigationId(navigationId);
+        commandAndControlLogDO.setGcsId(gcsId);
+        commandAndControlLogDO.setRcsId(rcsId);
+        commandAndControlLogDO.setPilotId(pilotId);
+        commandAndControlLogDO.setCommandCode(commandCode);
+        commandAndControlLogDO.setCommandResult(commandResultEnum.getCode());
+        commandAndControlLogDO.setGmtCreate(new Date());
+        commandAndControlLogDO.setGmtModify(new Date());
+        return commandAndControlLogDO;
     }
 }

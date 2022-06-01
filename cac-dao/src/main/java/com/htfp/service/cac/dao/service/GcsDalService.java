@@ -1,11 +1,11 @@
 package com.htfp.service.cac.dao.service;
 
-import com.htfp.service.cac.common.enums.MappingStatusEnums;
+import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
 import com.htfp.service.cac.dao.mapper.mapping.GcsIpMappingMapper;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
-import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
+import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -58,11 +58,17 @@ public class GcsDalService {
         return gcsIpMappingMapper.insertGcsIpMapping(gcsIpMappingDO);
     }
 
+    public void updateGcsIpMappingIp(GcsIpMappingDO gcsIpMappingDO, String gcsIp){
+        gcsIpMappingDO.setGcsIp(gcsIp);
+        gcsIpMappingDO.setGmtModify(new Date());
+        updateGcsIpMapping(gcsIpMappingDO);
+    }
+
     public GcsIpMappingDO buildNewGcsIpMappingDO(Long gcsId, String gcsIp) {
         GcsIpMappingDO gcsIpMappingDO = new GcsIpMappingDO();
         gcsIpMappingDO.setGcsId(gcsId);
         gcsIpMappingDO.setGcsIp(gcsIp);
-        gcsIpMappingDO.setStatus(MappingStatusEnums.VALID.getCode());
+        gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
         gcsIpMappingDO.setGmtCreate(new Date());
         gcsIpMappingDO.setGmtModify(new Date());
         return gcsIpMappingDO;

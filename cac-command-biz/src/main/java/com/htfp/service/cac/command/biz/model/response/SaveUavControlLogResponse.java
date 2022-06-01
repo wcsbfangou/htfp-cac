@@ -4,8 +4,8 @@ import lombok.Data;
 
 /**
  * @Author sunjipeng
- * @Date 2022-05-26 21:07
+ * @Date 2022-06-01 18:20
  */
 @Data
-public class GcsChangeControlUavResponse extends BaseResponse{
+public class SaveUavControlLogResponse extends BaseResponse{
 }

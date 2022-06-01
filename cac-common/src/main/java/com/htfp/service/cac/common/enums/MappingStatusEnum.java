@@ -4,7 +4,7 @@ package com.htfp.service.cac.common.enums;
  * @Author sunjipeng
  * @Date 2022-05-25 21:25
  */
-public enum MappingStatusEnums {
+public enum MappingStatusEnum {
 
     VALID(0, "生效"),
     INVALID(1, "失效"),
@@ -13,7 +13,7 @@ public enum MappingStatusEnums {
     public final Integer code;
     public final String desc;
 
-    MappingStatusEnums(Integer code, String desc) {
+    MappingStatusEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -26,10 +26,10 @@ public enum MappingStatusEnums {
         return desc;
     }
 
-    public static MappingStatusEnums getFromCode(Integer code) {
-        for (MappingStatusEnums mappingStatusEnums : values()) {
-            if (mappingStatusEnums.code.equals(code)) {
-                return mappingStatusEnums;
+    public static MappingStatusEnum getFromCode(Integer code) {
+        for (MappingStatusEnum mappingStatusEnum : values()) {
+            if (mappingStatusEnum.code.equals(code)) {
+                return mappingStatusEnum;
             }
         }
         return null;

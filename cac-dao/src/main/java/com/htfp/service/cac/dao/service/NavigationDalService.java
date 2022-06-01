@@ -1,6 +1,6 @@
 package com.htfp.service.cac.dao.service;
 
-import com.htfp.service.cac.common.enums.NavigationStatusEnums;
+import com.htfp.service.cac.common.enums.NavigationStatusEnum;
 import com.htfp.service.cac.dao.mapper.log.NavigationLogMapper;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import lombok.extern.slf4j.Slf4j;
@@ -34,20 +34,20 @@ public class NavigationDalService {
         return navigationLogMapper.insertNavigationLog(navigationLogDO);
     }
 
-    public void updateNavigationLogStatus(NavigationLogDO navigationLog, NavigationStatusEnums navigationStatusEnums) {
-        navigationLog.setNavigationStatus(navigationStatusEnums.getCode());
+    public void updateNavigationLogStatus(NavigationLogDO navigationLog, NavigationStatusEnum navigationStatusEnum) {
+        navigationLog.setNavigationStatus(navigationStatusEnum.getCode());
         navigationLog.setGmtModify(new Date());
         updateNavigationLog(navigationLog);
     }
 
-    public NavigationLogDO buildNavigationLogDO(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnums navigationStatusEnums){
+    public NavigationLogDO buildNavigationLogDO(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnum navigationStatusEnum){
         NavigationLogDO navigationLogDO = new NavigationLogDO();
         navigationLogDO.setNavigationId(navigationId);
         navigationLogDO.setGcsId(gcsId);
         navigationLogDO.setUavId(uavId);
         navigationLogDO.setMasterPilotId(masterPilotId);
         navigationLogDO.setDeputyPilotId(deputyPilotId);
-        navigationLogDO.setNavigationStatus(navigationStatusEnums.getCode());
+        navigationLogDO.setNavigationStatus(navigationStatusEnum.getCode());
         navigationLogDO.setGmtCreate(new Date());
         navigationLogDO.setGmtModify(new Date());
         return navigationLogDO;

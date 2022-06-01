@@ -1,6 +1,8 @@
 package com.htfp.service.cac.command.biz.service;
 
+import com.htfp.service.cac.command.biz.model.response.SaveUavControlLogResponse;
 import com.htfp.service.cac.command.biz.model.response.UavChangeStatusResponse;
+import com.htfp.service.cac.command.biz.model.resquest.SaveUavControlLogRequest;
 import com.htfp.service.cac.command.biz.model.resquest.UavChangeStatusRequest;
 
 /**
@@ -15,4 +17,11 @@ public interface IUavService {
      * @return
      */
     UavChangeStatusResponse uavChangeStatus(UavChangeStatusRequest uavChangeStatusRequest);
+
+    /**
+     * 存储无人机指控指令
+     * @param saveUavControlLogRequest
+     * @return
+     */
+    SaveUavControlLogResponse saveUavControlLog(SaveUavControlLogRequest saveUavControlLogRequest);
 }

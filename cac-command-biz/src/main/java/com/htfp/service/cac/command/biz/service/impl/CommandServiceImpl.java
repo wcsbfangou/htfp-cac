@@ -3,8 +3,8 @@ package com.htfp.service.cac.command.biz.service.impl;
 import com.htfp.service.cac.command.biz.model.response.GcsChangeControlUavResponse;
 import com.htfp.service.cac.command.biz.model.resquest.GcsChangeControlUavRequest;
 import com.htfp.service.cac.command.biz.service.ICommandService;
-import com.htfp.service.cac.common.enums.MappingStatusEnums;
-import com.htfp.service.cac.common.enums.NavigationStatusEnums;
+import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.enums.NavigationStatusEnum;
 import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
@@ -50,13 +50,13 @@ public class CommandServiceImpl implements ICommandService {
                 insertOrUpdateUavNavigationMapping(gcsChangeControlUavRequest.getUavId(), navigationId);
             }else{
                 UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(gcsChangeControlUavRequest.getUavId());
-                 if(uavNavigationMapping==null||MappingStatusEnums.INVALID.equals(MappingStatusEnums.getFromCode(uavNavigationMapping.getStatus()))) {
+                 if(uavNavigationMapping==null|| MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))) {
                      gcsChangeControlUavResponse.fail("无人机已结束航行或未开始航行");
                      return gcsChangeControlUavResponse;
                  }
                  navigationId = uavNavigationMapping.getNavigationId();
             }
-            insertNavigationLog(navigationId, gcsChangeControlUavRequest.getUavId(), gcsChangeControlUavRequest.getGcsId(), gcsChangeControlUavRequest.getMasterPilotId(), gcsChangeControlUavRequest.getDeputyPilotId(), NavigationStatusEnums.PROGRESSING);
+            insertNavigationLog(navigationId, gcsChangeControlUavRequest.getUavId(), gcsChangeControlUavRequest.getGcsId(), gcsChangeControlUavRequest.getMasterPilotId(), gcsChangeControlUavRequest.getDeputyPilotId(), NavigationStatusEnum.PROGRESSING);
         } catch (Exception e){
             log.error("地面站在控无人机变更异常，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest, e);
             gcsChangeControlUavResponse.fail(e.getMessage());
@@ -67,9 +67,9 @@ public class CommandServiceImpl implements ICommandService {
     public void insertOrUpdateUavNavigationMapping(Long uavId, Long navigationId){
         UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(uavId);
         if(uavNavigationMapping!=null) {
-            uavDalService.updateUavNavigationMappingNavigationId(uavNavigationMapping, navigationId, MappingStatusEnums.VALID);
+            uavDalService.updateUavNavigationMappingNavigationId(uavNavigationMapping, navigationId, MappingStatusEnum.VALID);
         } else {
-            uavNavigationMapping = uavDalService.buildUavNavigationMappingDO(uavId, navigationId, MappingStatusEnums.VALID);
+            uavNavigationMapping = uavDalService.buildUavNavigationMappingDO(uavId, navigationId, MappingStatusEnum.VALID);
             uavDalService.insertUavNavigationMapping(uavNavigationMapping);
         }
     }
@@ -79,8 +79,8 @@ public class CommandServiceImpl implements ICommandService {
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 
-    private void insertNavigationLog(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnums navigationStatusEnums){
-        NavigationLogDO navigationLogDO = navigationDalService.buildNavigationLogDO(navigationId, uavId, gcsId, masterPilotId, deputyPilotId, navigationStatusEnums);
+    private void insertNavigationLog(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnum navigationStatusEnum){
+        NavigationLogDO navigationLogDO = navigationDalService.buildNavigationLogDO(navigationId, uavId, gcsId, masterPilotId, deputyPilotId, navigationStatusEnum);
         navigationDalService.insertNavigationLog(navigationLogDO);
     }
 }

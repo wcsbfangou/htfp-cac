@@ -4,7 +4,7 @@ package com.htfp.service.cac.common.enums;
  * @Author sunjipeng
  * @Date 2022-05-26 22:18
  */
-public enum NavigationStatusEnums {
+public enum NavigationStatusEnum {
 
     PROGRESSING(0, "进行中"),
     FINISH(1, "结束"),
@@ -13,7 +13,7 @@ public enum NavigationStatusEnums {
     public final Integer code;
     public final String desc;
 
-    NavigationStatusEnums(Integer code, String desc) {
+    NavigationStatusEnum(Integer code, String desc) {
         this.code = code;
         this.desc = desc;
     }
@@ -26,10 +26,10 @@ public enum NavigationStatusEnums {
         return desc;
     }
 
-    public static NavigationStatusEnums getFromCode(Integer code) {
-        for (NavigationStatusEnums navigationStatusEnums : values()) {
-            if (navigationStatusEnums.code.equals(code)) {
-                return navigationStatusEnums;
+    public static NavigationStatusEnum getFromCode(Integer code) {
+        for (NavigationStatusEnum navigationStatusEnum : values()) {
+            if (navigationStatusEnum.code.equals(code)) {
+                return navigationStatusEnum;
             }
         }
         return null;
