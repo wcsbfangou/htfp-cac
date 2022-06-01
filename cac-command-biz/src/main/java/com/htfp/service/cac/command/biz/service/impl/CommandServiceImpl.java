@@ -5,6 +5,7 @@ import com.htfp.service.cac.command.biz.model.resquest.GcsChangeControlUavReques
 import com.htfp.service.cac.command.biz.service.ICommandService;
 import com.htfp.service.cac.common.enums.MappingStatusEnums;
 import com.htfp.service.cac.common.enums.NavigationStatusEnums;
+import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
@@ -40,10 +41,11 @@ public class CommandServiceImpl implements ICommandService {
         GcsChangeControlUavResponse gcsChangeControlUavResponse = new GcsChangeControlUavResponse();
         gcsChangeControlUavResponse.fail();
         try{
-            Long navigationId = null;
+            Long navigationId;
             // TODO: 2022/6/1 事务
             if(gcsChangeControlUavRequest.getNewArrival()){
-                // TODO: 2022/6/1 雪花算法
+                // TODO: 2022/6/1 IDC ID && 机器ID
+                navigationId = SnowflakeIdUtils.generateSnowFlakeId(1,1);
                 insertUavStatusLog(gcsChangeControlUavRequest.getUavId(), navigationId, gcsChangeControlUavRequest.getUavStatus());
                 insertOrUpdateUavNavigationMapping(gcsChangeControlUavRequest.getUavId(), navigationId);
             }else{
