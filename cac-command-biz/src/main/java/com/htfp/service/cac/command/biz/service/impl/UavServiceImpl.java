@@ -9,11 +9,10 @@ import com.htfp.service.cac.common.enums.NavigationStatusEnums;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
-import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingInfoDO;
+import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import com.htfp.service.cac.dao.service.NavigationDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -44,9 +43,9 @@ public class UavServiceImpl implements IUavService {
         UavChangeStatusResponse uavChangeStatusResponse = new UavChangeStatusResponse();
         uavChangeStatusResponse.fail();
         try{
-            List<UavNavigationMappingInfoDO> uavNavigationMappingInfoDOList = uavDalService.queryUavNavigationMapping(uavChangeStatusRequest.getUavId());
-            if(CollectionUtils.isNotEmpty(uavNavigationMappingInfoDOList)){
-                UavNavigationMappingInfoDO uavNavigationMappingInfo = uavNavigationMappingInfoDOList.get(0);
+            UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(uavChangeStatusRequest.getUavId());
+            if(uavNavigationMappingInfo != null){
+                // TODO: 2022/6/1 事务
                 insertUavStatusLog(uavChangeStatusRequest.getUavId(), uavNavigationMappingInfo.getNavigationId(), uavChangeStatusRequest.getUavStatus());
                 if(UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavChangeStatusRequest.getUavStatus()))){
                     uavDalService.updateUavNavigationMappingStatus(uavNavigationMappingInfo, MappingStatusEnums.INVALID);
@@ -64,7 +63,7 @@ public class UavServiceImpl implements IUavService {
     }
 
     private void insertUavStatusLog(Long uavId, Long navigationId, Integer status){
-        UavStatusLogDO uavStatusLog = uavDalService.buildUavStatusLogDO(uavId, navigationId, status);
+        UavStatusLogDO uavStatusLog = uavDalService.buildNewUavStatusLogDO(uavId, navigationId, status);
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 

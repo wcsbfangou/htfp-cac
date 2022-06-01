@@ -7,7 +7,7 @@ import com.htfp.service.cac.command.biz.model.resquest.GcsChangeControlUavReques
  * @Author sunjipeng
  * @Date 2022-05-26 21:16
  */
-public interface IGcsService {
+public interface ICommandService {
 
     /**
      * 地面站在控无人机变更

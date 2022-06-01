@@ -10,7 +10,7 @@ import java.util.Date;
  * @Date 2022-05-24 14:30
  */
 @Data
-public class UavNavigationMappingInfoDO implements Serializable {
+public class UavNavigationMappingDO implements Serializable {
 
     private Long id;
     private Long uavId;

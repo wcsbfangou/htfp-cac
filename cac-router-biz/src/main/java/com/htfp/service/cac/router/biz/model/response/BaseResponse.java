@@ -31,4 +31,9 @@ public class BaseResponse {
     public void fail(String message){
         this.setMessage(message);
     }
+
+    public void fail(Integer code, String message){
+        this.setCode(code);
+        this.setMessage(message);
+    }
 }

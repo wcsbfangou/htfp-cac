@@ -4,6 +4,7 @@ import com.htfp.service.cac.common.enums.MappingStatusEnums;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
 import com.htfp.service.cac.dao.mapper.mapping.GcsIpMappingMapper;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
+import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -29,6 +30,15 @@ public class GcsDalService {
     public boolean validateGcsId(Long gcsId){
         List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
         return CollectionUtils.isNotEmpty(gcsInfoDOList);
+    }
+
+    public GcsInfoDO queryGcsInfo(Long gcsId){
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
+        if(CollectionUtils.isNotEmpty(gcsInfoDOList)){
+            return gcsInfoDOList.get(0);
+        } else {
+            return null;
+        }
     }
 
     public GcsIpMappingDO queryGcsIpMapping(Long gcsId){

@@ -3,9 +3,7 @@ package com.htfp.service.cac.dao.service;
 import com.htfp.service.cac.common.enums.NavigationStatusEnums;
 import com.htfp.service.cac.dao.mapper.log.NavigationLogMapper;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
-import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -42,4 +40,16 @@ public class NavigationDalService {
         updateNavigationLog(navigationLog);
     }
 
+    public NavigationLogDO buildNavigationLogDO(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnums navigationStatusEnums){
+        NavigationLogDO navigationLogDO = new NavigationLogDO();
+        navigationLogDO.setNavigationId(navigationId);
+        navigationLogDO.setGcsId(gcsId);
+        navigationLogDO.setUavId(uavId);
+        navigationLogDO.setMasterPilotId(masterPilotId);
+        navigationLogDO.setDeputyPilotId(deputyPilotId);
+        navigationLogDO.setNavigationStatus(navigationStatusEnums.getCode());
+        navigationLogDO.setGmtCreate(new Date());
+        navigationLogDO.setGmtModify(new Date());
+        return navigationLogDO;
+    }
 }

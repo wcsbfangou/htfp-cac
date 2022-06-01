@@ -1,6 +1,6 @@
 package com.htfp.service.cac.dao.mapper.mapping;
 
-import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingInfoDO;
+import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -30,7 +30,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
-    UavNavigationMappingInfoDO selectById(@Param(value = "id") Long id);
+    UavNavigationMappingDO selectById(@Param(value = "id") Long id);
 
     /**
      * 根据uavId查询
@@ -39,7 +39,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByUavId(@Param(value = "uavId") Long uavId);
+    List<UavNavigationMappingDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
      * 根据uavIdList查询
@@ -54,7 +54,7 @@ public interface UavNavigationMappingMapper {
             + "</foreach>"
             + "</if>"
             + "</where></script>")
-    List<UavNavigationMappingInfoDO> getUavNavigationMappingByUavIdList(@Param(value = "uavIdList") List<Long> uavIdList);
+    List<UavNavigationMappingDO> getUavNavigationMappingByUavIdList(@Param(value = "uavIdList") List<Long> uavIdList);
 
     /**
      * 根据navigationId查询
@@ -63,7 +63,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
+    List<UavNavigationMappingDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
 
     /**
      * 根据status查询
@@ -72,7 +72,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE status = #{status} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByStatus(@Param(value = "status") Integer status);
+    List<UavNavigationMappingDO> selectByStatus(@Param(value = "status") Integer status);
 
     /**
      * 根据navigationId && status 查询
@@ -82,7 +82,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByNavigationIdAndStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "status") Integer status);
+    List<UavNavigationMappingDO> selectByNavigationIdAndStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "status") Integer status);
 
     /**
      * 根据uavId && navigationId 查询
@@ -92,7 +92,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByUavIdAndNavigationId(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId);
+    List<UavNavigationMappingDO> selectByUavIdAndNavigationId(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId);
 
     /**
      * 根据uavId && status 查询
@@ -102,7 +102,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByUavIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
+    List<UavNavigationMappingDO> selectByUavIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
 
 
     /**
@@ -114,7 +114,7 @@ public interface UavNavigationMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
-    List<UavNavigationMappingInfoDO> selectByUavIdAndNavigationIdIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId,  @Param(value = "status") Integer status);
+    List<UavNavigationMappingDO> selectByUavIdAndNavigationIdIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId, @Param(value = "status") Integer status);
 
     /**
      * 查询总数量
@@ -134,7 +134,7 @@ public interface UavNavigationMappingMapper {
     @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, status, gmt_create, gmt_modify"
             + "VALUES (#{uavNavigationMapping.uavId}, #{uavNavigationMapping.navigationId}, #{uavNavigationMapping.status}, #{uavNavigationMapping.gmtCreate}, #{uavNavigationMapping.gmtModify})")
     @Options(useGeneratedKeys = true, keyProperty = "uavNavigationMapping.id")
-    int insertUavNavigationMapping(@Param(value = "uavNavigationMapping") UavNavigationMappingInfoDO uavNavigationMapping);
+    int insertUavNavigationMapping(@Param(value = "uavNavigationMapping") UavNavigationMappingDO uavNavigationMapping);
 
     /**
      * 根据uavId逻辑删除一条mapping记录
@@ -167,5 +167,5 @@ public interface UavNavigationMappingMapper {
             + "<if test=\"uavNavigationMappingInfo.gmtModify != null\"> gmt_modify = #{uavNavigationMappingInfo.gmtModify} </if>"
             + "</set>"
             + "WHERE uav_id = #{uavNavigationMappingInfo.uavId} </script>")
-    int updateByUavNavigationMapping(@Param(value = "uavNavigationMappingInfo") UavNavigationMappingInfoDO uavNavigationMappingInfo);
+    int updateByUavNavigationMapping(@Param(value = "uavNavigationMappingInfo") UavNavigationMappingDO uavNavigationMappingInfo);
 }
