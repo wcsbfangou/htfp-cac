@@ -15,7 +15,7 @@ public enum ErrorCodeEnum {
     GCS_ID_VALIDATE_FAIL(2003, "地面站编码校验失败"),
     VALIDATE_TIMEOUT(2004, "认证超时"),
     LACK_OF_AUTHORIZATION(2005, "验证码缺失"),
-    LACK_OF_DATA(2006, "时间缺失"),
+    LACK_OF_DATE(2006, "时间缺失"),
     LACK_OF_HEADER_GCS_ID(2007, "请求方编号缺失"),
 
     REQUEST_PARSE_FAIL(3001, "请求体解析失败"),

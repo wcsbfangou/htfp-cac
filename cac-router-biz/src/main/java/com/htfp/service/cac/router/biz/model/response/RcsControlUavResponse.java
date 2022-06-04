@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.List;
 
+
 /**
  * @Author sunjipeng
  * @Date 2022-05-19 20:00
@@ -12,5 +13,5 @@ import java.util.List;
 @Data
 public class RcsControlUavResponse extends BaseResponse {
 
-    private String data;
+    private List<CommandUavResultParam> commandUavResultParamList;
 }

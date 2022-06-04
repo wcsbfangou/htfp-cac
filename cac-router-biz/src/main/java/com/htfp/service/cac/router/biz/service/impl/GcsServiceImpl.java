@@ -22,11 +22,11 @@ import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.model.request.ChangeUavParam;
 import com.htfp.service.cac.router.biz.model.request.ChangeUavStatusParam;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
-import com.htfp.service.cac.router.biz.model.request.GcsChangeUavRequest;
-import com.htfp.service.cac.router.biz.model.request.GcsControlUavRequest;
-import com.htfp.service.cac.router.biz.model.request.SignInRequest;
-import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
-import com.htfp.service.cac.router.biz.model.request.UavStatusChangeRequest;
+import com.htfp.service.cac.router.biz.model.request.GcsChangeUavValidate;
+import com.htfp.service.cac.router.biz.model.request.GcsControlUavValidate;
+import com.htfp.service.cac.router.biz.model.request.SignInValidate;
+import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
+import com.htfp.service.cac.router.biz.model.request.UavStatusChangeValidate;
 import com.htfp.service.cac.router.biz.model.response.BaseResponse;
 import com.htfp.service.cac.router.biz.model.response.GcsChangeUavResponse;
 import com.htfp.service.cac.router.biz.model.response.GcsControlUavResponse;
@@ -74,7 +74,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public SignInResponse gcsSignIn(SignInRequest signInRequest) {
+    public SignInResponse gcsSignIn(SignInValidate signInRequest) {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
@@ -106,7 +106,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public SignOutResponse gcsSignOut(SignOutRequest signOutRequest) {
+    public SignOutResponse gcsSignOut(SignOutValidate signOutRequest) {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
@@ -148,7 +148,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public GcsChangeUavResponse gcsChangeUav(GcsChangeUavRequest gcsChangeUavRequest) {
+    public GcsChangeUavResponse gcsChangeUav(GcsChangeUavValidate gcsChangeUavRequest) {
         GcsChangeUavResponse gcsChangeUavResponse = new GcsChangeUavResponse();
         gcsChangeUavResponse.fail();
         try {
@@ -194,7 +194,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public UavStatusChangeResponse uavStatusChange(UavStatusChangeRequest uavStatusChangeRequest) {
+    public UavStatusChangeResponse uavStatusChange(UavStatusChangeValidate uavStatusChangeRequest) {
         UavStatusChangeResponse uavStatusChangeResponse = new UavStatusChangeResponse();
         uavStatusChangeResponse.fail();
         try {
@@ -243,7 +243,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public GcsControlUavResponse gcsControlUav(GcsControlUavRequest gcsControlUavRequest) {
+    public GcsControlUavResponse gcsControlUav(GcsControlUavValidate gcsControlUavRequest) {
         GcsControlUavResponse gcsControlUavResponse = new GcsControlUavResponse();
         gcsControlUavResponse.fail();
         try {

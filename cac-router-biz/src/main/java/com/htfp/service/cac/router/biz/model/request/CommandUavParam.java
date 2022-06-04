@@ -2,6 +2,7 @@ package com.htfp.service.cac.router.biz.model.request;
 
 import com.htfp.service.cac.common.enums.CommandCodeEnum;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 
 @Data
-public class CommandUavParam implements BaseRequest<ErrorCodeEnum>{
+public class CommandUavParam implements BaseValidate<ErrorCodeEnum> {
 
     private String uavId;
     private String pilotId;

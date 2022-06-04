@@ -4,9 +4,9 @@ import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
 import com.htfp.service.cac.common.utils.JsonUtils;
-import com.htfp.service.cac.router.biz.model.request.RcsControlUavRequest;
-import com.htfp.service.cac.router.biz.model.request.SignInRequest;
-import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
+import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
+import com.htfp.service.cac.router.biz.model.request.SignInValidate;
+import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
 import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
@@ -47,7 +47,7 @@ public class RcsController {
      */
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse rcsSignIn(@RequestBody SignInRequest signInRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse rcsSignIn(@RequestBody SignInValidate signInRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -84,7 +84,7 @@ public class RcsController {
      */
     @RequestMapping(value = "/signOut", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse rcsSignOut(@RequestBody SignOutRequest signOutRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse rcsSignOut(@RequestBody SignOutValidate signOutRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -121,7 +121,7 @@ public class RcsController {
      */
     @RequestMapping(value = "/controlUav", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse rcsControlUav(@RequestBody RcsControlUavRequest rcsControlUavRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse rcsControlUav(@RequestBody RcsControlUavValidate rcsControlUavRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验

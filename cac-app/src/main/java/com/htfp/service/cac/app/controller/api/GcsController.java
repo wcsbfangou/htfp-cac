@@ -47,7 +47,7 @@ public class GcsController {
      */
     @RequestMapping(value = "/signIn", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse gcsSignIn(@RequestBody SignInRequest signInRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse gcsSignIn(@RequestBody SignInValidate signInRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -85,7 +85,7 @@ public class GcsController {
      */
     @RequestMapping(value = "/signOut", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse gcsSignOut(@RequestBody SignOutRequest signOutRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse gcsSignOut(@RequestBody SignOutValidate signOutRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -123,7 +123,7 @@ public class GcsController {
      */
     @RequestMapping(value = "/changeUav", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse gcsChangeUav(@RequestBody GcsChangeUavRequest gcsChangeUavRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse gcsChangeUav(@RequestBody GcsChangeUavValidate gcsChangeUavRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -152,7 +152,7 @@ public class GcsController {
      */
     @RequestMapping(value = "/uavStatusChange", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse uavStatusChange(@RequestBody UavStatusChangeRequest uavStatusChangeRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse uavStatusChange(@RequestBody UavStatusChangeValidate uavStatusChangeRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -181,7 +181,7 @@ public class GcsController {
      */
     @RequestMapping(value = "/controlUav", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse gcsControlUav(@RequestBody GcsControlUavRequest gcsControlUavRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse gcsControlUav(@RequestBody GcsControlUavValidate gcsControlUavRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验

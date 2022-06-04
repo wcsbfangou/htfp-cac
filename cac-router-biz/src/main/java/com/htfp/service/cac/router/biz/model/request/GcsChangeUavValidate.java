@@ -1,6 +1,7 @@
 package com.htfp.service.cac.router.biz.model.request;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -9,14 +10,14 @@ import java.util.List;
 
 /**
  * @Author sunjipeng
- * @Date 2022-05-18 15:07
+ * @Date 2022-05-18 15:03
  */
+
 @Data
-public class RcsControlUavRequest implements BaseRequest<ErrorCodeEnum> {
+public class GcsChangeUavValidate implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
-    private List<CommandUavParam> uavList;
-
+    private List<ChangeUavParam> uavList;
 
     @Override
     public ErrorCodeEnum validate() {
@@ -25,10 +26,10 @@ public class RcsControlUavRequest implements BaseRequest<ErrorCodeEnum> {
         } else if (CollectionUtils.isEmpty(uavList)) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
         } else {
-            for (CommandUavParam commandUavParam : uavList) {
-                ErrorCodeEnum commandUavParamValidateResult = commandUavParam.validate();
-                if (!ErrorCodeEnum.SUCCESS.equals(commandUavParamValidateResult)) {
-                    return commandUavParamValidateResult;
+            for (ChangeUavParam changeUavParam : uavList) {
+                ErrorCodeEnum changeUavParamValidateResult = changeUavParam.validate();
+                if (!ErrorCodeEnum.SUCCESS.equals(changeUavParamValidateResult)) {
+                    return changeUavParamValidateResult;
                 }
             }
             return ErrorCodeEnum.SUCCESS;

@@ -14,9 +14,9 @@ import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
-import com.htfp.service.cac.router.biz.model.request.RcsControlUavRequest;
-import com.htfp.service.cac.router.biz.model.request.SignInRequest;
-import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
+import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
+import com.htfp.service.cac.router.biz.model.request.SignInValidate;
+import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
 import com.htfp.service.cac.router.biz.model.response.BaseResponse;
 import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
@@ -56,7 +56,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public SignInResponse rcsSignIn(SignInRequest signInRequest) {
+    public SignInResponse rcsSignIn(SignInValidate signInRequest) {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
@@ -88,7 +88,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public SignOutResponse rcsSignOut(SignOutRequest signOutRequest) {
+    public SignOutResponse rcsSignOut(SignOutValidate signOutRequest) {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
@@ -125,7 +125,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public RcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest) {
+    public RcsControlUavResponse rcsControlUav(RcsControlUavValidate rcsControlUavRequest) {
         RcsControlUavResponse rcsControlUavResponse = new RcsControlUavResponse();
         rcsControlUavResponse.fail();
         try{

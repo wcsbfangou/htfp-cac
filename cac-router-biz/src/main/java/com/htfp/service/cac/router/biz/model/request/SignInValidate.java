@@ -1,6 +1,7 @@
 package com.htfp.service.cac.router.biz.model.request;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 
 @Data
-public class SignInRequest implements BaseRequest<ErrorCodeEnum> {
+public class SignInValidate implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
     private String gcsIp;

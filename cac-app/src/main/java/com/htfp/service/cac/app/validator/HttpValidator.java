@@ -2,7 +2,7 @@ package com.htfp.service.cac.app.validator;
 
 import com.htfp.service.cac.common.constant.HttpHeaderConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
-import com.htfp.service.cac.router.biz.model.request.BaseRequest;
+import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +36,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
      * @param httpServletRequest
      * @return
      */
-    public ErrorCodeEnum httpRequestValidate (BaseRequest<ErrorCodeEnum> request, HttpServletRequest httpServletRequest) {
+    public ErrorCodeEnum httpRequestValidate (BaseValidate<ErrorCodeEnum> request, HttpServletRequest httpServletRequest) {
         try {
             // 校验请求头
             ErrorCodeEnum headerValidateResult = validate(httpServletRequest);
@@ -138,7 +138,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
         }
         if (StringUtils.isBlank(date)) {
             log.info("验证失败, 请求头date缺失");
-            return ErrorCodeEnum.LACK_OF_DATA;
+            return ErrorCodeEnum.LACK_OF_DATE;
         }
         if (StringUtils.isBlank(gcsId)) {
             log.info("请求头地面站编号缺失");
