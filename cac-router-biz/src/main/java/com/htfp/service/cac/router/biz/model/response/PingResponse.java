@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class PingResponse extends BaseResponse implements BaseValidate<ErrorCodeEnum> {
 
+    private String resultStr;
+
     private String data;
 
     /**

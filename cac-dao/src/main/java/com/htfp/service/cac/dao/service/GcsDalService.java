@@ -1,5 +1,6 @@
 package com.htfp.service.cac.dao.service;
 
+import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
 import com.htfp.service.cac.dao.mapper.mapping.GcsIpMappingMapper;
@@ -41,8 +42,26 @@ public class GcsDalService {
         }
     }
 
+    public List<GcsInfoDO> queryGcsInfo(GcsTypeEnum gcsTypeEnum){
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByTypeId(gcsTypeEnum.getCode());
+        if(CollectionUtils.isNotEmpty(gcsInfoDOList)){
+            return gcsInfoDOList;
+        } else {
+            return null;
+        }
+    }
+
     public GcsIpMappingDO queryGcsIpMapping(Long gcsId){
         List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
+        if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
+            return gcsIpMappingDOList.get(0);
+        } else {
+            return null;
+        }
+    }
+
+    public GcsIpMappingDO queryGcsIpMapping(Long gcsId, MappingStatusEnum mappingStatusEnum){
+        List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsIdAndStatus(gcsId, mappingStatusEnum.getCode());
         if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
             return gcsIpMappingDOList.get(0);
         } else {

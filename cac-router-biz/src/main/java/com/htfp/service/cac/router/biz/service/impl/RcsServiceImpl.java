@@ -41,6 +41,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -144,6 +145,7 @@ public class RcsServiceImpl implements IRcsService {
         RcsControlUavResponse rcsControlUavResponse = new RcsControlUavResponse();
         rcsControlUavResponse.fail();
         try{
+            List<CommandUavResultParam> commandUavResultParamList = new ArrayList<>();
             Long rcsId = Long.valueOf(rcsControlUavRequest.getGcsId());
             for (CommandUavParam commandUavParam : rcsControlUavRequest.getUavList()) {
                 Long uavId = Long.valueOf(commandUavParam.getUavId());
@@ -156,9 +158,13 @@ public class RcsServiceImpl implements IRcsService {
                     if(routerControlUavResponse != null){
                         Boolean controlResult = getControlResult(routerControlUavResponse);
                         if(controlResult != null){
+                            CommandUavResultParam commandUavResultParam = new CommandUavResultParam();
+                            commandUavResultParam.setUavId(commandUavParam.getUavId());
+                            commandUavResultParam.setCommandResult(controlResult);
                             SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), controlResult);
                             SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
                             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
+                                commandUavResultParamList.add(commandUavResultParam);
                                 rcsControlUavResponse.success();
                             } else {
                                 rcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
@@ -175,6 +181,7 @@ public class RcsServiceImpl implements IRcsService {
                     break;
                 }
             }
+            rcsControlUavResponse.setCommandUavResultParamList(commandUavResultParamList);
         } catch (Exception e){
             log.error("远程地面站指控指令执行异常，gcsControlUavRequest={}", rcsControlUavResponse, e);
             rcsControlUavResponse.fail(e.getMessage());
