@@ -12,6 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 @Data
 public class RouterControlUavResponse extends BaseResponse implements BaseValidate<ErrorCodeEnum> {
 
+    private String resultStr;
+
     private String data;
 
     /**

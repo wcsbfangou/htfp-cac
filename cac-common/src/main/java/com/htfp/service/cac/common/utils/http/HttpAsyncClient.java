@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Slf4j
 @Component
-public class HttpClient {
+public class HttpAsyncClient {
 
     protected static final int defaultMaxTotal = 4096;
     protected static final int defaultMaxPerRoute = 256;
@@ -64,15 +64,15 @@ public class HttpClient {
     protected static final String GcsId = "GcsId";
     protected static final String Authorization = "Authorization";
 
-    private HttpClient() {
+    private HttpAsyncClient() {
     }
 
     private static class Holder {
-        private static HttpClient httpClient = new HttpClient();
+        private static HttpAsyncClient httpAsyncClient = new HttpAsyncClient();
     }
 
-    public static HttpClient getInstance() {
-        return Holder.httpClient;
+    public static HttpAsyncClient getInstance() {
+        return Holder.httpAsyncClient;
     }
 
     public static Map<Integer, CloseableHttpAsyncClient> httpClientMap = new ConcurrentHashMap<>();
@@ -167,6 +167,7 @@ public class HttpClient {
                                                   HttpContentWrapper contentWrapper, Map<String, String> httpHeader) throws Exception {
 
         HttpPost httpPost = buildHttpPost(requestUrl, customHttpConfig, contentWrapper);
+        // 添加指定的header
         httpHeader.forEach(httpPost::setHeader);
         return httpPost;
     }
@@ -218,13 +219,6 @@ public class HttpClient {
         // 是否特别制定Authorization
         if (StringUtils.isNotBlank(contentWrapper.getAuthorization())) {
             httpPost.setHeader(Authorization, contentWrapper.getAuthorization());
-        }
-        // 是否加额外的header
-        Map<String, String> headerMap = contentWrapper.getHeaderMap();
-        if (MapUtils.isNotEmpty(headerMap)) {
-            for (Map.Entry<String, String> entry : headerMap.entrySet()) {
-                httpPost.setHeader(entry.getKey(), entry.getValue());
-            }
         }
         return httpPost;
     }

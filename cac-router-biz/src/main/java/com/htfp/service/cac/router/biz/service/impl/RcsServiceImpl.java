@@ -1,10 +1,17 @@
 package com.htfp.service.cac.router.biz.service.impl;
 
+import com.google.common.collect.Maps;
 import com.htfp.service.cac.command.biz.model.response.SaveUavControlLogResponse;
 import com.htfp.service.cac.command.biz.model.resquest.SaveUavControlLogRequest;
 import com.htfp.service.cac.command.biz.service.IUavService;
+import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
+import com.htfp.service.cac.common.constant.HttpUriConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.common.utils.http.CustomHttpConfig;
+import com.htfp.service.cac.common.utils.http.HttpAsyncClient;
+import com.htfp.service.cac.common.utils.http.HttpContentWrapper;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
@@ -13,20 +20,28 @@ import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.cac.router.biz.model.request.ChangeUavParam;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
 import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
+import com.htfp.service.cac.router.biz.model.request.RouterControlUavRequest;
 import com.htfp.service.cac.router.biz.model.request.SignInValidate;
 import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
 import com.htfp.service.cac.router.biz.model.response.BaseResponse;
+import com.htfp.service.cac.router.biz.model.response.CommandUavResultParam;
 import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
+import com.htfp.service.cac.router.biz.model.response.RouterControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.service.IRcsService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -137,15 +152,23 @@ public class RcsServiceImpl implements IRcsService {
                 if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))){
                     UavGcsMappingDO uavGcsMapping = uavDalService.queryUavGcsMapping(uavId);
                     Long gcsId = uavGcsMapping.getGcsId();
-                    GcsIpMappingDO gcsIpMapping = gcsDalService.queryGcsIpMapping(gcsId);
-                    // TODO: 2022/6/1 http 请求
-                    SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), );
-                    SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
-                    if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
-                        rcsControlUavResponse.success();
+                    RouterControlUavResponse routerControlUavResponse = routerControlUav(gcsId, rcsId, commandUavParam);
+                    if(routerControlUavResponse != null){
+                        Boolean controlResult = getControlResult(routerControlUavResponse);
+                        if(controlResult != null){
+                            SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), controlResult);
+                            SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
+                            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
+                                rcsControlUavResponse.success();
+                            } else {
+                                rcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
+                                break;
+                            }
+                        } else {
+                            rcsControlUavResponse.setMessage("请求地面站未获得结果");
+                        }
                     } else {
-                        rcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
-                        break;
+                        rcsControlUavResponse.setMessage("请求地面站异常");
                     }
                 } else {
                     rcsControlUavResponse.fail(response.getCode(), response.getMessage());
@@ -177,7 +200,7 @@ public class RcsServiceImpl implements IRcsService {
         return response;
     }
 
-    SaveUavControlLogRequest buildSaveUavControlLogRequest(Long gcsId, Long rcsId, Long uavId, Long pilotId, Integer commandCode, Boolean commandResult){
+    private SaveUavControlLogRequest buildSaveUavControlLogRequest(Long gcsId, Long rcsId, Long uavId, Long pilotId, Integer commandCode, Boolean commandResult){
         SaveUavControlLogRequest saveUavControlLogRequest = new SaveUavControlLogRequest();
         saveUavControlLogRequest.setGcsId(gcsId);
         saveUavControlLogRequest.setRcsId(rcsId);
@@ -186,5 +209,74 @@ public class RcsServiceImpl implements IRcsService {
         saveUavControlLogRequest.setCommandCode(commandCode);
         saveUavControlLogRequest.setCommandResult(commandResult);
         return saveUavControlLogRequest;
+    }
+
+    private RouterControlUavResponse routerControlUav(Long gcsId, Long rcsId, CommandUavParam commandUavParam){
+        RouterControlUavResponse routerControlUavResponse = null;
+        try{
+            String url = getUrl(gcsId);
+            if(StringUtils.isNotEmpty(url)){
+                RouterControlUavRequest routerControlUavRequest = buildRouterControlUavRequest(rcsId, commandUavParam);
+                HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
+                        .contentObject(JsonUtils.object2Json(routerControlUavRequest, false))
+                        .gcsId(gcsId)
+                        .contentType(HttpContentTypeConstant.JSON_TYPE)
+                        .create();
+                Map<String, String> httpHeader = builderRequestHeader();
+                CustomHttpConfig customHttpConfig = buildCustomHttpConfig();
+                String httpResponse = HttpAsyncClient.getInstance().executePost(url, customHttpConfig, httpContentWrapper, httpHeader);
+                routerControlUavResponse = decodeHttpResponse(httpResponse);
+            }
+        } catch (Exception e){
+            log.error("请求地面站发生异常", e);
+        }
+        return routerControlUavResponse;
+    }
+
+    private String getUrl(Long gcsId){
+        GcsIpMappingDO gcsIpMapping = gcsDalService.queryGcsIpMapping(gcsId);
+        if(gcsIpMapping==null||MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(gcsIpMapping.getStatus()))||gcsIpMapping.getGcsIp()==null){
+            return null;
+        } else {
+            return gcsIpMapping.getGcsIp() + "/" + HttpUriConstant.ROUTER_CONTROL_UAV;
+        }
+    }
+    private RouterControlUavRequest buildRouterControlUavRequest(Long rcsId, CommandUavParam commandUavParam){
+        RouterControlUavRequest routerControlUavRequest = new RouterControlUavRequest();
+        routerControlUavRequest.setGcsId(rcsId.toString());
+        routerControlUavRequest.setUavList(Arrays.asList(commandUavParam));
+        return routerControlUavRequest;
+    }
+
+    public Map<String, String> builderRequestHeader() {
+        Map<String, String> map = Maps.newHashMap();
+        map.put("Accept","application/json");
+        map.put("Content-Type", "application/json;charset=UTF-8");
+        return map;
+    }
+
+    private CustomHttpConfig buildCustomHttpConfig(){
+        return new CustomHttpConfig();
+    }
+
+    private RouterControlUavResponse decodeHttpResponse(String response) throws Exception {
+        if (response==null ||StringUtils.isBlank(response)) {
+            return null;
+        } else {
+            RouterControlUavResponse routerControlUavResponse = JsonUtils.json2ObjectThrowException(response, RouterControlUavResponse.class);
+            routerControlUavResponse.setResultStr(response);
+            return routerControlUavResponse;
+        }
+    }
+    
+    private Boolean getControlResult(RouterControlUavResponse routerControlUavResponse){
+        Boolean result = null;
+        if(routerControlUavResponse.getSuccess()){
+            CommandUavResultParam commandUavResultParam = JsonUtils.json2Object(routerControlUavResponse.getData(), CommandUavResultParam.class);
+            if(commandUavResultParam!=null){
+                return commandUavResultParam.getCommandResult();
+            }
+        }
+        return result;
     }
 }

@@ -11,5 +11,5 @@ import lombok.Data;
 public class CommandUavResultParam {
 
     private String uavId;
-    private boolean commandResult;
+    private Boolean commandResult;
 }
