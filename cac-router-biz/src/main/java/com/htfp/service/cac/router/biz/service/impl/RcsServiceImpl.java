@@ -20,7 +20,6 @@ import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
-import com.htfp.service.cac.router.biz.model.request.ChangeUavParam;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
 import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
 import com.htfp.service.cac.router.biz.model.request.RouterControlUavRequest;
