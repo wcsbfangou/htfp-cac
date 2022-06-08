@@ -21,11 +21,11 @@ import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
-import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
+import com.htfp.service.cac.router.biz.model.request.RcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.request.RouterControlUavRequest;
-import com.htfp.service.cac.router.biz.model.request.SignInValidate;
-import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
-import com.htfp.service.cac.router.biz.model.response.BaseResponse;
+import com.htfp.service.cac.router.biz.model.request.SignInRequest;
+import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
+import com.htfp.service.cac.router.biz.model.BaseResponse;
 import com.htfp.service.cac.router.biz.model.response.CommandUavResultParam;
 import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.RouterControlUavResponse;
@@ -71,7 +71,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public SignInResponse rcsSignIn(SignInValidate signInRequest) {
+    public SignInResponse rcsSignIn(SignInRequest signInRequest) {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
@@ -82,7 +82,7 @@ public class RcsServiceImpl implements IRcsService {
                 if (gcsIpMappingDO != null) {
                     gcsDalService.updateGcsIpMappingIp(gcsIpMappingDO, signInRequest.getGcsIp());
                 } else {
-                    gcsIpMappingDO = gcsDalService.buildNewGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
+                    gcsIpMappingDO = gcsDalService.buildGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
                     gcsDalService.insertGcsIpMapping(gcsIpMappingDO);
                 }
                 signInResponse.success();
@@ -103,7 +103,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public SignOutResponse rcsSignOut(SignOutValidate signOutRequest) {
+    public SignOutResponse rcsSignOut(SignOutRequest signOutRequest) {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
@@ -140,7 +140,7 @@ public class RcsServiceImpl implements IRcsService {
      * @return
      */
     @Override
-    public RcsControlUavResponse rcsControlUav(RcsControlUavValidate rcsControlUavRequest) {
+    public RcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest) {
         RcsControlUavResponse rcsControlUavResponse = new RcsControlUavResponse();
         rcsControlUavResponse.fail();
         try{

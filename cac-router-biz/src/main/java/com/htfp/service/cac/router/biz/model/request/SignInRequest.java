@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 
 @Data
-public class SignInValidate implements BaseValidate<ErrorCodeEnum> {
+public class SignInRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
     private String gcsIp;

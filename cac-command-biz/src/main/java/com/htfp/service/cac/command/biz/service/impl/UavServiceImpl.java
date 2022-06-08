@@ -10,7 +10,6 @@ import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.NavigationStatusEnum;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
-import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.model.log.CommandAndControlLogDO;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
@@ -93,7 +92,7 @@ public class UavServiceImpl implements IUavService {
     }
 
     private void insertUavStatusLog(Long uavId, Long navigationId, Integer status){
-        UavStatusLogDO uavStatusLog = uavDalService.buildNewUavStatusLogDO(uavId, navigationId, status);
+        UavStatusLogDO uavStatusLog = uavDalService.buildUavStatusLogDO(uavId, navigationId, status);
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 

@@ -14,6 +14,6 @@ public class GcsUdpDataTransferServerInboundHandler extends SimpleChannelInbound
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, DatagramPacket packet) throws Exception {
-
+        channelHandlerContext.close();
     }
 }

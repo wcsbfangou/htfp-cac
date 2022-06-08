@@ -1,8 +1,8 @@
 package com.htfp.service.cac.router.biz.service;
 
-import com.htfp.service.cac.router.biz.model.request.RcsControlUavValidate;
-import com.htfp.service.cac.router.biz.model.request.SignInValidate;
-import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
+import com.htfp.service.cac.router.biz.model.request.RcsControlUavRequest;
+import com.htfp.service.cac.router.biz.model.request.SignInRequest;
+import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.response.SignOutResponse;
@@ -18,14 +18,14 @@ public interface IRcsService {
      * @param signInRequest
      * @return
      */
-    SignInResponse rcsSignIn(SignInValidate signInRequest);
+    SignInResponse rcsSignIn(SignInRequest signInRequest);
 
     /**
      * 远程地面站注销
      * @param signOutRequest
      * @return
      */
-    SignOutResponse rcsSignOut(SignOutValidate signOutRequest);
+    SignOutResponse rcsSignOut(SignOutRequest signOutRequest);
 
 
     /**
@@ -33,5 +33,5 @@ public interface IRcsService {
      * @param rcsControlUavRequest
      * @return
      */
-    RcsControlUavResponse rcsControlUav(RcsControlUavValidate rcsControlUavRequest);
+    RcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest);
 }

@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.model.response;
 
+import com.htfp.service.cac.router.biz.model.BaseResponse;
 import lombok.Data;
 
 /**
@@ -7,5 +8,5 @@ import lombok.Data;
  * @Date 2022-05-19 19:54
  */
 @Data
-public class GcsChangeUavResponse extends BaseResponse{
+public class GcsChangeUavResponse extends BaseResponse {
 }

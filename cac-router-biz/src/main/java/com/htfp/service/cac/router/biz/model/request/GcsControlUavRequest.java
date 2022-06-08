@@ -10,14 +10,15 @@ import java.util.List;
 
 /**
  * @Author sunjipeng
- * @Date 2022-05-18 15:03
+ * @Date 2022-05-18 15:06
  */
 
 @Data
-public class GcsChangeUavValidate implements BaseValidate<ErrorCodeEnum> {
+public class GcsControlUavRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
-    private List<ChangeUavParam> uavList;
+    private List<CommandUavParam> uavList;
+
 
     @Override
     public ErrorCodeEnum validate() {
@@ -26,10 +27,10 @@ public class GcsChangeUavValidate implements BaseValidate<ErrorCodeEnum> {
         } else if (CollectionUtils.isEmpty(uavList)) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
         } else {
-            for (ChangeUavParam changeUavParam : uavList) {
-                ErrorCodeEnum changeUavParamValidateResult = changeUavParam.validate();
-                if (!ErrorCodeEnum.SUCCESS.equals(changeUavParamValidateResult)) {
-                    return changeUavParamValidateResult;
+            for (CommandUavParam commandUavParam : uavList) {
+                ErrorCodeEnum commandUavParamValidateResult = commandUavParam.validate();
+                if (!ErrorCodeEnum.SUCCESS.equals(commandUavParamValidateResult)) {
+                    return commandUavParamValidateResult;
                 }
             }
             return ErrorCodeEnum.SUCCESS;

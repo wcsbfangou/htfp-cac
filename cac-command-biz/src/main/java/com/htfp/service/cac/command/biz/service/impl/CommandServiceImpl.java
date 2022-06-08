@@ -75,7 +75,7 @@ public class CommandServiceImpl implements ICommandService {
     }
 
     private void insertUavStatusLog(Long uavId, Long navigationId, Integer status){
-        UavStatusLogDO uavStatusLog = uavDalService.buildNewUavStatusLogDO(uavId, navigationId, status);
+        UavStatusLogDO uavStatusLog = uavDalService.buildUavStatusLogDO(uavId, navigationId, status);
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 

@@ -5,6 +5,7 @@ import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
 import com.htfp.service.cac.dao.mapper.mapping.GcsIpMappingMapper;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
+import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +52,28 @@ public class GcsDalService {
         }
     }
 
+    public int insertGcsInfo(GcsInfoDO gcsInfoDO){
+        return gcsInfoMapper.insertGcsInfo(gcsInfoDO);
+    }
+
+    public int updateGcsInfo(GcsInfoDO gcsInfoDO){
+        return gcsInfoMapper.updateByGcsInfo(gcsInfoDO);
+    }
+
+    public int deleteGcsInfoByGcsId(Long gcsId){
+        return gcsInfoMapper.deleteByGcsId(gcsId);
+    }
+
+    public int deleteGcsInfoById(Long id){
+        return gcsInfoMapper.deleteById(id);
+    }
+
+    public int updateGcsInfoControllableUavType(GcsInfoDO gcsInfoDO, Integer controllableUavType){
+        gcsInfoDO.setControllableUavType(controllableUavType);
+        gcsInfoDO.setGmtModify(new Date());
+        return updateGcsInfo(gcsInfoDO);
+    }
+
     public GcsIpMappingDO queryGcsIpMapping(Long gcsId){
         List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
         if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
@@ -83,7 +106,7 @@ public class GcsDalService {
         updateGcsIpMapping(gcsIpMappingDO);
     }
 
-    public GcsIpMappingDO buildNewGcsIpMappingDO(Long gcsId, String gcsIp) {
+    public GcsIpMappingDO buildGcsIpMappingDO(Long gcsId, String gcsIp) {
         GcsIpMappingDO gcsIpMappingDO = new GcsIpMappingDO();
         gcsIpMappingDO.setGcsId(gcsId);
         gcsIpMappingDO.setGcsIp(gcsIp);
@@ -91,5 +114,17 @@ public class GcsDalService {
         gcsIpMappingDO.setGmtCreate(new Date());
         gcsIpMappingDO.setGmtModify(new Date());
         return gcsIpMappingDO;
+    }
+
+    public GcsInfoDO buildGcsInfoDO(Long gcsId, Integer typeId, Integer controllableUavType, Integer dataLinkType, String token) {
+        GcsInfoDO gcsInfoDO = new GcsInfoDO();
+        gcsInfoDO.setGcsId(gcsId);
+        gcsInfoDO.setTypeId(typeId);
+        gcsInfoDO.setControllableUavType(controllableUavType);
+        gcsInfoDO.setDataLinkType(dataLinkType);
+        gcsInfoDO.setToken(token);
+        gcsInfoDO.setGmtCreate(new Date());
+        gcsInfoDO.setGmtModify(new Date());
+        return gcsInfoDO;
     }
 }

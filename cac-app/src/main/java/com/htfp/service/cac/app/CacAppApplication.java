@@ -36,7 +36,7 @@ public class CacAppApplication implements CommandLineRunner {
 
     @Async
     @Override
-    public void run(String... arg) throws Exception{
+    public void run(String... arg) throws Exception {
         gcsUdpDataTransferServer.startServer();
     }
 }

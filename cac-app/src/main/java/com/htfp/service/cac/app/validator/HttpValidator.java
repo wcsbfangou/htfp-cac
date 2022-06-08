@@ -2,6 +2,8 @@ package com.htfp.service.cac.app.validator;
 
 import com.htfp.service.cac.common.constant.HttpHeaderConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
+import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -10,6 +12,7 @@ import org.apache.http.Consts;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -30,13 +33,36 @@ import java.util.TimeZone;
 @Service
 public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRequest> {
 
+    @Resource
+    GcsDalService gcsDalService;
+
     /**
      * 校验HTTP请求
+     *
+     * @param request
+     * @return
+     */
+    public ErrorCodeEnum httpRequestValidate(BaseValidate<ErrorCodeEnum> request) {
+        try {
+            ErrorCodeEnum requestValidateResult = request.validate();
+            if (!ErrorCodeEnum.SUCCESS.equals(requestValidateResult)) {
+                return requestValidateResult;
+            }
+        } catch (Exception e) {
+            log.error("请求体校验发生异常, request={}，httpServletRequest={}", request, e);
+            return ErrorCodeEnum.UNKNOWN_ERROR;
+        }
+        return ErrorCodeEnum.SUCCESS;
+    }
+
+    /**
+     * 校验HTTP请求
+     *
      * @param request
      * @param httpServletRequest
      * @return
      */
-    public ErrorCodeEnum httpRequestValidate (BaseValidate<ErrorCodeEnum> request, HttpServletRequest httpServletRequest) {
+    public ErrorCodeEnum httpRequestValidate(BaseValidate<ErrorCodeEnum> request, HttpServletRequest httpServletRequest) {
         try {
             // 校验请求头
             ErrorCodeEnum headerValidateResult = validate(httpServletRequest);
@@ -57,6 +83,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
 
     /**
      * 参数校验
+     *
      * @param request
      * @return
      */
@@ -83,6 +110,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
 
     /**
      * 校验authorization
+     *
      * @param authorization
      * @param date
      * @param gcsId
@@ -98,7 +126,10 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
             if (!gcsId.equals(requestGcsId)) {
                 return ErrorCodeEnum.GCS_ID_VALIDATE_FAIL;
             }
-            // TODO: 2022/5/20 获取gcsToken
+            GcsInfoDO gcsInfoDO = gcsDalService.queryGcsInfo(Long.valueOf(gcsId));
+            if (gcsInfoDO != null) {
+                gcsToken = gcsInfoDO.getToken();
+            }
         } catch (Exception e) {
             log.error("查询地面站信息异常，gcsId={}", gcsId, e);
             return ErrorCodeEnum.UNKNOWN_ERROR;
@@ -126,6 +157,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
 
     /**
      * 校验请求头参数
+     *
      * @param authorization
      * @param date
      * @param gcsId
@@ -162,6 +194,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
 
     /**
      * 数据加密
+     *
      * @param content
      * @param secretKey
      * @return

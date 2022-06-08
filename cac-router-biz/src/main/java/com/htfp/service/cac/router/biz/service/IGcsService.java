@@ -14,33 +14,33 @@ public interface IGcsService {
      * @param signInRequest
      * @return
      */
-    SignInResponse gcsSignIn(SignInValidate signInRequest);
+    SignInResponse gcsSignIn(SignInRequest signInRequest);
 
     /**
      * 地面站注销
      * @param signOutRequest
      * @return
      */
-    SignOutResponse gcsSignOut(SignOutValidate signOutRequest);
+    SignOutResponse gcsSignOut(SignOutRequest signOutRequest);
 
     /**
      * 地面站在控无人机变更
      * @param gcsChangeUavRequest
      * @return
      */
-    GcsChangeUavResponse gcsChangeUav(GcsChangeUavValidate gcsChangeUavRequest);
+    GcsChangeUavResponse gcsChangeUav(GcsChangeUavRequest gcsChangeUavRequest);
 
     /**
      * 无人机状态变更
      * @param uavStatusChangeRequest
      * @return
      */
-    UavStatusChangeResponse uavStatusChange(UavStatusChangeValidate uavStatusChangeRequest);
+    UavStatusChangeResponse uavStatusChange(UavStatusChangeRequest uavStatusChangeRequest);
 
     /**
      * 地面站指控指令执行
      * @param gcsControlUavRequest
      * @return
      */
-    GcsControlUavResponse gcsControlUav(GcsControlUavValidate gcsControlUavRequest);
+    GcsControlUavResponse gcsControlUav(GcsControlUavRequest gcsControlUavRequest);
 }

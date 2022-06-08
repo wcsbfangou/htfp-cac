@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.model.response;
 
+import com.htfp.service.cac.router.biz.model.BaseResponse;
 import lombok.Data;
 
 import java.util.List;

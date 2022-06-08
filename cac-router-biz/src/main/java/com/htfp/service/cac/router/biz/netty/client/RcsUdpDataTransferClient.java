@@ -1,7 +1,6 @@
 package com.htfp.service.cac.router.biz.netty.client;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;

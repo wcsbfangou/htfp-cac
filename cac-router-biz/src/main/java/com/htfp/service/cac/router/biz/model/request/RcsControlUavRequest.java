@@ -13,7 +13,7 @@ import java.util.List;
  * @Date 2022-05-18 15:07
  */
 @Data
-public class RcsControlUavValidate implements BaseValidate<ErrorCodeEnum> {
+public class RcsControlUavRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
     private List<CommandUavParam> uavList;

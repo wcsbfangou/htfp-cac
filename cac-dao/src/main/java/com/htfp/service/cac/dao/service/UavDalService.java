@@ -109,6 +109,32 @@ public class UavDalService {
         }
     }
 
+    public List<UavInfoDO> queryUavInfo(Integer typeId){
+        return uavInfoMapper.selectByTypeId(typeId);
+    }
+
+    public int insertUavInfo(UavInfoDO uavInfoDO){
+        return uavInfoMapper.insertUavInfo(uavInfoDO);
+    }
+
+    public int updateUavInfo(UavInfoDO uavInfoDO){
+        return uavInfoMapper.updateByUavInfo(uavInfoDO);
+    }
+
+    public int deleteUavInfoByUavId(Long uavId){
+        return uavInfoMapper.deleteByUavId(uavId);
+    }
+
+    public int deleteUavInfoById(Long id){
+        return uavInfoMapper.deleteById(id);
+    }
+
+    public int updateUavInfoTypeId(UavInfoDO uavInfoDO, Integer typeId){
+        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
     public UavNavigationMappingDO queryUavNavigationMapping(Long uavId){
         List<UavNavigationMappingDO> uavNavigationMappingDOList = uavNavigationMappingMapper.selectByUavId(uavId);
         if(CollectionUtils.isNotEmpty(uavNavigationMappingDOList)){
@@ -147,7 +173,7 @@ public class UavDalService {
         return commandAndControlLogMapper.insertCommandAndControlLog(commandAndControlLogDO);
     }
 
-    public UavStatusLogDO buildNewUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {
+    public UavStatusLogDO buildUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {
         UavStatusLogDO uavStatusLogDO  = new UavStatusLogDO();
         uavStatusLogDO.setUavId(uavId);
         uavStatusLogDO.setNavigationId(navigationId);
@@ -157,7 +183,7 @@ public class UavDalService {
         return uavStatusLogDO;
     }
 
-    public UavGcsMappingDO buildNewUavGcsMappingDO(Long uavId, Long gcsId, MappingStatusEnum status) {
+    public UavGcsMappingDO buildUavGcsMappingDO(Long uavId, Long gcsId, MappingStatusEnum status) {
         UavGcsMappingDO uavGcsMappingDO  = new UavGcsMappingDO();
         uavGcsMappingDO.setUavId(uavId);
         uavGcsMappingDO.setGcsId(gcsId);
@@ -190,5 +216,14 @@ public class UavDalService {
         commandAndControlLogDO.setGmtCreate(new Date());
         commandAndControlLogDO.setGmtModify(new Date());
         return commandAndControlLogDO;
+    }
+
+    public UavInfoDO buildUavInfoDO(Long uavId, Integer typeId){
+        UavInfoDO uavInfoDO = new UavInfoDO();
+        uavInfoDO.setUavId(uavId);
+        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setGmtCreate(new Date());
+        uavInfoDO.setGmtModify(new Date());
+        return uavInfoDO;
     }
 }

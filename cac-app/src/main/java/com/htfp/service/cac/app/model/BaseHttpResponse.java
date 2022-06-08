@@ -82,11 +82,11 @@ public class BaseHttpResponse {
         this.data = data;
     }
 
-    public static  BaseHttpResponse success() {
+    public static BaseHttpResponse success() {
         return new BaseHttpResponse(true);
     }
 
-    public static  BaseHttpResponse success(String data) {
+    public static BaseHttpResponse success(String data) {
         return new BaseHttpResponse(true, data);
     }
 
@@ -94,7 +94,7 @@ public class BaseHttpResponse {
         return new BaseHttpResponse(false, errorCodeEnum);
     }
 
-    public static  BaseHttpResponse fail(ErrorCodeEnum errorCodeEnum, String data) {
+    public static BaseHttpResponse fail(ErrorCodeEnum errorCodeEnum, String data) {
         return new BaseHttpResponse(false, errorCodeEnum, data);
     }
 

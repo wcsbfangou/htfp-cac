@@ -22,12 +22,12 @@ import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.model.request.ChangeUavParam;
 import com.htfp.service.cac.router.biz.model.request.ChangeUavStatusParam;
 import com.htfp.service.cac.router.biz.model.request.CommandUavParam;
-import com.htfp.service.cac.router.biz.model.request.GcsChangeUavValidate;
-import com.htfp.service.cac.router.biz.model.request.GcsControlUavValidate;
-import com.htfp.service.cac.router.biz.model.request.SignInValidate;
-import com.htfp.service.cac.router.biz.model.request.SignOutValidate;
-import com.htfp.service.cac.router.biz.model.request.UavStatusChangeValidate;
-import com.htfp.service.cac.router.biz.model.response.BaseResponse;
+import com.htfp.service.cac.router.biz.model.request.GcsChangeUavRequest;
+import com.htfp.service.cac.router.biz.model.request.GcsControlUavRequest;
+import com.htfp.service.cac.router.biz.model.request.SignInRequest;
+import com.htfp.service.cac.router.biz.model.request.SignOutRequest;
+import com.htfp.service.cac.router.biz.model.request.UavStatusChangeRequest;
+import com.htfp.service.cac.router.biz.model.BaseResponse;
 import com.htfp.service.cac.router.biz.model.response.GcsChangeUavResponse;
 import com.htfp.service.cac.router.biz.model.response.GcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.response.SignInResponse;
@@ -74,7 +74,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public SignInResponse gcsSignIn(SignInValidate signInRequest) {
+    public SignInResponse gcsSignIn(SignInRequest signInRequest) {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
@@ -85,7 +85,7 @@ public class GcsServiceImpl implements IGcsService {
                 if (gcsIpMappingDO != null) {
                     gcsDalService.updateGcsIpMappingIp(gcsIpMappingDO, signInRequest.getGcsIp());
                 } else {
-                    gcsIpMappingDO = gcsDalService.buildNewGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
+                    gcsIpMappingDO = gcsDalService.buildGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
                     gcsDalService.insertGcsIpMapping(gcsIpMappingDO);
                 }
                 signInResponse.success();
@@ -106,7 +106,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public SignOutResponse gcsSignOut(SignOutValidate signOutRequest) {
+    public SignOutResponse gcsSignOut(SignOutRequest signOutRequest) {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
@@ -148,7 +148,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public GcsChangeUavResponse gcsChangeUav(GcsChangeUavValidate gcsChangeUavRequest) {
+    public GcsChangeUavResponse gcsChangeUav(GcsChangeUavRequest gcsChangeUavRequest) {
         GcsChangeUavResponse gcsChangeUavResponse = new GcsChangeUavResponse();
         gcsChangeUavResponse.fail();
         try {
@@ -194,7 +194,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public UavStatusChangeResponse uavStatusChange(UavStatusChangeValidate uavStatusChangeRequest) {
+    public UavStatusChangeResponse uavStatusChange(UavStatusChangeRequest uavStatusChangeRequest) {
         UavStatusChangeResponse uavStatusChangeResponse = new UavStatusChangeResponse();
         uavStatusChangeResponse.fail();
         try {
@@ -243,7 +243,7 @@ public class GcsServiceImpl implements IGcsService {
      * @return
      */
     @Override
-    public GcsControlUavResponse gcsControlUav(GcsControlUavValidate gcsControlUavRequest) {
+    public GcsControlUavResponse gcsControlUav(GcsControlUavRequest gcsControlUavRequest) {
         GcsControlUavResponse gcsControlUavResponse = new GcsControlUavResponse();
         gcsControlUavResponse.fail();
         try {
@@ -342,7 +342,7 @@ public class GcsServiceImpl implements IGcsService {
         if (uavGcsMapping != null) {
             uavDalService.updateUavGcsMappingGcsId(uavGcsMapping, gcsId, MappingStatusEnum.VALID);
         } else {
-            uavGcsMapping = uavDalService.buildNewUavGcsMappingDO(uavId, gcsId, MappingStatusEnum.VALID);
+            uavGcsMapping = uavDalService.buildUavGcsMappingDO(uavId, gcsId, MappingStatusEnum.VALID);
             uavDalService.insertUavGcsMapping(uavGcsMapping);
         }
     }

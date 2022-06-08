@@ -1,4 +1,4 @@
-package com.htfp.service.cac.router.biz.model.response;
+package com.htfp.service.cac.router.biz.model;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import lombok.Data;
