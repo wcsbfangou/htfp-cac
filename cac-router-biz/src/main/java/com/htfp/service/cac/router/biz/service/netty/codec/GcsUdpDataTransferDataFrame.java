@@ -1,6 +1,5 @@
 package com.htfp.service.cac.router.biz.service.netty.codec;
 
-
 import lombok.Data;
 
 /**
@@ -10,5 +9,16 @@ import lombok.Data;
 @Data
 public class GcsUdpDataTransferDataFrame implements BaseDataFrame {
 
+    private short magicCode;
+    private byte version;
+    private byte serializationAlgorithm;
+    private byte type;
+    private byte gcsIdLength;
+    private String gcsId;
+    private byte gcsTokenLength;
+    private String gcsToken;
+    private short sequenceId;
+    private int length;
+    private String data;
 
 }

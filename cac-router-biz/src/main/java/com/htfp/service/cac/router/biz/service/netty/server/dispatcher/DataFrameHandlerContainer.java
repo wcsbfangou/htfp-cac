@@ -17,7 +17,7 @@ import java.util.Map;
 public class DataFrameHandlerContainer implements InitializingBean {
 
     /**
-     * 消息类型与 MessageHandler 的映射
+     * 消息类型与 DataFrameHandler 的映射
      */
     private final Map<String, IDataFrameHandler> handlers = new HashMap<>();
 
@@ -36,15 +36,15 @@ public class DataFrameHandlerContainer implements InitializingBean {
     }
 
     /**
-     * 获得类型对应的 MessageHandler
+     * 获得类型对应的 DataFrameHandler
      *
      * @param type 类型
-     * @return MessageHandler
+     * @return DataFrameHandler
      */
-    public IDataFrameHandler getMessageHandler(String type) {
+    public IDataFrameHandler getDataFrameHandler(String type) {
         IDataFrameHandler handler = handlers.get(type);
         if (handler == null) {
-            throw new IllegalArgumentException(String.format("类型(%s) 找不到匹配的 MessageHandler 处理器", type));
+            throw new IllegalArgumentException(String.format("类型(%s) 找不到匹配的 DataFrameHandler 处理器", type));
         }
         return handler;
     }

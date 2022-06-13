@@ -1,9 +1,9 @@
 package com.htfp.service.cac.router.biz.service.netty.server.dispatcher;
 
 
+import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDataFrame;
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
-import com.htfp.service.cac.router.biz.service.netty.server.dispatcher.DataFrameHandlerContainer;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -22,12 +22,13 @@ public class GcsUdpDataFrameDispatcher extends SimpleChannelInboundHandler<GcsUd
     @Resource
     private DataFrameHandlerContainer dataFrameHandlerContainer;
 
-    private final ExecutorService executor =  Executors.newFixedThreadPool(200);
+    private final ExecutorService executor = Executors.newFixedThreadPool(200);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, GcsUdpDataTransferDataFrame gcsUdpDataTransferDataFrame) throws Exception {
-        // 获得 type 对应的 MessageHandler 处理器
-        IDataFrameHandler dataFrameHandler = dataFrameHandlerContainer.getMessageHandler(getDataType(gcsUdpDataTransferDataFrame));
+        // 获得 type 对应的 DataFrameHandler 处理器
+        String dataFrameType = getDataFrameType(gcsUdpDataTransferDataFrame);
+        IDataFrameHandler dataFrameHandler = dataFrameHandlerContainer.getDataFrameHandler(dataFrameType);
         // 执行逻辑
         executor.submit(new Runnable() {
 
@@ -40,7 +41,12 @@ public class GcsUdpDataFrameDispatcher extends SimpleChannelInboundHandler<GcsUd
         });
     }
 
-    private String getDataType(GcsUdpDataTransferDataFrame gcsUdpDataTransferDataFrame){
-        return null;
+    private String getDataFrameType(GcsUdpDataTransferDataFrame gcsUdpDataTransferDataFrame) {
+        DataFrameTypeEnum dataFrameTypeEnum = DataFrameTypeEnum.getFromMagicCodeAndType(gcsUdpDataTransferDataFrame.getMagicCode(), gcsUdpDataTransferDataFrame.getType());
+        if (dataFrameTypeEnum != null) {
+            return dataFrameTypeEnum.getName();
+        } else {
+            return null;
+        }
     }
 }

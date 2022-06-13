@@ -1,12 +1,12 @@
 package com.htfp.service.cac.router.biz.service.netty.handler;
 
+import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDecoder;
+import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferEncoder;
+import com.htfp.service.cac.router.biz.service.netty.handler.common.NettyServerHandler;
 import com.htfp.service.cac.router.biz.service.netty.server.dispatcher.GcsUdpDataFrameDispatcher;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.dns.DatagramDnsQueryDecoder;
-import io.netty.handler.codec.dns.DatagramDnsQueryEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 
@@ -28,9 +28,9 @@ public class GcsUdpDataTransferServerHandlerInitializer extends ChannelInitializ
         ChannelPipeline channelPipeline = ch.pipeline();
         channelPipeline
                 // 编码器
-                .addLast(new DatagramDnsQueryEncoder())
+                .addLast(new GcsUdpDataTransferEncoder())
                 // 解码器
-                .addLast(new DatagramDnsQueryDecoder())
+                .addLast(new GcsUdpDataTransferDecoder())
                 // 消息分发器
                 .addLast(gcsUdpDataFrameDispatcher)
                 // 服务端处理器

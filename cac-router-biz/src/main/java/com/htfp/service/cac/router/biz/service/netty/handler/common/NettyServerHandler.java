@@ -1,4 +1,4 @@
-package com.htfp.service.cac.router.biz.service.netty.handler;
+package com.htfp.service.cac.router.biz.service.netty.handler.common;
 
 import com.htfp.service.cac.router.biz.service.netty.server.NettyChannelManager;
 import io.netty.channel.ChannelHandler;

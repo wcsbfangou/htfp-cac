@@ -44,24 +44,6 @@ public class NettyChannelManager {
     }
 
     /**
-     * 添加指定用户到 {@link #userChannels} 中
-     *
-     * @param channel Channel
-     * @param user 用户
-     */
-    public void addUser(Channel channel, String user) {
-        Channel existChannel = channels.get(channel.id());
-        if (existChannel == null) {
-            log.error("[addUser][连接({}) 不存在]", channel.id());
-            return;
-        }
-        // 设置属性
-        channel.attr(CHANNEL_ATTR_KEY_USER).set(user);
-        // 添加到 userChannels
-        userChannels.put(user, channel);
-    }
-
-    /**
      * 将 Channel 从 {@link #channels} 和 {@link #userChannels} 中移除
      *
      * @param channel Channel
@@ -74,6 +56,35 @@ public class NettyChannelManager {
             userChannels.remove(channel.attr(CHANNEL_ATTR_KEY_USER).get());
         }
         log.info("[remove][一个连接({})离开]", channel.id());
+    }
+
+    /**
+     * 添加指定用户到 {@link #userChannels} 中
+     *
+     * @param user 用户
+     * @param channel Channel
+     */
+    public void addUser(String user, Channel channel) {
+        Channel existChannel = channels.get(channel.id());
+        if (existChannel == null) {
+            log.error("[addUser][连接({}) 不存在]", channel.id());
+            return;
+        }
+        // 设置属性
+        channel.attr(CHANNEL_ATTR_KEY_USER).set(user);
+        // 添加到 userChannels
+        userChannels.put(user, channel);
+    }
+
+    /**
+     * 将 Channel 从 {@link #userChannels} 中移除
+     *
+     * @param user String
+     */
+    public void removeUser(String user) {
+        // 移除 userChannels
+        userChannels.remove(user);
+        log.info("[remove][一个用户连接({})离开]", user);
     }
 
     /**
