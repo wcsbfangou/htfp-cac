@@ -22,6 +22,7 @@ public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
         in.markReaderIndex();
         // 判断是否大于最小长度
         if (in.readableBytes() <= UdpDataFrameConstant.DATA_FRAME_MIN_LENGTH) {
+            log.error("[decode][连接({}) 解析消息失败，数据可读长度小于数据帧最小长度in={}]", ctx.channel().id(), in.toString());
             return;
         }
         gcsUdpDataTransferDataFrame.setMagicCode(in.readShort());
@@ -33,6 +34,7 @@ public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
         int gcsIdLength = Byte.toUnsignedInt(gcsIdLengthByte);
         if (in.readableBytes() < gcsIdLength) {
             in.resetReaderIndex();
+            log.error("[decode][连接({}) 解析消息失败，数据剩余可读长度小于gcsId长度，in={}]", ctx.channel().id(), in.toString());
             return;
         }
         byte[] gcsIdByteArray = new byte[gcsIdLength];
@@ -44,6 +46,7 @@ public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
         int gcsTokenLength = Byte.toUnsignedInt(gcsTokenLengthByte);
         if (in.readableBytes() < gcsTokenLength) {
             in.resetReaderIndex();
+            log.error("[decode][连接({}) 解析消息失败，数据剩余可读长度小于gcsToken长度，in={}]", ctx.channel().id(), in.toString());
             return;
         }
         byte[] gcsTokenByteArray = new byte[gcsTokenLength];
@@ -60,6 +63,7 @@ public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
         }
         if (in.readableBytes() < dataLength) {
             in.resetReaderIndex();
+            log.error("[decode][连接({}) 解析消息失败，数据剩余可读长度小于data长度，in={}]", ctx.channel().id(), in.toString());
             return;
         }
         byte[] dataByteArray = new byte[dataLength];

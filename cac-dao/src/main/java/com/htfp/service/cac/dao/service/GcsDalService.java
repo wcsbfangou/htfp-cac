@@ -45,6 +45,17 @@ public class GcsDalService {
         return false;
     }
 
+    public boolean validateGcsToken(Long gcsId, String gcsToken){
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
+        if(CollectionUtils.isNotEmpty(gcsInfoDOList)){
+            if(gcsInfoDOList.get(0).getToken().equals(gcsToken) &&
+                    GcsTypeEnum.GCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public GcsInfoDO queryGcsInfo(Long gcsId){
         List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
         if(CollectionUtils.isNotEmpty(gcsInfoDOList)){

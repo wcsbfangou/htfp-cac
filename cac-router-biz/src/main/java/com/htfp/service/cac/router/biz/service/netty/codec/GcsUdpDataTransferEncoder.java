@@ -13,19 +13,21 @@ import lombok.extern.slf4j.Slf4j;
 public class GcsUdpDataTransferEncoder extends MessageToByteEncoder<GcsUdpDataTransferDataFrame> {
     @Override
     protected void encode(ChannelHandlerContext ctx, GcsUdpDataTransferDataFrame dataFrame, ByteBuf out) throws Exception {
-        out.writeShort(dataFrame.getMagicCode());
-        out.writeByte(dataFrame.getVersion());
-        out.writeByte(dataFrame.getSerializationAlgorithm());
-        out.writeByte(dataFrame.getType());
-        out.writeByte(dataFrame.getGcsIdLength());
-        out.writeBytes(dataFrame.getGcsId().getBytes(), 0, dataFrame.getGcsIdLength());
-        out.writeByte(dataFrame.getGcsTokenLength());
-        out.writeBytes(dataFrame.getGcsToken().getBytes(), 0, dataFrame.getGcsTokenLength());
-        out.writeShort(dataFrame.getSequenceId());
-        out.writeInt(dataFrame.getLength());
-        out.writeBytes(dataFrame.getData().getBytes());
-        // TODO: 2022/6/13 测试之后记得删除此log
-        log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
+        if (dataFrame != null) {
+            out.writeShort(dataFrame.getMagicCode());
+            out.writeByte(dataFrame.getVersion());
+            out.writeByte(dataFrame.getSerializationAlgorithm());
+            out.writeByte(dataFrame.getType());
+            out.writeByte(dataFrame.getGcsIdLength());
+            out.writeBytes(dataFrame.getGcsId().getBytes(), 0, dataFrame.getGcsIdLength());
+            out.writeByte(dataFrame.getGcsTokenLength());
+            out.writeBytes(dataFrame.getGcsToken().getBytes(), 0, dataFrame.getGcsTokenLength());
+            out.writeShort(dataFrame.getSequenceId());
+            out.writeInt(dataFrame.getLength());
+            out.writeBytes(dataFrame.getData().getBytes());
+            // TODO: 2022/6/13 测试之后记得删除此log
+            log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
+        }
     }
 
 }

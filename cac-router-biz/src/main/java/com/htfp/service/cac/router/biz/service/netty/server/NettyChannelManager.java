@@ -84,7 +84,7 @@ public class NettyChannelManager {
     public void removeUser(String user) {
         // 移除 userChannels
         userChannels.remove(user);
-        log.info("[remove][一个用户连接({})离开]", user);
+        log.info("[removeUser][一个用户连接({})离开]", user);
     }
 
     /**
@@ -116,11 +116,27 @@ public class NettyChannelManager {
     public void sendAll(BaseDataFrame dataFrame) {
         for (Channel channel : channels.values()) {
             if (!channel.isActive()) {
-                log.error("[send][连接({})未激活]", channel.id());
+                log.error("[sendALL][连接({})未激活]", channel.id());
                 return;
             }
             // 发送消息
             channel.writeAndFlush(dataFrame);
+        }
+    }
+
+    /**
+     * 向所有用户发送消息
+     *
+     * @param dataFrame 消息体
+     */
+    public void sendAllUser(BaseDataFrame dataFrame) {
+        for (Channel userChannel : userChannels.values()) {
+            if (!userChannel.isActive()) {
+                log.error("[sendAllUser][连接({})未激活]", userChannel.id());
+                return;
+            }
+            // 发送消息
+            userChannel.writeAndFlush(dataFrame);
         }
     }
 }

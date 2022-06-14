@@ -28,15 +28,17 @@ public class DataTransferCancelSubscribeHandler implements IDataFrameHandler<Gcs
 
     @Override
     public void execute(Channel channel, GcsUdpDataTransferDataFrame dataFrame) {
-        Long rcsId = Long.valueOf(dataFrame.getGcsId());
-        String rcsToken = dataFrame.getGcsToken();
-        if(gcsDalService.validateRcsToken(rcsId, rcsToken)){
-            // 将用户和 Channel 绑定
-            nettyChannelManager.removeUser(dataFrame.getGcsId());
-        } else {
-            dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
+        if (dataFrame != null) {
+            Long rcsId = Long.valueOf(dataFrame.getGcsId());
+            String rcsToken = dataFrame.getGcsToken();
+            if (gcsDalService.validateRcsToken(rcsId, rcsToken)) {
+                // 将用户和 Channel 解绑
+                nettyChannelManager.removeUser(dataFrame.getGcsId());
+            } else {
+                dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
+            }
+            channel.writeAndFlush(dataFrame);
         }
-        channel.writeAndFlush(dataFrame);
     }
 
     @Override

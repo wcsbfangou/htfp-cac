@@ -28,15 +28,17 @@ public class DataTransferSubscribeHandler implements IDataFrameHandler<GcsUdpDat
 
     @Override
     public void execute(Channel channel, GcsUdpDataTransferDataFrame dataFrame) {
-        Long rcsId = Long.valueOf(dataFrame.getGcsId());
-        String rcsToken = dataFrame.getGcsToken();
-        if(gcsDalService.validateRcsToken(rcsId, rcsToken)){
-            // 将用户和 Channel 绑定
-            nettyChannelManager.addUser(dataFrame.getGcsId(), channel);
-        } else {
-            dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
+        if (dataFrame != null) {
+            Long rcsId = Long.valueOf(dataFrame.getGcsId());
+            String rcsToken = dataFrame.getGcsToken();
+            if (gcsDalService.validateRcsToken(rcsId, rcsToken)) {
+                // 将用户和 Channel 绑定
+                nettyChannelManager.addUser(dataFrame.getGcsId(), channel);
+            } else {
+                dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
+            }
+            channel.writeAndFlush(dataFrame);
         }
-        channel.writeAndFlush(dataFrame);
     }
 
     @Override
