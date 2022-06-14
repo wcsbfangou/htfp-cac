@@ -24,9 +24,9 @@ public class RouterControlUavResponse extends BaseResponse implements BaseValida
      */
     @Override
     public ErrorCodeEnum validate() {
-        if(StringUtils.isBlank(data)){
+        if (StringUtils.isBlank(data)) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
-        }else {
+        } else {
             return ErrorCodeEnum.SUCCESS;
         }
     }

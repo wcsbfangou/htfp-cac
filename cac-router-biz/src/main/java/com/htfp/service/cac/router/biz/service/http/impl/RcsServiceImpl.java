@@ -47,6 +47,7 @@ import java.util.Objects;
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 15:15
+ * @Description 远程地面站服务类
  */
 @Slf4j
 @Service
@@ -75,9 +76,12 @@ public class RcsServiceImpl implements IRcsService {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
+            log.info("远程地面站注册start，signRequest={}", signInRequest);
             final Long gcsId = Long.getLong(signInRequest.getGcsId());
+            // 校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
             if (validateGcsIdResult) {
+                // 更新或插入地面站与Ip的mapping关系表
                 GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
                 if (gcsIpMappingDO != null) {
                     gcsDalService.updateGcsIpMappingIp(gcsIpMappingDO, signInRequest.getGcsIp());
@@ -89,6 +93,7 @@ public class RcsServiceImpl implements IRcsService {
             } else {
                 signInResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
             }
+            log.info("远程地面站注册end，signRequest={}，signInResponse={}", signInRequest, signInResponse);
         } catch (Exception e) {
             log.error("远程地面站注册异常，signRequest={}", signInRequest, e);
             signInResponse.fail(e.getMessage());
@@ -107,14 +112,19 @@ public class RcsServiceImpl implements IRcsService {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
+            log.info("远程地面站注销start，signOutRequest={}", signOutRequest);
             final Long gcsId = Long.getLong(signOutRequest.getGcsId());
+            //校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
             if (validateGcsIdResult) {
+                // 地面站下线
                 GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
                 if (gcsIpMappingDO != null) {
+                    //(1)校验gcs与Ip的mapping关系
                     if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
                         signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
                     } else {
+                        //(2)校验通过后更新gcs与Ip的mapping关系
                         gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
                         gcsIpMappingDO.setGmtModify(new Date());
                         gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
@@ -126,6 +136,7 @@ public class RcsServiceImpl implements IRcsService {
             } else {
                 signOutResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
             }
+            log.info("远程地面站注销end，signOutRequest={},signOutResponse={}", signOutRequest, signOutResponse);
         } catch (Exception e) {
             log.error("远程地面站注销异常，signOutRequest={}", signOutRequest, e);
             signOutResponse.fail(e.getMessage());
@@ -144,23 +155,32 @@ public class RcsServiceImpl implements IRcsService {
         RcsControlUavResponse rcsControlUavResponse = new RcsControlUavResponse();
         rcsControlUavResponse.fail();
         try{
+            log.info("远程地面站指控指令执行start，gcsControlUavRequest={}", rcsControlUavRequest);
             List<CommandUavResultParam> commandUavResultParamList = new ArrayList<>();
             Long rcsId = Long.valueOf(rcsControlUavRequest.getGcsId());
+            // 遍历uavList进行处理
             for (CommandUavParam commandUavParam : rcsControlUavRequest.getUavList()) {
                 Long uavId = Long.valueOf(commandUavParam.getUavId());
                 Long pilotId = Long.valueOf(commandUavParam.getPilotId());
+                //(1)校验可控无人机类型
                 BaseResponse response = validateControlType(uavId, rcsId, pilotId);
                 if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))){
+                    //(2)查询无人机与地面站Mapping关系
                     UavGcsMappingDO uavGcsMapping = uavDalService.queryUavGcsMapping(uavId);
                     Long gcsId = uavGcsMapping.getGcsId();
+                    //(3)向地面站发起指控命令HTTP请求
                     RouterControlUavResponse routerControlUavResponse = routerControlUav(gcsId, rcsId, commandUavParam);
                     if(routerControlUavResponse != null){
+                        //(4)根据响应体判断结果
                         Boolean controlResult = getControlResult(routerControlUavResponse);
                         if(controlResult != null){
+                            //(5)构造响应结果
                             CommandUavResultParam commandUavResultParam = new CommandUavResultParam();
                             commandUavResultParam.setUavId(commandUavParam.getUavId());
                             commandUavResultParam.setCommandResult(controlResult);
+                            //(6)构造请求体
                             SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), controlResult);
+                            //(7)调用指控模块接口，更新指控记录日志
                             SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
                             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
                                 commandUavResultParamList.add(commandUavResultParam);
@@ -181,8 +201,9 @@ public class RcsServiceImpl implements IRcsService {
                 }
             }
             rcsControlUavResponse.setCommandUavResultParamList(commandUavResultParamList);
+            log.info("远程地面站指控指令执行end，gcsControlUavRequest={}，rcsControlUavResponse={}", rcsControlUavRequest, rcsControlUavResponse);
         } catch (Exception e){
-            log.error("远程地面站指控指令执行异常，gcsControlUavRequest={}", rcsControlUavResponse, e);
+            log.error("远程地面站指控指令执行异常，gcsControlUavRequest={}", rcsControlUavRequest, e);
             rcsControlUavResponse.fail(e.getMessage());
         }
         return rcsControlUavResponse;

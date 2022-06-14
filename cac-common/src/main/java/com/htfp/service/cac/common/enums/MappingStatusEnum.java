@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.enums;
 /**
  * @Author sunjipeng
  * @Date 2022-05-25 21:25
+ * @Description Mapping关系的Status枚举
  */
 public enum MappingStatusEnum {
 

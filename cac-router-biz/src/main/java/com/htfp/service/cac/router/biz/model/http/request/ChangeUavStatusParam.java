@@ -18,9 +18,9 @@ public class ChangeUavStatusParam implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if(StringUtils.isBlank(uavId)){
+        if (StringUtils.isBlank(uavId)) {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
-        }else if(UavStatusEnum.getFromCode(uavStatus)==null){
+        } else if (UavStatusEnum.getFromCode(uavStatus) == null) {
             return ErrorCodeEnum.LACK_OF_UAV_STATUS;
         } else {
             return ErrorCodeEnum.SUCCESS;

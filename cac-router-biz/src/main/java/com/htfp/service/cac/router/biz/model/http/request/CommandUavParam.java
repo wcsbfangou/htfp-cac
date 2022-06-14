@@ -21,11 +21,11 @@ public class CommandUavParam implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if(StringUtils.isBlank(uavId)){
+        if (StringUtils.isBlank(uavId)) {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
-        }else if(StringUtils.isBlank(pilotId)){
+        } else if (StringUtils.isBlank(pilotId)) {
             return ErrorCodeEnum.LACK_OF_PILOT_ID;
-        } else if(CommandCodeEnum.getFromCode(commandCode) == null){
+        } else if (CommandCodeEnum.getFromCode(commandCode) == null) {
             return ErrorCodeEnum.LACK_OF_COMMAND_CODE;
         } else {
             return ErrorCodeEnum.SUCCESS;

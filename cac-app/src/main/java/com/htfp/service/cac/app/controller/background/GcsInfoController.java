@@ -35,6 +35,12 @@ public class GcsInfoController {
     @Resource
     private GcsDalService gcsDalService;
 
+    /**
+     * 根据gcsId查询gcs信息
+     *
+     * @param gcsId
+     * @return
+     */
     @RequestMapping(value = "/queryGcsInfoByGcsId", method = RequestMethod.POST)
     @ResponseBody
     public QueryGcsInfoResponse queryGcsByGcsId(@RequestParam(value = "gcsId") String gcsId) {
@@ -61,6 +67,13 @@ public class GcsInfoController {
         return queryGcsInfoResponse;
     }
 
+    /**
+     * 更新gcs可控无人机类型
+     *
+     * @param gcsId
+     * @param controllableUavType
+     * @return
+     */
     @RequestMapping(value = "/updateGcsInfoControllableUavType", method = RequestMethod.POST)
     @ResponseBody
     public boolean updateGcsInfoControllableUavType(@RequestParam(value = "gcsId") String gcsId, @RequestParam(value = "controllableUavType") Integer controllableUavType) {
@@ -79,13 +92,18 @@ public class GcsInfoController {
         return result;
     }
 
+    /**
+     * 插入gcs信息
+     *
+     * @param gcsInfoRequest
+     * @return
+     */
     @RequestMapping(value = "/insertGcsInfo", method = RequestMethod.POST)
     @ResponseBody
     public boolean insertGcsInfo(@RequestBody GcsInfoRequest gcsInfoRequest) {
         boolean result = false;
         try {
             if (ErrorCodeEnum.SUCCESS.equals(httpValidator.httpRequestValidate(gcsInfoRequest))) {
-                // TODO: 2022/6/8 生成gcsToken
                 generateGcsToken(gcsInfoRequest);
                 GcsInfoDO gcsInfo = gcsDalService.buildGcsInfoDO(Long.valueOf(gcsInfoRequest.getGcsId()), gcsInfoRequest.getTypeId(), gcsInfoRequest.getControllableUavType(), gcsInfoRequest.getDataLinkType(), gcsInfoRequest.getToken());
                 int id = gcsDalService.insertGcsInfo(gcsInfo);
@@ -99,6 +117,12 @@ public class GcsInfoController {
         return result;
     }
 
+    /**
+     * 根据gcsId删除gcs信息
+     *
+     * @param gcsId
+     * @return
+     */
     @RequestMapping(value = "/deleteGcsInfoByGcsId", method = RequestMethod.POST)
     @ResponseBody
     public boolean deleteGcsInfoByGcsId(@RequestParam(value = "gcsId") String gcsId) {
@@ -117,6 +141,12 @@ public class GcsInfoController {
         return result;
     }
 
+    /**
+     * 根据gcsId使用base64编码生成对应的token
+     *
+     * @param gcsInfoRequest
+     * @throws UnsupportedEncodingException
+     */
     private void generateGcsToken(GcsInfoRequest gcsInfoRequest) throws UnsupportedEncodingException {
         String gcsToken = Base64.getEncoder().encodeToString(gcsInfoRequest.getGcsId().getBytes("UTF-8"));
         gcsInfoRequest.setToken(gcsToken);

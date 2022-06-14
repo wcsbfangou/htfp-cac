@@ -12,6 +12,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 14:26
+ * @Description 地面站数据透传解码器
  */
 @Slf4j
 public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {

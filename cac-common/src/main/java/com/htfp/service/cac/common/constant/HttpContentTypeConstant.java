@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.constant;
 /**
  * @Author sunjipeng
  * @Date 2022-06-05 19:23
+ * @Description HTTP请求体相关
  */
 public class HttpContentTypeConstant {
 

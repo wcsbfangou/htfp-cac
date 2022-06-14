@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 21:28
+ * @Description Gcs与Ip的mapping关系表Mapper
  */
 
 @Mapper
@@ -113,7 +114,7 @@ public interface GcsIpMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND gcs_ip = #{gcsIp} AND status = #{status} AND is_del = 0")
-    List<GcsIpMappingDO> selectByGcsIdAndGcsIpAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "gcsIp") String gcsIp,  @Param(value = "status") String status);
+    List<GcsIpMappingDO> selectByGcsIdAndGcsIpAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "gcsIp") String gcsIp, @Param(value = "status") String status);
 
     /**
      * 查询总数量

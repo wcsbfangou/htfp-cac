@@ -7,6 +7,7 @@ package com.htfp.service.cac.router.biz.model;
 public interface BaseValidate<T> {
     /**
      * 参数校验
+     *
      * @return
      */
     T validate();

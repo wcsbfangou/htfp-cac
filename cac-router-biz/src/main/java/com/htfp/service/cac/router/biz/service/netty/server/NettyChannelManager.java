@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 16:22
+ * @Description channel管理
  */
 @Slf4j
 @Component
@@ -27,7 +28,7 @@ public class NettyChannelManager {
      */
     private ConcurrentMap<ChannelId, Channel> channels = new ConcurrentHashMap<>();
     /**
-     * 用户与 Channel 的映射。
+     * 订阅用户与 Channel 的映射。
      *
      * 通过它，可以获取用户对应的 Channel。这样，我们可以向指定用户发送消息。
      */
@@ -88,7 +89,7 @@ public class NettyChannelManager {
     }
 
     /**
-     * 向指定用户发送消息
+     * 向指定订阅用户发送消息
      *
      * @param user 用户
      * @param dataFrame 消息体
@@ -125,7 +126,7 @@ public class NettyChannelManager {
     }
 
     /**
-     * 向所有用户发送消息
+     * 向所有订阅用户发送消息
      *
      * @param dataFrame 消息体
      */

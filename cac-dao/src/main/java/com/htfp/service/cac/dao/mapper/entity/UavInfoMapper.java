@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 16:42
+ * @Description 无人机静态信息表Mapper
  */
 @Mapper
 @Repository
@@ -23,6 +24,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据id查询
+     *
      * @param id
      * @return
      */
@@ -31,6 +33,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据uavId查询
+     *
      * @param uavId
      * @return
      */
@@ -39,6 +42,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据uavIdList查询
+     *
      * @param uavIdList
      * @return
      */
@@ -53,6 +57,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据typeId查询
+     *
      * @param typeId
      * @return
      */
@@ -61,6 +66,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据uavId && TypeId查询
+     *
      * @param uavId
      * @param typeId
      * @return
@@ -70,6 +76,7 @@ public interface UavInfoMapper {
 
     /**
      * 查询总数量
+     *
      * @return
      */
     @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
@@ -78,6 +85,7 @@ public interface UavInfoMapper {
 
     /**
      * 插入uavInfo数据
+     *
      * @param uavInfo
      * @return
      */
@@ -88,6 +96,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据uavId逻辑删除一条无人机记录
+     *
      * @param uavId
      * @return
      */
@@ -96,6 +105,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据id逻辑删除一条无人机记录
+     *
      * @param id
      * @return
      */
@@ -104,6 +114,7 @@ public interface UavInfoMapper {
 
     /**
      * 根据uavId更改typeId
+     *
      * @param typeId
      * @param uavId
      * @return

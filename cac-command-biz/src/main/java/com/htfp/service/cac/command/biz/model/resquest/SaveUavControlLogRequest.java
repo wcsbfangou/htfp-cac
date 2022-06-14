@@ -5,6 +5,7 @@ import lombok.Data;
 /**
  * @Author sunjipeng
  * @Date 2022-06-01 18:15
+ * @Description 保存无人机指控日志请求体
  */
 
 @Data

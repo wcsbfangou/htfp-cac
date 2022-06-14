@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 /**
  * @Author sunjipeng
  * @Date 2022-05-31 23:08
+ * @Description 指控服务
  */
 @Slf4j
 @Service
@@ -40,33 +41,41 @@ public class CommandServiceImpl implements ICommandService {
     public GcsChangeControlUavResponse gcsChangeUav(GcsChangeControlUavRequest gcsChangeControlUavRequest) {
         GcsChangeControlUavResponse gcsChangeControlUavResponse = new GcsChangeControlUavResponse();
         gcsChangeControlUavResponse.fail();
-        try{
+        try {
+            log.info("地面站在控无人机变更start，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest);
             Long navigationId;
             // TODO: 2022/6/1 事务
-            if(gcsChangeControlUavRequest.getNewArrival()){
+            // 判断是否为新启动的无人机
+            if (gcsChangeControlUavRequest.getNewArrival()) {
                 // TODO: 2022/6/1 IDC ID && 机器ID
-                navigationId = SnowflakeIdUtils.generateSnowFlakeId(1,1);
+                // 生成navigationId
+                navigationId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
+                // 插入一条新的uavStatusLog
                 insertUavStatusLog(gcsChangeControlUavRequest.getUavId(), navigationId, gcsChangeControlUavRequest.getUavStatus());
+                // 插入或更新Uav与Navigation的Mapping关系
                 insertOrUpdateUavNavigationMapping(gcsChangeControlUavRequest.getUavId(), navigationId);
-            }else{
+            } else {
+                //校验无人机是否结束航行或未开始航行
                 UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(gcsChangeControlUavRequest.getUavId());
-                 if(uavNavigationMapping==null|| MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))) {
-                     gcsChangeControlUavResponse.fail("无人机已结束航行或未开始航行");
-                     return gcsChangeControlUavResponse;
-                 }
-                 navigationId = uavNavigationMapping.getNavigationId();
+                if (uavNavigationMapping == null || MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))) {
+                    gcsChangeControlUavResponse.fail("无人机已结束航行或未开始航行");
+                    return gcsChangeControlUavResponse;
+                }
+                navigationId = uavNavigationMapping.getNavigationId();
             }
+            // NavigationLog表插入一条log
             insertNavigationLog(navigationId, gcsChangeControlUavRequest.getUavId(), gcsChangeControlUavRequest.getGcsId(), gcsChangeControlUavRequest.getMasterPilotId(), gcsChangeControlUavRequest.getDeputyPilotId(), NavigationStatusEnum.PROGRESSING);
-        } catch (Exception e){
+            log.info("地面站在控无人机变更end，gcsChangeControlUavRequest={}，gcsChangeControlUavResponse={}", gcsChangeControlUavRequest, gcsChangeControlUavResponse);
+        } catch (Exception e) {
             log.error("地面站在控无人机变更异常，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest, e);
             gcsChangeControlUavResponse.fail(e.getMessage());
         }
         return gcsChangeControlUavResponse;
     }
 
-    public void insertOrUpdateUavNavigationMapping(Long uavId, Long navigationId){
+    public void insertOrUpdateUavNavigationMapping(Long uavId, Long navigationId) {
         UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(uavId);
-        if(uavNavigationMapping!=null) {
+        if (uavNavigationMapping != null) {
             uavDalService.updateUavNavigationMappingNavigationId(uavNavigationMapping, navigationId, MappingStatusEnum.VALID);
         } else {
             uavNavigationMapping = uavDalService.buildUavNavigationMappingDO(uavId, navigationId, MappingStatusEnum.VALID);
@@ -74,12 +83,12 @@ public class CommandServiceImpl implements ICommandService {
         }
     }
 
-    private void insertUavStatusLog(Long uavId, Long navigationId, Integer status){
+    private void insertUavStatusLog(Long uavId, Long navigationId, Integer status) {
         UavStatusLogDO uavStatusLog = uavDalService.buildUavStatusLogDO(uavId, navigationId, status);
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 
-    private void insertNavigationLog(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnum navigationStatusEnum){
+    private void insertNavigationLog(Long navigationId, Long uavId, Long gcsId, Long masterPilotId, Long deputyPilotId, NavigationStatusEnum navigationStatusEnum) {
         NavigationLogDO navigationLogDO = navigationDalService.buildNavigationLogDO(navigationId, uavId, gcsId, masterPilotId, deputyPilotId, navigationStatusEnum);
         navigationDalService.insertNavigationLog(navigationLogDO);
     }

@@ -28,6 +28,7 @@ import java.util.TimeZone;
 /**
  * @Author sunjipeng
  * @Date 2022-05-18 15:59
+ * @Description 校验http请求
  */
 @Slf4j
 @Service
@@ -37,7 +38,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
     GcsDalService gcsDalService;
 
     /**
-     * 校验HTTP请求
+     * 校验HTTP请求体
      *
      * @param request
      * @return
@@ -56,7 +57,7 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
     }
 
     /**
-     * 校验HTTP请求
+     * 校验HTTP请求体&&请求头
      *
      * @param request
      * @param httpServletRequest

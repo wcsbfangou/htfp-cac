@@ -5,6 +5,7 @@ import lombok.Data;
 /**
  * @Author sunjipeng
  * @Date 2022-06-10 16:50
+ * @Description 地面站数据透传数据帧
  */
 @Data
 public class GcsUdpDataTransferDataFrame implements BaseDataFrame {

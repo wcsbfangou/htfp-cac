@@ -28,6 +28,7 @@ import java.util.Map;
 /**
  * @Author sunjipeng
  * @Date 2022-06-06 11:31
+ * @Description 远程地面站探活定时任务
  */
 @Slf4j
 public class RcsPingJob extends QuartzJobBean {
@@ -40,21 +41,22 @@ public class RcsPingJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         List<GcsInfoDO> rcsInfoDOList = gcsDalService.queryGcsInfo(GcsTypeEnum.RCS);
-        if(CollectionUtils.isNotEmpty(rcsInfoDOList)){
+        if (CollectionUtils.isNotEmpty(rcsInfoDOList)) {
             for (GcsInfoDO rcsInfoDO : rcsInfoDOList) {
                 GcsIpMappingDO rcsIpMapping = gcsDalService.queryGcsIpMapping(rcsInfoDO.getGcsId(), MappingStatusEnum.VALID);
-                if(rcsIpMapping!=null){
+                if (rcsIpMapping != null) {
+                    // TODO: 2022/6/14 报警
                     boolean pingResult = pingRcs(rcsIpMapping.getGcsId(), rcsIpMapping.getGcsIp());
                 }
             }
         }
     }
 
-    private boolean pingRcs(Long rcsId, String rcsIp){
+    private boolean pingRcs(Long rcsId, String rcsIp) {
         boolean result = false;
-        try{
+        try {
             String url = getUrl(rcsIp);
-            if(StringUtils.isNotEmpty(url)){
+            if (StringUtils.isNotEmpty(url)) {
                 PingRequest pingRequest = buildPingRequest(rcsId);
                 HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
                         .contentObject(JsonUtils.object2Json(pingRequest, false))
@@ -65,21 +67,21 @@ public class RcsPingJob extends QuartzJobBean {
                 CustomHttpConfig customHttpConfig = buildCustomHttpConfig();
                 String httpResponse = HttpAsyncClient.getInstance().executePost(url, customHttpConfig, httpContentWrapper, httpHeader);
                 PingResponse pingResponse = decodeHttpResponse(httpResponse);
-                if(pingResponse.getSuccess()){
+                if (pingResponse.getSuccess()) {
                     result = generateEchoToken(rcsId).equals(pingResponse.getData());
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("请求地面站发生异常", e);
         }
         return result;
     }
 
-    private String getUrl(String rcsIp){
+    private String getUrl(String rcsIp) {
         return rcsIp + "/" + HttpUriConstant.RCS_PING;
     }
 
-    private PingRequest buildPingRequest(Long rcsId){
+    private PingRequest buildPingRequest(Long rcsId) {
         PingRequest pingRequest = new PingRequest();
         pingRequest.setGcsId(rcsId.toString());
         pingRequest.setEchoToken(generateEchoToken(rcsId));
@@ -88,17 +90,17 @@ public class RcsPingJob extends QuartzJobBean {
 
     public Map<String, String> builderRequestHeader() {
         Map<String, String> map = Maps.newHashMap();
-        map.put("Accept","application/json");
+        map.put("Accept", "application/json");
         map.put("Content-Type", "application/json;charset=UTF-8");
         return map;
     }
 
-    private CustomHttpConfig buildCustomHttpConfig(){
+    private CustomHttpConfig buildCustomHttpConfig() {
         return new CustomHttpConfig();
     }
 
     private PingResponse decodeHttpResponse(String response) throws Exception {
-        if (response==null ||StringUtils.isBlank(response)) {
+        if (response == null || StringUtils.isBlank(response)) {
             return null;
         } else {
             PingResponse pingResponse = JsonUtils.json2ObjectThrowException(response, PingResponse.class);
@@ -107,7 +109,7 @@ public class RcsPingJob extends QuartzJobBean {
         }
     }
 
-    private String generateEchoToken(Long rcsId){
+    private String generateEchoToken(Long rcsId) {
         return RCS_ECHO_TOKEN + rcsId.toString();
     }
 }

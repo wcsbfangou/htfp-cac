@@ -5,6 +5,7 @@ import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 /**
  * @Author sunjipeng
  * @Date 2022-05-18 14:55
+ * @Description http响应基类
  */
 public class BaseHttpResponse {
 

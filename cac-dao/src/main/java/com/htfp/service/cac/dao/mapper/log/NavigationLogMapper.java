@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-25 14:28
+ * @Description 飞行日志表Mapper
  */
 
 @Mapper

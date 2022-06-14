@@ -25,9 +25,9 @@ public class PingResponse extends BaseResponse implements BaseValidate<ErrorCode
      */
     @Override
     public ErrorCodeEnum validate() {
-        if(StringUtils.isBlank(data)){
+        if (StringUtils.isBlank(data)) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
-        }else {
+        } else {
             return ErrorCodeEnum.SUCCESS;
         }
     }

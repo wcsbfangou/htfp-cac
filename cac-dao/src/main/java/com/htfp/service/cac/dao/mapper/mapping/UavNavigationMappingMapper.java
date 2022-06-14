@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 22:09
+ * @Description Uav与Navigation的mapping关系表Mapper
  */
 
 @Mapper

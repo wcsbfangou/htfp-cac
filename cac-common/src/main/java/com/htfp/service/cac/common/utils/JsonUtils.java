@@ -18,6 +18,7 @@ import java.util.Map;
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 19:52
+ * @Description Jackson序列化工具类
  */
 @Slf4j
 public class JsonUtils {

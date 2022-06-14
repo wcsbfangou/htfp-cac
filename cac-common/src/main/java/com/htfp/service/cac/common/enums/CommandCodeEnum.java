@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.enums;
 /**
  * @Author sunjipeng
  * @Date 2022-05-19 9:38
+ * @Description 指控指令枚举
  */
 public enum CommandCodeEnum {
 
@@ -106,7 +107,7 @@ public enum CommandCodeEnum {
     GIMBAL_PITCH_PLUS(15003, "俯仰+"),
     GIMBAL_PITCH_MINUS(15004, "俯仰-"),
     GIMBAL_SCAN(15005, "扫描"),
-    GIMBAL_LOCK(15006,"锁定"),
+    GIMBAL_LOCK(15006, "锁定"),
     GIMBAL_RESET(15007, "复位"),
     GIMBAL_ZOOM_IN(15008, "变焦拉近"),
     GIMBAL_ZOOM_OUT(15009, "变焦推远"),
@@ -126,7 +127,7 @@ public enum CommandCodeEnum {
     POD_CHANNEL_ONE(19003, "吊舱通道1"),
     POD_CHANNEL_TWO(19004, "吊舱通道2"),
     IMAGE_STITCHING_0_3(19005, "0-3号图像拼接"),
-    IMAGE_STITCHING_4_6(19006,"4-6号图像拼接"),
+    IMAGE_STITCHING_4_6(19006, "4-6号图像拼接"),
     RECORD_ON(19007, "记录"),
     RECORD_OFF(19008, "停止记录"),
     ERASE_DATA(19009, "清空数据"),
@@ -139,7 +140,7 @@ public enum CommandCodeEnum {
     TASK_MANAGER_POWER_ON(20003, "任管供电开"),
     TASK_MANAGER_POWER_OFF(20004, "任管供电关"),
     SATELLITE_CHANNEL_ONE_ON(20005, "卫通Ⅰ开"),
-    SATELLITE_CHANNEL_ONE_OFF(20006,"卫通Ⅰ关"),
+    SATELLITE_CHANNEL_ONE_OFF(20006, "卫通Ⅰ关"),
     VOICE_RADIO_ON(20007, "语音电台开"),
     VOICE_RADIO_OFF(20008, "语音电台关"),
     TRANSPONDER_ON(20009, "应答机开"),
@@ -152,7 +153,7 @@ public enum CommandCodeEnum {
     OIL_DRAIN_ON(21003, "放油开"),
     OIL_DRAIN_OFF(21004, "放油关"),
     AIR_INTAKE_FILTER_OFF(21005, "进气道过滤网关"),
-    AIR_INTAKE_FILTER_ON(21006,"进气道过滤网开"),
+    AIR_INTAKE_FILTER_ON(21006, "进气道过滤网开"),
     FUEL_MANAGEMENT_EXPERT_MODE_ON(21007, "燃油管理专家模式进入"),
     FUEL_MANAGEMENT_EXPERT_MODE_OFF(21008, "燃油管理专家模式退出"),
     FIRE_EXTINGUISH_ENABLE_OFF(21009, "灭火使能关"),
@@ -164,7 +165,7 @@ public enum CommandCodeEnum {
     RELEASE_SHUT_DOWN(21015, "解除关车"),
     AIR_RESTART(21016, "空中再启动"),
     NO_REMOTE_COMMAND(21017, "无遥控指令"),
-    PITCH_PLUS(21018,"桨距增"),
+    PITCH_PLUS(21018, "桨距增"),
     PITCH_MINUS(21019, "桨距减"),
     FISH_SCALES_PLATE_ON(21020, "鱼鳞板开"),
     FISH_SCALES_PLATE_OFF(21021, "鱼鳞板关"),

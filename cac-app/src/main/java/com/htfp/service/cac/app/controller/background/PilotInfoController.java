@@ -34,6 +34,12 @@ public class PilotInfoController {
     private PilotDalService pilotDalService;
 
 
+    /**
+     * 根据pilotId查询pilot信息
+     *
+     * @param pilotId
+     * @return
+     */
     @RequestMapping(value = "/queryPilotInfoByPilotId", method = RequestMethod.POST)
     @ResponseBody
     public QueryPilotInfoResponse queryPilotByPilotId(@RequestParam(value = "pilotId") String pilotId) {
@@ -58,6 +64,13 @@ public class PilotInfoController {
         return queryPilotInfoResponse;
     }
 
+    /**
+     * 更新pilot可控无人机类型
+     *
+     * @param pilotId
+     * @param controllableUavType
+     * @return
+     */
     @RequestMapping(value = "/updatePilotInfoControllableUavType", method = RequestMethod.POST)
     @ResponseBody
     public boolean updatePilotInfoControllableUavType(@RequestParam(value = "pilotId") String pilotId, @RequestParam(value = "controllableUavType") Integer controllableUavType) {
@@ -76,6 +89,12 @@ public class PilotInfoController {
         return result;
     }
 
+    /**
+     * 插入pilot信息
+     *
+     * @param pilotInfoRequest
+     * @return
+     */
     @RequestMapping(value = "/insertPilotInfo", method = RequestMethod.POST)
     @ResponseBody
     public boolean insertPilotInfo(@RequestBody PilotInfoRequest pilotInfoRequest) {
@@ -94,6 +113,12 @@ public class PilotInfoController {
         return result;
     }
 
+    /**
+     * 根据pilotId删除pilot信息
+     *
+     * @param pilotId
+     * @return
+     */
     @RequestMapping(value = "/deletePilotInfoByPilotId", method = RequestMethod.POST)
     @ResponseBody
     public boolean deletePilotInfoByPilotId(@RequestParam(value = "pilotId") String pilotId) {

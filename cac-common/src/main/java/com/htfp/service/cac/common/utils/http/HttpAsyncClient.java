@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @Author sunjipeng
  * @Date 2022-06-02 16:25
+ * @Description 异步HTTPClient
  */
 @Slf4j
 @Component

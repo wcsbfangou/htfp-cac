@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.enums;
 /**
  * @Author sunjipeng
  * @Date 2022-05-18 16:39
+ * @Description 返回体失败类型枚举
  */
 public enum ErrorCodeEnum {
 

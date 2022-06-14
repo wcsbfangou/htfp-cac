@@ -15,6 +15,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 17:53
+ * @Description 驾驶员静态信息表Mapper
  */
 @Mapper
 @Repository
@@ -24,6 +25,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据Id查询
+     *
      * @param id
      * @return
      */
@@ -32,6 +34,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotId查询
+     *
      * @param pilotId
      * @return
      */
@@ -40,6 +43,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotIdList查询
+     *
      * @param pilotIdList
      * @return
      */
@@ -54,6 +58,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotName查询
+     *
      * @param pilotName
      * @return
      */
@@ -62,6 +67,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据controllableUavType查询
+     *
      * @param controllableUavType
      * @return
      */
@@ -70,6 +76,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotId && controllableUavType
+     *
      * @param pilotId
      * @param controllableUavType
      * @return
@@ -79,6 +86,7 @@ public interface PilotInfoMapper {
 
     /**
      * 查询总数量
+     *
      * @return
      */
     @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
@@ -87,6 +95,7 @@ public interface PilotInfoMapper {
 
     /**
      * 插入pilotInfo数据
+     *
      * @param pilotInfo
      * @return
      */
@@ -97,6 +106,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotId逻辑删除一条驾驶员记录
+     *
      * @param pilotId
      * @return
      */
@@ -105,6 +115,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据id逻辑删除一条驾驶员记录
+     *
      * @param id
      * @return
      */
@@ -113,6 +124,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotId更改controllableUavType
+     *
      * @param controllableUavType
      * @param pilotId
      * @return
@@ -122,6 +134,7 @@ public interface PilotInfoMapper {
 
     /**
      * 根据pilotId更改pilotName
+     *
      * @param pilotName
      * @param pilotId
      * @return

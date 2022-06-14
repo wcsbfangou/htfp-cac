@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * @Author sunjipeng
  * @Date 2022-05-12 14:02
+ * @Description 启动类
  */
 
 @SpringBootApplication(exclude = {

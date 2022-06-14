@@ -18,6 +18,7 @@ import java.util.Objects;
 /**
  * @Author sunjipeng
  * @Date 2022-06-04 17:35
+ * @Description 日期工具类
  */
 @Slf4j
 public class DateUtils {
@@ -99,14 +100,17 @@ public class DateUtils {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return dateFormat.format(date);
     }
+
     public static String date2Str24H(Date date) {
         DateFormat dateFormat = new SimpleDateFormat(NORMAL_PATTERN);
         return dateFormat.format(date);
     }
+
     public static String date2Str(Date date) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         return dateFormat.format(date);
     }
+
     public static String date2Str(Date date, String pattern) {
         DateFormat dateFormat = new SimpleDateFormat(pattern);
         return dateFormat.format(date);
@@ -135,13 +139,13 @@ public class DateUtils {
         return new Date(dateMillSeconds);
     }
 
-    public static Date getSecondAfter(Date date , int secondAfter) {
+    public static Date getSecondAfter(Date date, int secondAfter) {
         long secondMillSeconds = date.getTime() + 1000L * secondAfter;
         return new Date(secondMillSeconds);
     }
 
-    public static Date getMinuteAfter(Date date , int minuteAfter) {
-        long hourMillSeconds = date.getTime() + 1000L * 60 * minuteAfter ;
+    public static Date getMinuteAfter(Date date, int minuteAfter) {
+        long hourMillSeconds = date.getTime() + 1000L * 60 * minuteAfter;
         return new Date(hourMillSeconds);
     }
 
@@ -160,7 +164,7 @@ public class DateUtils {
         return cal.getTime();
     }
 
-    public static String getNormalDateString(Long time){
+    public static String getNormalDateString(Long time) {
         if (time == null) {
             return null;
         }
@@ -176,7 +180,7 @@ public class DateUtils {
         long time1 = cal.getTimeInMillis();
         cal.setTime(startDate);
         long time2 = cal.getTimeInMillis();
-        long betweenDays = (time1-time2)/(1000*3600*24);
+        long betweenDays = (time1 - time2) / (1000 * 3600 * 24);
         return Integer.parseInt(String.valueOf(betweenDays));
     }
 
@@ -187,18 +191,19 @@ public class DateUtils {
         return Days.daysBetween(start, end).getDays();
     }
 
-    public static Date getHourAfter(Date date , int hourAfter) {
-        long hourMillSeconds = date.getTime() + 1000L * 3600 * hourAfter ;
+    public static Date getHourAfter(Date date, int hourAfter) {
+        long hourMillSeconds = date.getTime() + 1000L * 3600 * hourAfter;
         return new Date(hourMillSeconds);
     }
 
-    public static Date getHourBefore(Date date, int hourBefore){
-        long hourMillSeconds = date.getTime() - 1000L * 3600 * hourBefore ;
+    public static Date getHourBefore(Date date, int hourBefore) {
+        long hourMillSeconds = date.getTime() - 1000L * 3600 * hourBefore;
         return new Date(hourMillSeconds);
     }
 
     /**
      * 判断日期是否是有效格式
+     *
      * @param date
      * @return
      */
@@ -244,6 +249,7 @@ public class DateUtils {
 
     /**
      * 不同格式的日期字符串转换
+     *
      * @param sourceDateString
      * @param sourcePattern
      * @param targetPattern
@@ -293,7 +299,7 @@ public class DateUtils {
         return null;
     }
 
-    public static Integer getDateInt (Date date) {
+    public static Integer getDateInt(Date date) {
         if (Objects.isNull(date)) {
             return 0;
         }
@@ -301,10 +307,10 @@ public class DateUtils {
         return StringUtils.isBlank(dateStr) ? 0 : Integer.valueOf(dateStr);
     }
 
-    public static boolean checkDateIsBeofreToday (Date date) {
+    public static boolean checkDateIsBeofreToday(Date date) {
         Date today = today();
 
-        if(date.before(today)){
+        if (date.before(today)) {
             return true;
         }
 

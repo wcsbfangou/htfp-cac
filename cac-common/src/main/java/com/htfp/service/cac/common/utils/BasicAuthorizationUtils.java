@@ -16,6 +16,7 @@ import java.util.TimeZone;
 /**
  * @Author sunjipeng
  * @Date 2022-06-02 18:09
+ * @Description 请求头加密校验工具类
  */
 @Slf4j
 public class BasicAuthorizationUtils {

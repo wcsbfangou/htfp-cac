@@ -11,17 +11,18 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @Author sunjipeng
  * @Date 2022-06-06 14:45
+ * @Description 定时任务
  */
 @Configuration
 public class QuartzConfig {
 
     @Bean
-    public JobDetail gcsPingJobQuartz(){
+    public JobDetail gcsPingJobQuartz() {
         return JobBuilder.newJob(GcsPingJob.class).withIdentity("gcsPingJob").storeDurably().build();
     }
 
     @Bean
-    public Trigger gcsPingJobQuartzTrigger(){
+    public Trigger gcsPingJobQuartzTrigger() {
         return TriggerBuilder.newTrigger().forJob(gcsPingJobQuartz())
                 .withIdentity("gcsPingJob")
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ? "))
@@ -29,12 +30,12 @@ public class QuartzConfig {
     }
 
     @Bean
-    public JobDetail rcsPingJobQuartz(){
+    public JobDetail rcsPingJobQuartz() {
         return JobBuilder.newJob(RcsPingJob.class).withIdentity("rcsPingJob").storeDurably().build();
     }
 
     @Bean
-    public Trigger rcsPingJobQuartzTrigger(){
+    public Trigger rcsPingJobQuartzTrigger() {
         return TriggerBuilder.newTrigger().forJob(rcsPingJobQuartz())
                 .withIdentity("rcsPingJob")
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ? "))

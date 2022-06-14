@@ -5,51 +5,77 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @Author sunjipeng
  * @Date 2022-06-01 13:36
+ * @Description 雪花算法工具类
  */
 @Slf4j
 public class SnowflakeIdUtils {
 
-    /** 开始时间截 */
+    /**
+     * 开始时间截
+     */
     private static final long twepoch = 0L;
 
-    /** 机器id所占的位数 */
+    /**
+     * 机器id所占的位数
+     */
     private static final long workerIdBits = 5L;
 
-    /** 数据标识id所占的位数 */
+    /**
+     * 数据标识id所占的位数
+     */
     private static final long dataCenterIdBits = 5L;
 
-    /** 序列在id中占的位数 */
+    /**
+     * 序列在id中占的位数
+     */
     private static final long sequenceBits = 12L;
 
-    /** 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数) */
+    /**
+     * 支持的最大机器id，结果是31 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
+     */
     private static final long maxWorkerId = -1L ^ (-1L << 5L);
 
-    /** 支持的最大数据标识id，结果是31 */
+    /**
+     * 支持的最大数据标识id，结果是31
+     */
     private static final long maxDataCenterId = -1L ^ (-1L << 5L);
 
-    /** 机器ID向左移12位 */
+    /**
+     * 机器ID向左移12位
+     */
     private static final long workerIdShift = sequenceBits;
 
-    /** 数据标识id向左移17位(12+5) */
+    /**
+     * 数据标识id向左移17位(12+5)
+     */
     private static final long dataCenterIdShift = sequenceBits + workerIdBits;
 
-    /** 时间截向左移22位(5+5+12) */
+    /**
+     * 时间截向左移22位(5+5+12)
+     */
     private static final long timestampLeftShift = sequenceBits + workerIdBits + dataCenterIdBits;
 
-    /** 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095) */
+    /**
+     * 生成序列的掩码，这里为4095 (0b111111111111=0xfff=4095)
+     */
     private static final long sequenceMask = -1L ^ (-1L << 12L);
 
-    /** 毫秒内序列(0~4095) */
+    /**
+     * 毫秒内序列(0~4095)
+     */
     private static long sequence = 0L;
 
-    /** 上次生成ID的时间截 */
+    /**
+     * 上次生成ID的时间截
+     */
     private static long lastTimestamp = -1L;
 
     // ==============================Methods=================================
 
     /**
      * 获得下一个ID (该方法是线程安全的)
-     * @param workerId 工作机器ID(0~31)
+     *
+     * @param workerId     工作机器ID(0~31)
      * @param dataCenterId 数据中心ID(0~31)
      * @return SnowflakeId
      */
@@ -93,6 +119,7 @@ public class SnowflakeIdUtils {
 
     /**
      * 阻塞到下一个毫秒，直到获得新的时间戳
+     *
      * @param lastTimestamp 上次生成ID的时间截
      * @return 当前时间戳
      */
@@ -106,6 +133,7 @@ public class SnowflakeIdUtils {
 
     /**
      * 返回以毫秒为单位的当前时间
+     *
      * @return 当前时间(毫秒)
      */
     private static long timeGen() {

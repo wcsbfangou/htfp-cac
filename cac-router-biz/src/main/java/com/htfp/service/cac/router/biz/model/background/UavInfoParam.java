@@ -18,9 +18,9 @@ public class UavInfoParam implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if(StringUtils.isBlank(uavId)){
+        if (StringUtils.isBlank(uavId)) {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
-        } else if (typeId == null){
+        } else if (typeId == null) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
         } else {
             return ErrorCodeEnum.SUCCESS;

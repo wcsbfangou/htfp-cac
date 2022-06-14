@@ -14,6 +14,7 @@ import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeRespon
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 9:46
+ * @Description 地面站服务类
  */
 public interface IGcsService {
 

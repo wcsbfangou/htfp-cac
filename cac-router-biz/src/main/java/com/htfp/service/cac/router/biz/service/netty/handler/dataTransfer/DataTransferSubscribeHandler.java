@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 16:18
+ * @Description 订阅数据透传Handler
  */
 @Slf4j
 @Component

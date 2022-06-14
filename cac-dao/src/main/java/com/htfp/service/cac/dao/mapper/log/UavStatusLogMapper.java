@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-25 14:47
+ * @Description 无人机状态记录表Mapper
  */
 
 @Mapper
@@ -67,7 +68,7 @@ public interface UavStatusLogMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId } AND uav_status = #{uavStatus} AND is_del = 0")
-    List<UavStatusLogDO> selectByNavigationIdAndUavStatus( @Param(value = "navigationId") Long navigationId, @Param(value = "uavStatus") Long uavStatus);
+    List<UavStatusLogDO> selectByNavigationIdAndUavStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "uavStatus") Long uavStatus);
 
     /**
      * 根据 uavId 和 navigationId 和 uavStatus 查询

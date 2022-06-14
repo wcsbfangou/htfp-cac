@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 20:31
+ * @Description 地面站静态信息表Mapper
  */
 
 @Mapper

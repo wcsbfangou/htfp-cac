@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-26 21:05
+ * @Description 无人机服务
  */
 @Slf4j
 @Service
@@ -46,12 +47,16 @@ public class UavServiceImpl implements IUavService {
     public UavChangeStatusResponse uavChangeStatus(UavChangeStatusRequest uavChangeStatusRequest) {
         UavChangeStatusResponse uavChangeStatusResponse = new UavChangeStatusResponse();
         uavChangeStatusResponse.fail();
-        try{
+        try {
+            log.info("无人机状态更新流程start，uavChangeStatusRequest={}", uavChangeStatusRequest);
+            // 根据Uav与Navigation的mapping关系校验
             UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(uavChangeStatusRequest.getUavId());
-            if(uavNavigationMappingInfo != null){
+            if (uavNavigationMappingInfo != null) {
                 // TODO: 2022/6/1 事务
+                // UavStatusLog中插入一条数据
                 insertUavStatusLog(uavChangeStatusRequest.getUavId(), uavNavigationMappingInfo.getNavigationId(), uavChangeStatusRequest.getUavStatus());
-                if(UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavChangeStatusRequest.getUavStatus()))){
+                // 如果无人机状态为终态:(1)更新Uav与Navigation的mapping表status为失效状态;(2)更新NavigationLog的Status为完结状态
+                if (UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavChangeStatusRequest.getUavStatus()))) {
                     uavDalService.updateUavNavigationMappingStatus(uavNavigationMappingInfo, MappingStatusEnum.INVALID);
                     updateNavigationLogStatus(uavNavigationMappingInfo.getNavigationId(), NavigationStatusEnum.FINISH);
                 }
@@ -59,7 +64,8 @@ public class UavServiceImpl implements IUavService {
             } else {
                 uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
             }
-        } catch (Exception e){
+            log.info("无人机状态更新流程end，uavChangeStatusRequest={}，uavChangeStatusResponse={}", uavChangeStatusRequest, uavChangeStatusResponse);
+        } catch (Exception e) {
             log.error("无人机状态更新流程异常，uavChangeStatusRequest={}", uavChangeStatusRequest, e);
             uavChangeStatusResponse.fail(e.getMessage());
         }
@@ -77,33 +83,37 @@ public class UavServiceImpl implements IUavService {
         SaveUavControlLogResponse saveUavControlLogResponse = new SaveUavControlLogResponse();
         saveUavControlLogResponse.fail();
         try {
+            log.info("存储无人机指控指令流程start，saveUavControlLogRequest={}", saveUavControlLogRequest);
+            // 根据Uav与Navigation的mapping关系校验
             UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(saveUavControlLogRequest.getUavId());
-            if(uavNavigationMappingInfo != null){
+            if (uavNavigationMappingInfo != null) {
+                // 插入指挥控制日志
                 insertCommandAndControlLog(saveUavControlLogRequest.getUavId(), uavNavigationMappingInfo.getNavigationId(), saveUavControlLogRequest.getGcsId(), saveUavControlLogRequest.getRcsId(), saveUavControlLogRequest.getPilotId(), saveUavControlLogRequest.getCommandCode(), CommandResultEnum.getFromResult(saveUavControlLogRequest.getCommandResult()));
                 saveUavControlLogResponse.success();
             } else {
                 saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
             }
-        } catch (Exception e){
+            log.info("存储无人机指控指令流程end，saveUavControlLogRequest={}, saveUavControlLogResponse={}", saveUavControlLogRequest, saveUavControlLogResponse);
+        } catch (Exception e) {
             log.error("存储无人机指控指令流程异常，saveUavControlLogRequest={}", saveUavControlLogRequest, e);
             saveUavControlLogResponse.fail(e.getMessage());
         }
         return saveUavControlLogResponse;
     }
 
-    private void insertUavStatusLog(Long uavId, Long navigationId, Integer status){
+    private void insertUavStatusLog(Long uavId, Long navigationId, Integer status) {
         UavStatusLogDO uavStatusLog = uavDalService.buildUavStatusLogDO(uavId, navigationId, status);
         uavDalService.insertUavStatusLog(uavStatusLog);
     }
 
-    void updateNavigationLogStatus(Long navigationId, NavigationStatusEnum navigationStatusEnum){
+    void updateNavigationLogStatus(Long navigationId, NavigationStatusEnum navigationStatusEnum) {
         List<NavigationLogDO> navigationLogDOList = navigationDalService.queryNavigationLog(navigationId);
         for (NavigationLogDO navigationLog : navigationLogDOList) {
             navigationDalService.updateNavigationLogStatus(navigationLog, navigationStatusEnum);
         }
     }
 
-    private void insertCommandAndControlLog(Long uavId, Long navigationId, Long gcsId, Long rcsId, Long pilotId, Integer commandCode, CommandResultEnum commandResultEnum){
+    private void insertCommandAndControlLog(Long uavId, Long navigationId, Long gcsId, Long rcsId, Long pilotId, Integer commandCode, CommandResultEnum commandResultEnum) {
         CommandAndControlLogDO commandAndControlLogDO = uavDalService.buildCommandAndControlLogDO(uavId, navigationId, gcsId, rcsId, pilotId, commandCode, commandResultEnum);
         uavDalService.insertCommandAndControlLog(commandAndControlLogDO);
     }

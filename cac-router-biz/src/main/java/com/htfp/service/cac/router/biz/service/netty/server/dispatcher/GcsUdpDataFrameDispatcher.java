@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 15:47
+ * @Description 地面站透传业务的数据帧分发器Handler
  */
 @ChannelHandler.Sharable
 public class GcsUdpDataFrameDispatcher extends SimpleChannelInboundHandler<GcsUdpDataTransferDataFrame> {

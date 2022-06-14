@@ -21,13 +21,13 @@ public class ChangeUavParam implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if( newArrival == null){
+        if (newArrival == null) {
             return ErrorCodeEnum.LACK_OF_OTHER_FILED;
-        } else if(StringUtils.isBlank(uavId)){
+        } else if (StringUtils.isBlank(uavId)) {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
-        } else if (StringUtils.isBlank(masterPilotId)){
+        } else if (StringUtils.isBlank(masterPilotId)) {
             return ErrorCodeEnum.LACK_OF_PILOT_ID;
-        } else if(newArrival && UavStatusEnum.getFromCode(uavStatus)==null){
+        } else if (newArrival && UavStatusEnum.getFromCode(uavStatus) == null) {
             return ErrorCodeEnum.LACK_OF_UAV_STATUS;
         } else {
             return ErrorCodeEnum.SUCCESS;

@@ -3,12 +3,13 @@ package com.htfp.service.cac.common.enums.dataFrame;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 13:30
+ * @Description 数据帧类型枚举
  */
 public enum DataFrameTypeEnum {
 
     DATA_TRANSFER_SUBSCRIBE(1, "DATA_TRANSFER_SUBSCRIBE", "订阅"),
     DATA_TRANSFER_CANCEL_SUBSCRIBE(2, "DATA_TRANSFER_CANCEL_SUBSCRIBE", "取消订阅"),
-    DATA_TRANSFER_GCS_TO_RCS(3, "DATA_TRANSFER_GCS_TO_RCS","GCS到RCS数据透传"),
+    DATA_TRANSFER_GCS_TO_RCS(3, "DATA_TRANSFER_GCS_TO_RCS", "GCS到RCS数据透传"),
     ;
 
     public final Integer type;
@@ -42,10 +43,10 @@ public enum DataFrameTypeEnum {
         return null;
     }
 
-    public static DataFrameTypeEnum getFromMagicCodeAndType(short magicCode, byte type){
-        if(MagicCodeEnum.DATA_TRANSFER.equals(MagicCodeEnum.getFromCode(magicCode))){
+    public static DataFrameTypeEnum getFromMagicCodeAndType(short magicCode, byte type) {
+        if (MagicCodeEnum.DATA_TRANSFER.equals(MagicCodeEnum.getFromCode(magicCode))) {
             DataTransferTypeEnum dataTransferTypeEnum = DataTransferTypeEnum.getFromType(type);
-            if(dataTransferTypeEnum!=null){
+            if (dataTransferTypeEnum != null) {
                 return DataFrameTypeEnum.getFromType(dataTransferTypeEnum.getDataFrameType());
             } else {
                 return null;

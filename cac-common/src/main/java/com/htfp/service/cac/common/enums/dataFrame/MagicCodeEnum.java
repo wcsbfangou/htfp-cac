@@ -3,10 +3,11 @@ package com.htfp.service.cac.common.enums.dataFrame;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 10:55
+ * @Description 数据帧头魔数枚举
  */
 public enum MagicCodeEnum {
 
-    DATA_TRANSFER((short)0, "数据透传"),
+    DATA_TRANSFER((short) 0, "数据透传"),
     ;
 
     public final short code;

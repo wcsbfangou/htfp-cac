@@ -8,11 +8,13 @@ import com.htfp.service.cac.command.biz.model.resquest.UavChangeStatusRequest;
 /**
  * @Author sunjipeng
  * @Date 2022-05-26 21:03
+ * @Description 无人机服务
  */
 public interface IUavService {
 
     /**
      * 无人机状态变更
+     *
      * @param uavChangeStatusRequest
      * @return
      */
@@ -20,6 +22,7 @@ public interface IUavService {
 
     /**
      * 存储无人机指控指令
+     *
      * @param saveUavControlLogRequest
      * @return
      */

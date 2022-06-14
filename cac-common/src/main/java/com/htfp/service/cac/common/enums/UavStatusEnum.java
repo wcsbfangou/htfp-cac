@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.enums;
 /**
  * @Author sunjipeng
  * @Date 2022-05-18 19:04
+ * @Description 无人机状态枚举
  */
 public enum UavStatusEnum {
 

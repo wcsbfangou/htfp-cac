@@ -10,6 +10,7 @@ import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 9:47
+ * @Description 远程地面站服务类
  */
 public interface IRcsService {
 

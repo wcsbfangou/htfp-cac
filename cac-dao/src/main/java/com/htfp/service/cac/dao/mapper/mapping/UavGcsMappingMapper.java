@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-24 21:54
+ * @Description Uav与Gcs的mapping关系表Mapper
  */
 
 @Mapper
@@ -113,7 +114,7 @@ public interface UavGcsMappingMapper {
      * @return
      */
     @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND gcs_ip = #{gcsId} AND status = #{status} AND is_del = 0")
-    List<UavGcsMappingDO> selectByUavIdAndGcsIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "gcsId") Long gcsId,  @Param(value = "status") Integer status);
+    List<UavGcsMappingDO> selectByUavIdAndGcsIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "gcsId") Long gcsId, @Param(value = "status") Integer status);
 
     /**
      * 查询总数量

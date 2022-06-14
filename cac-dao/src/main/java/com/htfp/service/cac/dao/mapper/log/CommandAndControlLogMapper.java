@@ -14,6 +14,7 @@ import java.util.List;
 /**
  * @Author sunjipeng
  * @Date 2022-05-25 10:57
+ * @Description 指控日志表Mapper
  */
 
 @Mapper

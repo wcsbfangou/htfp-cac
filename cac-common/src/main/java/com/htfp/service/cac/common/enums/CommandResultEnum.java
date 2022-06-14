@@ -3,11 +3,12 @@ package com.htfp.service.cac.common.enums;
 /**
  * @Author sunjipeng
  * @Date 2022-06-01 20:25
+ * @Description 指控结果枚举
  */
 public enum CommandResultEnum {
 
     SUCCESS(0, true, "成功"),
-    FAIL(1, false,"失败"),
+    FAIL(1, false, "失败"),
     ;
 
     public final Integer code;

@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 13:49
+ * @Description Udp服务端Handler处理链初始化
  */
 public class GcsUdpDataTransferServerHandlerInitializer extends ChannelInitializer<Channel> {
 
@@ -35,6 +36,6 @@ public class GcsUdpDataTransferServerHandlerInitializer extends ChannelInitializ
                 .addLast(gcsUdpDataFrameDispatcher)
                 // 服务端处理器
                 .addLast(nettyServerHandler)
-                ;
+        ;
     }
 }

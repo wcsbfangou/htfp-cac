@@ -3,6 +3,7 @@ package com.htfp.service.cac.app.validator;
 /**
  * @Author sunjipeng
  * @Date 2022-05-18 15:52
+ * @Description 校验接口
  */
 public interface BaseValidator<R, T> {
     /**

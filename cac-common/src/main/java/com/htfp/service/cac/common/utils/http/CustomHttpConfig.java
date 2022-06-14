@@ -6,6 +6,7 @@ import lombok.Setter;
 /**
  * @Author sunjipeng
  * @Date 2022-06-02 16:51
+ * @Description HTTP请求设置
  */
 @Getter
 @Setter

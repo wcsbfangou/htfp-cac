@@ -3,10 +3,11 @@ package com.htfp.service.cac.common.enums.dataFrame;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 11:19
+ * @Description 数据帧内Data的序列化算法枚举
  */
 public enum SerializationAlgorithmEnum {
 
-    NO_ALGORITHM((byte)0, "不使用序列化算法"),
+    NO_ALGORITHM((byte) 0, "不使用序列化算法"),
     ;
 
     public final byte type;

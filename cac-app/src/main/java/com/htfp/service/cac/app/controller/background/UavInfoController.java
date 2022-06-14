@@ -33,6 +33,12 @@ public class UavInfoController {
     @Resource
     private UavDalService uavDalService;
 
+    /**
+     * 根据uavId查询uav信息
+     *
+     * @param uavId
+     * @return
+     */
     @RequestMapping(value = "/queryUavInfoByUavId", method = RequestMethod.POST)
     @ResponseBody
     public QueryUavInfoResponse queryUavByUavId(@RequestParam(value = "uavId") String uavId) {
@@ -56,6 +62,13 @@ public class UavInfoController {
         return queryUavInfoResponse;
     }
 
+    /**
+     * 更新uav类型
+     *
+     * @param uavId
+     * @param typeId
+     * @return
+     */
     @RequestMapping(value = "/updateUavInfoType", method = RequestMethod.POST)
     @ResponseBody
     public boolean updateUavInfoType(@RequestParam(value = "uavId") String uavId, @RequestParam(value = "typeId") Integer typeId) {
@@ -74,6 +87,12 @@ public class UavInfoController {
         return result;
     }
 
+    /**
+     * 插入uav信息
+     *
+     * @param uavInfoRequest
+     * @return
+     */
     @RequestMapping(value = "/insertUavInfo", method = RequestMethod.POST)
     @ResponseBody
     public boolean insertUavInfo(@RequestBody UavInfoRequest uavInfoRequest) {
@@ -92,6 +111,12 @@ public class UavInfoController {
         return result;
     }
 
+    /**
+     * 根据uavId删除uav信息
+     *
+     * @param uavId
+     * @return
+     */
     @RequestMapping(value = "/deleteUavInfoByUavId", method = RequestMethod.POST)
     @ResponseBody
     public boolean deleteUavInfoByUavId(@RequestParam(value = "uavId") String uavId) {

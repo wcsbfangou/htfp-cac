@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.constant;
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 16:42
+ * @Description HTTP Header相关
  */
 public class HttpHeaderConstant {
 

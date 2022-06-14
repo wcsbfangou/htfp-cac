@@ -3,6 +3,7 @@ package com.htfp.service.cac.app.validator;
 /**
  * @Author sunjipeng
  * @Date 2022-05-20 10:44
+ * @Description http相关的常量
  */
 public class HttpValidatorConstant {
     public static final String HTTP_HEADER_DATE = "Date";

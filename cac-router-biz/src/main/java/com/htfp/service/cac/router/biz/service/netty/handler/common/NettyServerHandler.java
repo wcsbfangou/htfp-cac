@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 17:02
+ * @Desscription 服务端的连接管理Handler
  */
 @Slf4j
 @Component

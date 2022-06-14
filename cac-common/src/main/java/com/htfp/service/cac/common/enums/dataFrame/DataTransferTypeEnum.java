@@ -3,12 +3,13 @@ package com.htfp.service.cac.common.enums.dataFrame;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 11:07
+ * @Description 数据传输类型枚举
  */
 public enum DataTransferTypeEnum {
 
-    SUBSCRIBE(1, (byte)1, "订阅"),
-    CANCEL_SUBSCRIBE(2, (byte)2, "取消订阅"),
-    GCS_TO_RCS_DATA_TRANSFER(3, (byte)3, "GCS到RCS数据透传"),
+    SUBSCRIBE(1, (byte) 1, "订阅"),
+    CANCEL_SUBSCRIBE(2, (byte) 2, "取消订阅"),
+    GCS_TO_RCS_DATA_TRANSFER(3, (byte) 3, "GCS到RCS数据透传"),
     ;
 
     public final Integer dataFrameType;

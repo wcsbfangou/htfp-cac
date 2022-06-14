@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.enums.dataFrame;
 /**
  * @Author sunjipeng
  * @Date 2022-06-13 11:22
+ * @Description 数据帧版本枚举
  */
 public enum DataFrameVersionEnum {
 

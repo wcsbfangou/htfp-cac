@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @Author sunjipeng
  * @Date 2022-06-11 14:58
+ * @Description 地面站数据透传编码器
  */
 @Slf4j
 public class GcsUdpDataTransferEncoder extends MessageToByteEncoder<GcsUdpDataTransferDataFrame> {

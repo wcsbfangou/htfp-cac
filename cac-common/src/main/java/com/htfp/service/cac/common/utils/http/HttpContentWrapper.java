@@ -8,6 +8,7 @@ import java.util.Map;
 /**
  * @Author sunjipeng
  * @Date 2022-06-02 16:44
+ * @Description HTTP请求头相关
  */
 @Getter
 @Builder(builderMethodName = "of", buildMethodName = "create")

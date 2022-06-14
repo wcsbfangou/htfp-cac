@@ -3,6 +3,7 @@ package com.htfp.service.cac.common.constant;
 /**
  * @Author sunjipeng
  * @Date 2022-06-05 18:54
+ * @Description HTTP对外请求的URI
  */
 public class HttpUriConstant {
 
