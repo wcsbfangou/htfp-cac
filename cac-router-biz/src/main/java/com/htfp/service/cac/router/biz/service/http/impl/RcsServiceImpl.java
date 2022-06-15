@@ -77,7 +77,7 @@ public class RcsServiceImpl implements IRcsService {
         signInResponse.fail();
         try {
             log.info("远程地面站注册start，signRequest={}", signInRequest);
-            final Long gcsId = Long.getLong(signInRequest.getGcsId());
+            final Long gcsId = Long.valueOf(signInRequest.getGcsId());
             // 校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
             if (validateGcsIdResult) {
@@ -113,7 +113,7 @@ public class RcsServiceImpl implements IRcsService {
         signOutResponse.fail();
         try {
             log.info("远程地面站注销start，signOutRequest={}", signOutRequest);
-            final Long gcsId = Long.getLong(signOutRequest.getGcsId());
+            final Long gcsId = Long.valueOf(signOutRequest.getGcsId());
             //校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
             if (validateGcsIdResult) {

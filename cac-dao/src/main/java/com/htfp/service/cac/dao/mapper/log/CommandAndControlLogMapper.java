@@ -29,7 +29,7 @@ public interface CommandAndControlLogMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     CommandAndControlLogDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface CommandAndControlLogMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<CommandAndControlLogDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -47,7 +47,7 @@ public interface CommandAndControlLogMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND is_del = 0")
     List<CommandAndControlLogDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
 
     /**
@@ -56,7 +56,7 @@ public interface CommandAndControlLogMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcsId = #{gcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcsId = #{gcsId} AND is_del = 0")
     List<CommandAndControlLogDO> selectByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
@@ -65,7 +65,7 @@ public interface CommandAndControlLogMapper {
      * @param rcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE rcsId = #{rcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE rcsId = #{rcsId} AND is_del = 0")
     List<CommandAndControlLogDO> selectByRcsId(@Param(value = "rcsId") Long rcsId);
 
     /**
@@ -74,7 +74,7 @@ public interface CommandAndControlLogMapper {
      * @param pilotId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE pilotId = #{pilotId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE pilotId = #{pilotId} AND is_del = 0")
     List<CommandAndControlLogDO> selectByPilotId(@Param(value = "pilotId") Long pilotId);
 
     /**
@@ -82,7 +82,7 @@ public interface CommandAndControlLogMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -92,7 +92,7 @@ public interface CommandAndControlLogMapper {
      * @param commandAndControlLog
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, gcs_id, rcs_id, pilot_id, command_code, command_result, gmt_create, gmt_modify"
+    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, gcs_id, rcs_id, pilot_id, command_code, command_result, gmt_create, gmt_modify) "
             + "VALUES (#{commandAndControlLog.uavId}, #{commandAndControlLog.navigationId}, #{commandAndControlLog.gcsId}, #{commandAndControlLog.rcsId}, #{commandAndControlLog.pilotId}, #{commandAndControlLog.commandCode}, #{commandAndControlLog.commandResult}, #{commandAndControlLog.gmtCreate}, #{commandAndControlLog.gmtModify})")
     @Options(useGeneratedKeys = true, keyProperty = "commandAndControlLog.id")
     int insertCommandAndControlLog(@Param(value = "commandAndControlLog") CommandAndControlLogDO commandAndControlLog);

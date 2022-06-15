@@ -57,6 +57,8 @@ public class PilotInfoController {
                 pilotInfoParam.setControllableUavType(pilotInfo.getControllableUavType());
                 queryPilotInfoResponse.setData(pilotInfoParam);
                 queryPilotInfoResponse.success();
+            } else {
+                queryPilotInfoResponse.fail("无此pilot数据");
             }
         } catch (Exception e) {
             log.error("查询驾驶员信息异常, pilotId={}", pilotId, e);
@@ -78,9 +80,11 @@ public class PilotInfoController {
         try {
             if (!StringUtils.isBlank(pilotId) && controllableUavType != null) {
                 PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(Long.valueOf(pilotId));
-                int id = pilotDalService.updatePilotInfoControllableUavType(pilotInfo, controllableUavType);
-                if (id > 0) {
-                    result = true;
+                if (pilotInfo != null) {
+                    int id = pilotDalService.updatePilotInfoControllableUavType(pilotInfo, controllableUavType);
+                    if (id > 0) {
+                        result = true;
+                    }
                 }
             }
         } catch (Exception e) {

@@ -29,7 +29,7 @@ public interface UavGcsMappingMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     UavGcsMappingDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface UavGcsMappingMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<UavGcsMappingDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -62,7 +62,7 @@ public interface UavGcsMappingMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND is_del = 0")
     List<UavGcsMappingDO> selectByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
@@ -71,7 +71,7 @@ public interface UavGcsMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE status = #{status} AND is_del = 0")
     List<UavGcsMappingDO> selectByStatus(@Param(value = "status") Integer status);
 
     /**
@@ -81,7 +81,7 @@ public interface UavGcsMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND status = #{status} AND is_del = 0")
     List<UavGcsMappingDO> selectByGcsIdAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "status") Integer status);
 
     /**
@@ -91,8 +91,8 @@ public interface UavGcsMappingMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND gcs_ip = #{gcsIp} AND is_del = 0")
-    List<UavGcsMappingDO> selectByUavIdAndGcsIp(@Param(value = "uavId") Long uavId, @Param(value = "gcsId") Long gcsId);
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND gcs_id = #{gcsId} AND is_del = 0")
+    List<UavGcsMappingDO> selectByUavIdAndGcsId(@Param(value = "uavId") Long uavId, @Param(value = "gcsId") Long gcsId);
 
     /**
      * 根据uavId && status 查询
@@ -101,8 +101,8 @@ public interface UavGcsMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
-    List<UavGcsMappingDO> selectByUavIpAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
+    List<UavGcsMappingDO> selectByUavIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
 
 
     /**
@@ -113,7 +113,7 @@ public interface UavGcsMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND gcs_ip = #{gcsId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND gcs_id = #{gcsId} AND status = #{status} AND is_del = 0")
     List<UavGcsMappingDO> selectByUavIdAndGcsIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "gcsId") Long gcsId, @Param(value = "status") Integer status);
 
     /**
@@ -121,7 +121,7 @@ public interface UavGcsMappingMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -131,8 +131,9 @@ public interface UavGcsMappingMapper {
      * @param uavGcsMapping
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, gcs_id, status, gmt_create, gmt_modify"
-            + "VALUES (#{uavGcsMapping.uavId}, #{uavGcsMapping.gcsId}, #{uavGcsMapping.status}, #{uavGcsMapping.gmtCreate}, #{uavGcsMapping.gmtModify})")
+    @Insert("INSERT INTO " + TABLE + " (uav_id, gcs_id, status, gmt_create, gmt_modify) "
+            + "VALUES (#{uavGcsMapping.uavId}, #{uavGcsMapping.gcsId}, #{uavGcsMapping.status}, #{uavGcsMapping.gmtCreate}, #{uavGcsMapping.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE gcs_id=#{uavGcsMapping.gcsId}, status=#{uavGcsMapping.status}, gmt_modify=#{uavGcsMapping.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "uavGcsMapping.id")
     int insertUavGcsMapping(@Param(value = "uavGcsMapping") UavGcsMappingDO uavGcsMapping);
 
@@ -161,7 +162,7 @@ public interface UavGcsMappingMapper {
      * @return
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
-            + "<if test=\"uavGcsMapping.gcsId != null\"> gcs_ip = #{uavGcsMapping.gcsId}, </if>"
+            + "<if test=\"uavGcsMapping.gcsId != null\"> gcs_id = #{uavGcsMapping.gcsId}, </if>"
             + "<if test=\"uavGcsMapping.status != null\"> status = #{uavGcsMapping.status}, </if>"
             + "<if test=\"uavGcsMapping.isDel != null\"> is_del = #{uavGcsMapping.isDel}, </if>"
             + "<if test=\"uavGcsMapping.gmtModify != null\"> gmt_modify = #{uavGcsMapping.gmtModify} </if>"

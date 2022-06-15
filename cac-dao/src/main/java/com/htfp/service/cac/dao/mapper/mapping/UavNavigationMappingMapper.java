@@ -30,7 +30,7 @@ public interface UavNavigationMappingMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     UavNavigationMappingDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -39,7 +39,7 @@ public interface UavNavigationMappingMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<UavNavigationMappingDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -63,7 +63,7 @@ public interface UavNavigationMappingMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND is_del = 0")
     List<UavNavigationMappingDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
 
     /**
@@ -72,7 +72,7 @@ public interface UavNavigationMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE status = #{status} AND is_del = 0")
     List<UavNavigationMappingDO> selectByStatus(@Param(value = "status") Integer status);
 
     /**
@@ -82,7 +82,7 @@ public interface UavNavigationMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
     List<UavNavigationMappingDO> selectByNavigationIdAndStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "status") Integer status);
 
     /**
@@ -92,7 +92,7 @@ public interface UavNavigationMappingMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND is_del = 0")
     List<UavNavigationMappingDO> selectByUavIdAndNavigationId(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId);
 
     /**
@@ -102,7 +102,7 @@ public interface UavNavigationMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND status = #{status} AND is_del = 0")
     List<UavNavigationMappingDO> selectByUavIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "status") Integer status);
 
 
@@ -114,7 +114,7 @@ public interface UavNavigationMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND status = #{status} AND is_del = 0")
     List<UavNavigationMappingDO> selectByUavIdAndNavigationIdIdAndStatus(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId, @Param(value = "status") Integer status);
 
     /**
@@ -122,7 +122,7 @@ public interface UavNavigationMappingMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -132,8 +132,9 @@ public interface UavNavigationMappingMapper {
      * @param uavNavigationMapping
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, status, gmt_create, gmt_modify"
-            + "VALUES (#{uavNavigationMapping.uavId}, #{uavNavigationMapping.navigationId}, #{uavNavigationMapping.status}, #{uavNavigationMapping.gmtCreate}, #{uavNavigationMapping.gmtModify})")
+    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, status, gmt_create, gmt_modify) "
+            + "VALUES (#{uavNavigationMapping.uavId}, #{uavNavigationMapping.navigationId}, #{uavNavigationMapping.status}, #{uavNavigationMapping.gmtCreate}, #{uavNavigationMapping.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE navigation_id=#{uavNavigationMapping.navigationId}, status=#{uavNavigationMapping.status}, gmt_modify=#{uavNavigationMapping.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "uavNavigationMapping.id")
     int insertUavNavigationMapping(@Param(value = "uavNavigationMapping") UavNavigationMappingDO uavNavigationMapping);
 

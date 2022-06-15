@@ -60,6 +60,8 @@ public class GcsInfoController {
                 gcsInfoParam.setDataLinkType(gcsInfo.getDataLinkType());
                 queryGcsInfoResponse.setData(gcsInfoParam);
                 queryGcsInfoResponse.success();
+            } else {
+                queryGcsInfoResponse.fail("无此gcs数据");
             }
         } catch (Exception e) {
             log.error("查询地面站信息异常, gcsId={}", gcsId, e);
@@ -81,9 +83,11 @@ public class GcsInfoController {
         try {
             if (!StringUtils.isBlank(gcsId) && controllableUavType != null) {
                 GcsInfoDO gcsInfo = gcsDalService.queryGcsInfo(Long.valueOf(gcsId));
-                int id = gcsDalService.updateGcsInfoControllableUavType(gcsInfo, controllableUavType);
-                if (id > 0) {
-                    result = true;
+                if (gcsInfo != null) {
+                    int id = gcsDalService.updateGcsInfoControllableUavType(gcsInfo, controllableUavType);
+                    if (id > 0) {
+                        result = true;
+                    }
                 }
             }
         } catch (Exception e) {

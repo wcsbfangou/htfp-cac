@@ -25,7 +25,7 @@ public class QuartzConfig {
     public Trigger gcsPingJobQuartzTrigger() {
         return TriggerBuilder.newTrigger().forJob(gcsPingJobQuartz())
                 .withIdentity("gcsPingJob")
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ? "))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"))
                 .build();
     }
 
@@ -38,7 +38,7 @@ public class QuartzConfig {
     public Trigger rcsPingJobQuartzTrigger() {
         return TriggerBuilder.newTrigger().forJob(rcsPingJobQuartz())
                 .withIdentity("rcsPingJob")
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ? "))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"))
                 .build();
     }
 }

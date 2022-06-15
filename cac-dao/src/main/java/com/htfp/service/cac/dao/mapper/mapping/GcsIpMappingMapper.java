@@ -29,7 +29,7 @@ public interface GcsIpMappingMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     GcsIpMappingDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface GcsIpMappingMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
@@ -62,7 +62,7 @@ public interface GcsIpMappingMapper {
      * @param gcsIp
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_ip = #{gcsIp} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_ip = #{gcsIp} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsIp(@Param(value = "gcsIp") String gcsIp);
 
     /**
@@ -71,7 +71,7 @@ public interface GcsIpMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE status = #{status} AND is_del = 0")
     List<GcsIpMappingDO> selectByStatus(@Param(value = "status") Integer status);
 
     /**
@@ -81,7 +81,7 @@ public interface GcsIpMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND status = #{status} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsIdAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "status") Integer status);
 
     /**
@@ -91,7 +91,7 @@ public interface GcsIpMappingMapper {
      * @param gcsIp
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND gcs_ip = #{gcsIp} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND gcs_ip = #{gcsIp} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsIdAndGcsIp(@Param(value = "gcsId") Long gcsId, @Param(value = "gcsIp") String gcsIp);
 
     /**
@@ -101,7 +101,7 @@ public interface GcsIpMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_ip = #{gcsIp} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_ip = #{gcsIp} AND status = #{status} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsIpAndStatus(@Param(value = "gcsIp") String gcsIp, @Param(value = "status") Integer status);
 
 
@@ -113,7 +113,7 @@ public interface GcsIpMappingMapper {
      * @param status
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND gcs_ip = #{gcsIp} AND status = #{status} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND gcs_ip = #{gcsIp} AND status = #{status} AND is_del = 0")
     List<GcsIpMappingDO> selectByGcsIdAndGcsIpAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "gcsIp") String gcsIp, @Param(value = "status") String status);
 
     /**
@@ -121,7 +121,7 @@ public interface GcsIpMappingMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -131,9 +131,10 @@ public interface GcsIpMappingMapper {
      * @param gcsIpMapping
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, gmt_create, gmt_modify"
-            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})")
-    @Options(useGeneratedKeys = true, keyProperty = "gcsInfo.id")
+    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, gmt_create, gmt_modify) "
+            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE gcs_ip=#{gcsIpMapping.gcsIp}, status=#{gcsIpMapping.status}, gmt_modify=#{gcsIpMapping.gmtModify}, is_del = 0")
+    @Options(useGeneratedKeys = true, keyProperty = "gcsIpMapping.id")
     int insertGcsIpMapping(@Param(value = "gcsIpMapping") GcsIpMappingDO gcsIpMapping);
 
     /**

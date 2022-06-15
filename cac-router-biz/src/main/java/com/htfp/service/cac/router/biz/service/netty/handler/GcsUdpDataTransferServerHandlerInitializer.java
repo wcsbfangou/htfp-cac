@@ -7,6 +7,7 @@ import com.htfp.service.cac.router.biz.service.netty.server.dispatcher.GcsUdpDat
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 
@@ -16,6 +17,7 @@ import javax.annotation.Resource;
  * @Date 2022-06-11 13:49
  * @Description Udp服务端Handler处理链初始化
  */
+@Component
 public class GcsUdpDataTransferServerHandlerInitializer extends ChannelInitializer<Channel> {
 
     @Resource

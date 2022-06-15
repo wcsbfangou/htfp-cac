@@ -29,7 +29,7 @@ public interface UavStatusLogMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     UavStatusLogDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface UavStatusLogMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<UavStatusLogDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -47,7 +47,7 @@ public interface UavStatusLogMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND is_del = 0")
     List<UavStatusLogDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
 
     /**
@@ -57,7 +57,7 @@ public interface UavStatusLogMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND navigation_id = #{navigationId} AND is_del = 0")
     List<UavStatusLogDO> selectByUavIdAndNavigationId(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId);
 
     /**
@@ -67,7 +67,7 @@ public interface UavStatusLogMapper {
      * @param uavStatus
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId } AND uav_status = #{uavStatus} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId } AND uav_status = #{uavStatus} AND is_del = 0")
     List<UavStatusLogDO> selectByNavigationIdAndUavStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "uavStatus") Long uavStatus);
 
     /**
@@ -78,7 +78,7 @@ public interface UavStatusLogMapper {
      * @param uavStatus
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND navigation_id = #{navigationId } AND uav_status = #{uavStatus} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND navigation_id = #{navigationId } AND uav_status = #{uavStatus} AND is_del = 0")
     List<UavStatusLogDO> selectByUavIdAndNavigationIdAndUavStatus(@Param(value = "uavId") Long uavId, @Param(value = "navigationId") Long navigationId, @Param(value = "uavStatus") Long uavStatus);
 
     /**
@@ -86,7 +86,7 @@ public interface UavStatusLogMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -96,7 +96,7 @@ public interface UavStatusLogMapper {
      * @param uavStatusLog
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, uav_status, gmt_create, gmt_modify"
+    @Insert("INSERT INTO " + TABLE + " (uav_id, navigation_id, uav_status, gmt_create, gmt_modify) "
             + "VALUES (#{uavStatusLog.uavId}, #{uavStatusLog.navigationId}, #{uavStatusLog.uavStatus}, #{uavStatusLog.gmtCreate}, #{uavStatusLog.gmtModify})")
     @Options(useGeneratedKeys = true, keyProperty = "uavStatusLog.id")
     int insertUavStatusLogDO(@Param(value = "uavStatusLog") UavStatusLogDO uavStatusLog);

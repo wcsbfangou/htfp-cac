@@ -49,7 +49,7 @@ public class UavDalService {
     }
 
     public UavGcsMappingDO queryUavGcsMapping(Long uavId, Long gcsId) {
-        List<UavGcsMappingDO> uavGcsMappingDOList = uavGcsMappingMapper.selectByUavIdAndGcsIp(uavId, gcsId);
+        List<UavGcsMappingDO> uavGcsMappingDOList = uavGcsMappingMapper.selectByUavIdAndGcsId(uavId, gcsId);
         if (CollectionUtils.isNotEmpty(uavGcsMappingDOList)) {
             return uavGcsMappingDOList.get(0);
         } else {

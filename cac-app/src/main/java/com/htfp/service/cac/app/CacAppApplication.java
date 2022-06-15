@@ -1,5 +1,6 @@
 package com.htfp.service.cac.app;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -15,11 +16,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @Description 启动类
  */
 
-@SpringBootApplication(exclude = {
-        DataSourceAutoConfiguration.class,
-        JdbcTemplateAutoConfiguration.class,
-        DataSourceTransactionManagerAutoConfiguration.class})
+@SpringBootApplication
 @ComponentScan(value = {"com.htfp.service.cac"})
+@MapperScan("com.htfp.service.cac.dao.mapper")
 @EnableTransactionManagement
 @PropertySource({"classpath:/nettySetting.properties"})
 public class CacAppApplication {

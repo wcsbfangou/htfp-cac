@@ -55,6 +55,8 @@ public class UavInfoController {
                 uavInfoParam.setTypeId(uavInfo.getTypeId());
                 queryUavInfoResponse.setData(uavInfoParam);
                 queryUavInfoResponse.success();
+            } else {
+                queryUavInfoResponse.fail("无此uav数据");
             }
         } catch (Exception e) {
             log.error("查询无人机信息异常, uavId={}", uavId, e);
@@ -76,9 +78,11 @@ public class UavInfoController {
         try {
             if (!StringUtils.isBlank(uavId) && typeId != null) {
                 UavInfoDO uavInfo = uavDalService.queryUavInfo(Long.valueOf(uavId));
-                int id = uavDalService.updateUavInfoTypeId(uavInfo, typeId);
-                if (id > 0) {
-                    result = true;
+                if (uavInfo != null) {
+                    int id = uavDalService.updateUavInfoTypeId(uavInfo, typeId);
+                    if (id > 0) {
+                        result = true;
+                    }
                 }
             }
         } catch (Exception e) {

@@ -29,7 +29,7 @@ public interface NavigationLogMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     NavigationLogDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface NavigationLogMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<NavigationLogDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -47,7 +47,7 @@ public interface NavigationLogMapper {
      * @param navigationId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND is_del = 0")
     List<NavigationLogDO> selectByNavigationId(@Param(value = "navigationId") Long navigationId);
 
     /**
@@ -56,7 +56,7 @@ public interface NavigationLogMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcsId = #{gcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcsId = #{gcsId} AND is_del = 0")
     List<NavigationLogDO> selectByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
@@ -66,7 +66,7 @@ public interface NavigationLogMapper {
      * @param navigationStatus
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE navigation_id = #{navigationId} AND navigation_status = #{navigationStatus} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE navigation_id = #{navigationId} AND navigation_status = #{navigationStatus} AND is_del = 0")
     List<NavigationLogDO> selectByNavigationIdAndNavigationStatus(@Param(value = "navigationId") Long navigationId, @Param(value = "navigationStatus") Integer navigationStatus);
 
     /**
@@ -74,7 +74,7 @@ public interface NavigationLogMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -84,7 +84,7 @@ public interface NavigationLogMapper {
      * @param navigationLog
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (navigation_id, navigation_status, uav_id, gcs_id, master_pilot_id, deputy_pilot_id, gmt_create, gmt_modify"
+    @Insert("INSERT INTO " + TABLE + " (navigation_id, navigation_status, uav_id, gcs_id, master_pilot_id, deputy_pilot_id, gmt_create, gmt_modify) "
             + "VALUES (#{navigationLog.navigationId}, #{navigationLog.navigationStatus}, #{navigationLog.uavId}, #{navigationLog.gcsId}, #{navigationLog.masterPilotId}, #{navigationLog.deputyPilotId}, #{navigationLog.gmtCreate}, #{navigationLog.gmtModify})")
     @Options(useGeneratedKeys = true, keyProperty = "navigationLog.id")
     int insertNavigationLog(@Param(value = "navigationLog") NavigationLogDO navigationLog);

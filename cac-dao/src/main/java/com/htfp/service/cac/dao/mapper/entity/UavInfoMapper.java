@@ -28,7 +28,7 @@ public interface UavInfoMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     UavInfoDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -37,7 +37,7 @@ public interface UavInfoMapper {
      * @param uavId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
     List<UavInfoDO> selectByUavId(@Param(value = "uavId") Long uavId);
 
     /**
@@ -61,7 +61,7 @@ public interface UavInfoMapper {
      * @param typeId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE type_id = #{typeId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND is_del = 0")
     List<UavInfoDO> selectByTypeId(@Param(value = "typeId") Integer typeId);
 
     /**
@@ -71,7 +71,7 @@ public interface UavInfoMapper {
      * @param typeId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE uav_id = #{uavId} AND type_id = #{typeId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND type_id = #{typeId} AND is_del = 0")
     List<UavInfoDO> selectByUavIdAndTypeId(@Param(value = "uavId") Long uavId, @Param(value = "typeId") Integer typeId);
 
     /**
@@ -79,7 +79,7 @@ public interface UavInfoMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -89,8 +89,9 @@ public interface UavInfoMapper {
      * @param uavInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, type_id, gmt_create, gmt_modify"
-            + "VALUES (#{uavInfo.uavId}, #{uavInfo.typeId},#{uavInfo.gmtCreate},#{uavInfo.gmtModify})")
+    @Insert("INSERT INTO " + TABLE + " (uav_id, type_id, gmt_create, gmt_modify) "
+            + "VALUES (#{uavInfo.uavId}, #{uavInfo.typeId},#{uavInfo.gmtCreate},#{uavInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE type_id=#{uavInfo.typeId}, gmt_modify=#{uavInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "uavInfo.id")
     int insertUavInfo(@Param(value = "uavInfo") UavInfoDO uavInfo);
 

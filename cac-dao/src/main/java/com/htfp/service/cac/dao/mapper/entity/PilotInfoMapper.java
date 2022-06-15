@@ -29,7 +29,7 @@ public interface PilotInfoMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     PilotInfoDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface PilotInfoMapper {
      * @param pilotId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE pilot_id = #{pilotId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE pilot_id = #{pilotId} AND is_del = 0")
     List<PilotInfoDO> selectByPilotId(@Param(value = "pilotId") Long pilotId);
 
     /**
@@ -62,7 +62,7 @@ public interface PilotInfoMapper {
      * @param pilotName
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE pilot_name = #{pilotName} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE pilot_name = #{pilotName} AND is_del = 0")
     List<PilotInfoDO> selectByPilotName(@Param(value = "pilotName") Long pilotName);
 
     /**
@@ -71,7 +71,7 @@ public interface PilotInfoMapper {
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE controllable_uav_type = #{controllableUavType} AND is_del = 0")
     List<PilotInfoDO> selectByControllableUavType(@Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
@@ -81,7 +81,7 @@ public interface PilotInfoMapper {
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE pilot_id = #{pilotId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE pilot_id = #{pilotId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
     List<PilotInfoDO> selectByPilotIdAndControllableUavType(@Param(value = "pilotId") Long pilotId, @Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
@@ -89,7 +89,7 @@ public interface PilotInfoMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -99,8 +99,9 @@ public interface PilotInfoMapper {
      * @param pilotInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (pilot_id, pilot_name, controllable_uav_type, gmt_create, gmt_modify"
-            + "VALUES (#{pilotInfo.pilotId}, #{pilotInfo.pilotName}, #{pilotInfo.controllableUavType}, #{pilotInfo.gmtCreate}, #{pilotInfo.gmtModify})")
+    @Insert("INSERT INTO " + TABLE + " (pilot_id, pilot_name, controllable_uav_type, gmt_create, gmt_modify) "
+            + "VALUES (#{pilotInfo.pilotId}, #{pilotInfo.pilotName}, #{pilotInfo.controllableUavType}, #{pilotInfo.gmtCreate}, #{pilotInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE pilot_name=#{pilotInfo.pilotName}, controllable_uav_type=#{pilotInfo.controllableUavType}, gmt_modify=#{pilotInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "pilotInfo.id")
     int insertPilotInfo(@Param(value = "pilotInfo") PilotInfoDO pilotInfo);
 
@@ -150,7 +151,7 @@ public interface PilotInfoMapper {
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"pilotInfo.pilotName != null\"> pilot_name = #{pilotInfo.pilotName}, </if>"
-            + "<if test=\"pilotInfo.controllableUavType != null\"> controllable_uva_type = #{pilotInfo.controllableUavType}, </if>"
+            + "<if test=\"pilotInfo.controllableUavType != null\"> controllable_uav_type = #{pilotInfo.controllableUavType}, </if>"
             + "<if test=\"pilotInfo.isDel != null\"> is_del = #{pilotInfo.isDel}, </if>"
             + "<if test=\"pilotInfo.gmtModify != null\"> gmt_modify = #{pilotInfo.gmtModify} </if>"
             + "</set>"

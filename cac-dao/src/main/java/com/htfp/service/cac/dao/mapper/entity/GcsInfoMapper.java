@@ -29,7 +29,7 @@ public interface GcsInfoMapper {
      * @param id
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE id = #{id} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND is_del = 0")
     GcsInfoDO selectById(@Param(value = "id") Long id);
 
     /**
@@ -38,7 +38,7 @@ public interface GcsInfoMapper {
      * @param gcsId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND is_del = 0")
     List<GcsInfoDO> selectByGcsId(@Param(value = "gcsId") Long gcsId);
 
     /**
@@ -62,7 +62,7 @@ public interface GcsInfoMapper {
      * @param typeId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE type_id = #{typeId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND is_del = 0")
     List<GcsInfoDO> selectByTypeId(@Param(value = "typeId") Integer typeId);
 
     /**
@@ -71,7 +71,7 @@ public interface GcsInfoMapper {
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE controllable_uav_type = #{controllableUavType} AND is_del = 0")
     List<GcsInfoDO> selectByControllableUavType(@Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
@@ -80,7 +80,7 @@ public interface GcsInfoMapper {
      * @param dataLinkType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE data_link_type = #{dataLinkType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE data_link_type = #{dataLinkType} AND is_del = 0")
     List<GcsInfoDO> selectByDataLinkType(@Param(value = "dataLinkType") Integer dataLinkType);
 
     /**
@@ -90,7 +90,7 @@ public interface GcsInfoMapper {
      * @param typeId
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND type_id = #{typeId} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND type_id = #{typeId} AND is_del = 0")
     List<GcsInfoDO> selectByGcsIdAndTypeId(@Param(value = "gcsId") Long gcsId, @Param(value = "typeId") Integer typeId);
 
     /**
@@ -100,7 +100,7 @@ public interface GcsInfoMapper {
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE gcs_id = #{gcsId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
     List<GcsInfoDO> selectByGcsIdAndControllableUavType(@Param(value = "gcsId") Long gcsId, @Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
@@ -110,7 +110,7 @@ public interface GcsInfoMapper {
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE type_id = #{typeId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
     List<GcsInfoDO> selectByTypeIdAndControllableUavType(@Param(value = "typeId") Integer typeId, @Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
@@ -120,7 +120,7 @@ public interface GcsInfoMapper {
      * @param dataLinkType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE type_id = #{typeId} AND data_link_type = #{dataLinkType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND data_link_type = #{dataLinkType} AND is_del = 0")
     List<GcsInfoDO> selectByTypeIdAndDataLinkType(@Param(value = "typeId") Integer typeId, @Param(value = "dataLinkType") Integer dataLinkType);
 
     /**
@@ -131,7 +131,7 @@ public interface GcsInfoMapper {
      * @param dataLinkType
      * @return
      */
-    @Select("SELECT * FROM" + TABLE + "WHERE type_id = #{typeId} AND controllable_uav_type = #{controllableUavType} AND data_link_type = #{dataLinkType} AND is_del = 0")
+    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND controllable_uav_type = #{controllableUavType} AND data_link_type = #{dataLinkType} AND is_del = 0")
     List<GcsInfoDO> selectByTypeIdAndControllableUavTypeAndDataLinkType(@Param(value = "typeId") Integer typeId, @Param(value = "controllableUavType") Integer controllableUavType, @Param(value = "dataLinkType") Integer dataLinkType);
 
     /**
@@ -139,7 +139,7 @@ public interface GcsInfoMapper {
      *
      * @return
      */
-    @Select("SELECT COUNT(*) FROM" + TABLE + "WHERE is_del = 0")
+    @Select("SELECT COUNT(*) FROM " + TABLE + " WHERE is_del = 0")
     Long selectCount();
 
 
@@ -149,8 +149,9 @@ public interface GcsInfoMapper {
      * @param gcsInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (gcs_id, type_id, controllable_uav_type, data_link_type, token, gmt_create, gmt_modify"
-            + "VALUES (#{gcsInfo.gcsId}, #{gcsInfo.typeId}, #{gcsInfo.controllableUavType}, #{gcsInfo.dataLinkType}, #{gcsInfo.token}, #{gcsInfo.gmtCreate}, #{gcsInfo.gmtModify})")
+    @Insert("INSERT INTO " + TABLE + " (gcs_id, type_id, controllable_uav_type, data_link_type, token, gmt_create, gmt_modify) "
+            + "VALUES (#{gcsInfo.gcsId}, #{gcsInfo.typeId}, #{gcsInfo.controllableUavType}, #{gcsInfo.dataLinkType}, #{gcsInfo.token}, #{gcsInfo.gmtCreate}, #{gcsInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE type_id=#{gcsInfo.typeId}, controllable_uav_type=#{gcsInfo.controllableUavType}, data_link_type=#{gcsInfo.dataLinkType}, token=#{gcsInfo.token}, gmt_modify=#{gcsInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "gcsInfo.id")
     int insertGcsInfo(@Param(value = "gcsInfo") GcsInfoDO gcsInfo);
 
@@ -180,7 +181,7 @@ public interface GcsInfoMapper {
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"gcsInfo.typeId != null\"> type_id = #{gcsInfo.typeId}, </if>"
-            + "<if test=\"gcsInfo.controllableUavType != null\"> controllable_uva_type = #{gcsInfo.controllableUavType}, </if>"
+            + "<if test=\"gcsInfo.controllableUavType != null\"> controllable_uav_type = #{gcsInfo.controllableUavType}, </if>"
             + "<if test=\"gcsInfo.dataLinkType != null\"> data_link_type = #{gcsInfo.dataLinkType}, </if>"
             + "<if test=\"gcsInfo.token != null\"> token = #{gcsInfo.token}, </if>"
             + "<if test=\"gcsInfo.isDel != null\"> is_del = #{gcsInfo.isDel}, </if>"
