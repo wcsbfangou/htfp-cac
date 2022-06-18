@@ -72,7 +72,7 @@ public class GcsPingJob extends QuartzJobBean {
                 }
             }
         } catch (Exception e) {
-            log.error("请求地面站发生异常", e);
+            log.error("[GcsPing]请求地面站发生异常", e);
         }
         return result;
     }

@@ -31,6 +31,8 @@ public enum ErrorCodeEnum {
     WRONG_UAV_ID(3010, "无人机编号错误"),
     WRONG_GCS_ID(3011, "地面站编号错误"),
     WRONG_PILOT_ID(3012, "飞行员编号错误"),
+    GCS_NOT_SIGN_IN(3013, "地面站未注册"),
+    UAV_NOT_IN_NAVIGATION(3014, "无人机未处于航行中"),
 
     SYSTEM_UNAVAILABLE(4001, "系统暂时不可用"),
     SYSTEM_ERROR(4002, "系统错误"),

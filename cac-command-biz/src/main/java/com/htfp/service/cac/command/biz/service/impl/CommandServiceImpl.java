@@ -5,6 +5,7 @@ import com.htfp.service.cac.command.biz.model.resquest.GcsChangeControlUavReques
 import com.htfp.service.cac.command.biz.service.ICommandService;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.NavigationStatusEnum;
+import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
@@ -42,7 +43,7 @@ public class CommandServiceImpl implements ICommandService {
         GcsChangeControlUavResponse gcsChangeControlUavResponse = new GcsChangeControlUavResponse();
         gcsChangeControlUavResponse.fail();
         try {
-            log.info("地面站在控无人机变更start，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest);
+            log.info("[command]地面站在控无人机变更start，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest);
             Long navigationId;
             // TODO: 2022/6/1 事务
             // 判断是否为新启动的无人机
@@ -65,9 +66,10 @@ public class CommandServiceImpl implements ICommandService {
             }
             // NavigationLog表插入一条log
             insertNavigationLog(navigationId, gcsChangeControlUavRequest.getUavId(), gcsChangeControlUavRequest.getGcsId(), gcsChangeControlUavRequest.getMasterPilotId(), gcsChangeControlUavRequest.getDeputyPilotId(), NavigationStatusEnum.PROGRESSING);
-            log.info("地面站在控无人机变更end，gcsChangeControlUavRequest={}，gcsChangeControlUavResponse={}", gcsChangeControlUavRequest, gcsChangeControlUavResponse);
+            gcsChangeControlUavResponse.success();
+            log.info("[command]地面站在控无人机变更end，gcsChangeControlUavRequest={}，gcsChangeControlUavResponse={}", gcsChangeControlUavRequest, JsonUtils.object2Json(gcsChangeControlUavResponse));
         } catch (Exception e) {
-            log.error("地面站在控无人机变更异常，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest, e);
+            log.error("[command]地面站在控无人机变更异常，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest, e);
             gcsChangeControlUavResponse.fail(e.getMessage());
         }
         return gcsChangeControlUavResponse;

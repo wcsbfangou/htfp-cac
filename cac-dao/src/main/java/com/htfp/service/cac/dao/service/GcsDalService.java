@@ -97,6 +97,15 @@ public class GcsDalService {
         return updateGcsInfo(gcsInfoDO);
     }
 
+    public boolean validateGcsStatus(Long gcsId){
+        List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
+        if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {
+            return MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDOList.get(0).getStatus()));
+        } else {
+            return false;
+        }
+    }
+
     public GcsIpMappingDO queryGcsIpMapping(Long gcsId){
         List<GcsIpMappingDO> gcsIpMappingDOList = gcsIpMappingMapper.selectByGcsId(gcsId);
         if (CollectionUtils.isNotEmpty(gcsIpMappingDOList)) {

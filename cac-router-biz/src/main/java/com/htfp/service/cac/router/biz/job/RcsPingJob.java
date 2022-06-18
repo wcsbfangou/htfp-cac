@@ -72,7 +72,7 @@ public class RcsPingJob extends QuartzJobBean {
                 }
             }
         } catch (Exception e) {
-            log.error("请求地面站发生异常", e);
+            log.error("[RcsPing]请求地面站发生异常", e);
         }
         return result;
     }

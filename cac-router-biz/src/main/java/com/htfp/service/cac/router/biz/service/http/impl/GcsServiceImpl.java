@@ -11,6 +11,7 @@ import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
+import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
@@ -79,7 +80,7 @@ public class GcsServiceImpl implements IGcsService {
         SignInResponse signInResponse = new SignInResponse();
         signInResponse.fail();
         try {
-            log.info("地面站注册start，signRequest={}", signInRequest);
+            log.info("[router]地面站注册start，signRequest={}", signInRequest);
             final Long gcsId = Long.valueOf(signInRequest.getGcsId());
             //校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
@@ -96,9 +97,9 @@ public class GcsServiceImpl implements IGcsService {
             } else {
                 signInResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
             }
-            log.info("地面站注册end，signInRequest={}，signInResponse={}", signInRequest, signInResponse);
+            log.info("[router]地面站注册end，signInRequest={}，signInResponse={}", signInRequest, JsonUtils.object2Json(signInResponse));
         } catch (Exception e) {
-            log.error("地面站注册异常，signRequest={}", signInRequest, e);
+            log.error("[router]地面站注册异常，signRequest={}", signInRequest, e);
             signInResponse.fail(e.getMessage());
         }
         return signInResponse;
@@ -115,7 +116,7 @@ public class GcsServiceImpl implements IGcsService {
         SignOutResponse signOutResponse = new SignOutResponse();
         signOutResponse.fail();
         try {
-            log.info("地面站注销start，signOutRequest={}", signOutRequest);
+            log.info("[router]地面站注销start，signOutRequest={}", signOutRequest);
             final Long gcsId = Long.valueOf(signOutRequest.getGcsId());
             // 校验地面站
             boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
@@ -145,9 +146,9 @@ public class GcsServiceImpl implements IGcsService {
             } else {
                 signOutResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
             }
-            log.info("地面站注销end，signOutRequest={},signOutResponse={}", signOutRequest, signOutResponse);
+            log.info("[router]地面站注销end，signOutRequest={},signOutResponse={}", signOutRequest, JsonUtils.object2Json(signOutResponse));
         } catch (Exception e) {
-            log.error("地面站注销异常，signOutRequest={}", signOutRequest, e);
+            log.error("[router]地面站注销异常，signOutRequest={}", signOutRequest, e);
             signOutResponse.fail(e.getMessage());
         }
         return signOutResponse;
@@ -164,25 +165,27 @@ public class GcsServiceImpl implements IGcsService {
         GcsChangeUavResponse gcsChangeUavResponse = new GcsChangeUavResponse();
         gcsChangeUavResponse.fail();
         try {
-            log.info("地面站在控无人机变更start，gcsChangeUavRequest={}", gcsChangeUavRequest);
+            log.info("[router]地面站在控无人机变更start，gcsChangeUavRequest={}", gcsChangeUavRequest);
             final Long gcsId = Long.valueOf(gcsChangeUavRequest.getGcsId());
-            //(1)查询gcsInfo进行校验
-            GcsInfoDO gcsInfo = gcsDalService.queryGcsInfo(gcsId);
-            if (gcsInfo != null) {
-                //(2)校验通过后，遍历uavList进行处理
+            //(1)校验地面站信息以及是否上线
+            BaseResponse validateGcsResult = validateGcs(gcsId);
+            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
+                //(2)在循环之前查询gcsInfo
+                GcsInfoDO gcsInfo = gcsDalService.queryGcsInfo(gcsId);
+                //(3)校验通过后，遍历uavList进行处理
                 for (ChangeUavParam changeUavParam : gcsChangeUavRequest.getUavList()) {
                     Long uavId = Long.valueOf(changeUavParam.getUavId());
                     Long masterPilotId = Long.valueOf(changeUavParam.getMasterPilotId());
                     Long deputyPilotId = StringUtils.isNotEmpty(changeUavParam.getDeputyPilotId()) ? Long.valueOf(changeUavParam.getDeputyPilotId()) : null;
-                    //(3)校验可控无人机类型
-                    BaseResponse response = validateChangeUavParam(uavId, gcsInfo, masterPilotId, deputyPilotId);
+                    //(4)校验可控无人机类型
+                    BaseResponse response = validateUavStatusChangeParam(uavId, gcsInfo, masterPilotId, deputyPilotId);
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
-                        //(4)构造请求体
+                        //(5)构造请求体
                         GcsChangeControlUavRequest gcsChangeControlUavRequest = buildGcsChangeControlUavRequest(gcsId, uavId, changeUavParam.getNewArrival(), changeUavParam.getUavStatus(), masterPilotId, deputyPilotId);
-                        // TODO: 2022/6/1 (5)(6)事务
-                        //(5)调用指控模块接口，变更在控无人机
+                        // TODO: 2022/6/1 (6)(7)事务
+                        //(6)调用指控模块接口，变更在控无人机
                         GcsChangeControlUavResponse gcsChangeControlUavResponse = commandService.gcsChangeUav(gcsChangeControlUavRequest);
-                        //(6)插入或更新uav与gcs的mapping关系表
+                        //(7)插入或更新uav与gcs的mapping关系表
                         if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(gcsChangeControlUavResponse.getCode()))) {
                             insertOrUpdateUavGcsMapping(uavId, gcsId);
                             gcsChangeUavResponse.success();
@@ -196,11 +199,11 @@ public class GcsServiceImpl implements IGcsService {
                     }
                 }
             } else {
-                gcsChangeUavResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
+                gcsChangeUavResponse.fail(validateGcsResult.getCode(), validateGcsResult.getMessage());
             }
-            log.info("地面站在控无人机变更start，gcsChangeUavRequest={}, gcsChangeUavResponse={}", gcsChangeUavRequest, gcsChangeUavResponse);
+            log.info("[router]地面站在控无人机变更end，gcsChangeUavRequest={}, gcsChangeUavResponse={}", gcsChangeUavRequest, JsonUtils.object2Json(gcsChangeUavResponse));
         } catch (Exception e) {
-            log.error("地面站在控无人机变更异常，gcsChangeUavRequest={}", gcsChangeUavRequest, e);
+            log.error("[router]地面站在控无人机变更异常，gcsChangeUavRequest={}", gcsChangeUavRequest, e);
             gcsChangeUavResponse.fail(e.getMessage());
         }
         return gcsChangeUavResponse;
@@ -217,16 +220,16 @@ public class GcsServiceImpl implements IGcsService {
         UavStatusChangeResponse uavStatusChangeResponse = new UavStatusChangeResponse();
         uavStatusChangeResponse.fail();
         try {
-            log.info("无人机状态变更start，uavStatusChangeRequest={}", uavStatusChangeRequest);
+            log.info("[router]无人机状态变更start，uavStatusChangeRequest={}", uavStatusChangeRequest);
             final Long gcsId = Long.valueOf(uavStatusChangeRequest.getGcsId());
-            //(1)校验地面站信息
-            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
-            if (validateGcsIdResult) {
+            //(1)校验地面站信息以及是否上线
+            BaseResponse validateGcsResult = validateGcs(gcsId);
+            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
                 List<ChangeUavStatusParam> uavList = uavStatusChangeRequest.getUavList();
                 //(2)校验通过后，遍历UavList处理
                 for (ChangeUavStatusParam changeUavStatusParam : uavList) {
                     Long uavId = Long.valueOf(changeUavStatusParam.getUavId());
-                    BaseResponse response = validateChangeUavParam(uavId, gcsId);
+                    BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                         // (3)构造请求体
                         UavChangeStatusRequest uavChangeStatusRequest = buildUavChangeStatusRequest(gcsId, uavId, changeUavStatusParam.getUavStatus());
@@ -250,11 +253,11 @@ public class GcsServiceImpl implements IGcsService {
                     }
                 }
             } else {
-                uavStatusChangeResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
+                uavStatusChangeResponse.fail(validateGcsResult.getCode(), validateGcsResult.getMessage());
             }
-            log.info("无人机状态变更end，uavStatusChangeRequest={}，uavStatusChangeResponse={}", uavStatusChangeRequest, uavStatusChangeResponse);
+            log.info("[router]无人机状态变更end，uavStatusChangeRequest={}，uavStatusChangeResponse={}", uavStatusChangeRequest, JsonUtils.object2Json(uavStatusChangeResponse));
         } catch (Exception e) {
-            log.error("无人机状态变更异常，uavStatusChangeRequest={}", uavStatusChangeRequest, e);
+            log.error("[router]无人机状态变更异常，uavStatusChangeRequest={}", uavStatusChangeRequest, e);
             uavStatusChangeResponse.fail(e.getMessage());
         }
         return uavStatusChangeResponse;
@@ -271,7 +274,7 @@ public class GcsServiceImpl implements IGcsService {
         GcsControlUavResponse gcsControlUavResponse = new GcsControlUavResponse();
         gcsControlUavResponse.fail();
         try {
-            log.error("地面站指控指令执行start，gcsControlUavRequest={}", gcsControlUavRequest);
+            log.error("[router]地面站指控指令执行start，gcsControlUavRequest={}", gcsControlUavRequest);
             Long gcsId = Long.valueOf(gcsControlUavRequest.getGcsId());
             for (CommandUavParam commandUavParam : gcsControlUavRequest.getUavList()) {
                 // 构造请求体
@@ -285,9 +288,9 @@ public class GcsServiceImpl implements IGcsService {
                     break;
                 }
             }
-            log.error("地面站指控指令执行end，gcsControlUavRequest={}，gcsControlUavResponse={}", gcsControlUavRequest, gcsControlUavResponse);
+            log.error("[router]地面站指控指令执行end，gcsControlUavRequest={}，gcsControlUavResponse={}", gcsControlUavRequest, JsonUtils.object2Json(gcsControlUavResponse));
         } catch (Exception e) {
-            log.error("地面站指控指令执行异常，gcsControlUavRequest={}", gcsControlUavRequest, e);
+            log.error("[router]地面站指控指令执行异常，gcsControlUavRequest={}", gcsControlUavRequest, e);
             gcsControlUavResponse.fail(e.getMessage());
         }
         return gcsControlUavResponse;
@@ -322,16 +325,32 @@ public class GcsServiceImpl implements IGcsService {
         return uavChangeStatusRequest;
     }
 
-    private BaseResponse validateChangeUavParam(Long uavId, GcsInfoDO gcsInfo, Long masterPilotId, Long deputyPilotId) {
+    private BaseResponse validateGcs(Long gcsId) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.fail();
+        if (gcsDalService.validateGcsId(gcsId)) {
+            if (gcsDalService.validateGcsStatus(gcsId)) {
+                baseResponse.success();
+            } else {
+                baseResponse.fail(ErrorCodeEnum.GCS_NOT_SIGN_IN);
+            }
+        } else {
+            baseResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
+        }
+        return baseResponse;
+    }
+
+    private BaseResponse validateUavStatusChangeParam(Long uavId, GcsInfoDO gcsInfo, Long masterPilotId, Long deputyPilotId) {
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.fail();
         UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
         if (uavInfo != null) {
-            if (Objects.equals(uavInfo.getTypeId(), gcsInfo.getControllableUavType())) {
+            if (uavInfo.getTypeId() == (uavInfo.getTypeId() & gcsInfo.getControllableUavType())) {
                 PilotInfoDO masterPilotInfo = pilotDalService.queryPilotInfo(masterPilotId);
                 PilotInfoDO deputyPilotInfo = deputyPilotId != null ? pilotDalService.queryPilotInfo(deputyPilotId) : masterPilotInfo;
                 if (masterPilotInfo != null && deputyPilotInfo != null) {
-                    if (Objects.equals(uavInfo.getTypeId(), masterPilotInfo.getControllableUavType()) || Objects.equals(uavInfo.getTypeId(), deputyPilotInfo.getControllableUavType())) {
+                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & masterPilotInfo.getControllableUavType()) ||
+                            uavInfo.getTypeId() == (uavInfo.getTypeId() & deputyPilotInfo.getControllableUavType())) {
                         baseResponse.success();
                     } else {
                         baseResponse.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);
@@ -348,7 +367,7 @@ public class GcsServiceImpl implements IGcsService {
         return baseResponse;
     }
 
-    private BaseResponse validateChangeUavParam(Long uavId, Long gcsId) {
+    private BaseResponse validateUavStatusChangeParam(Long uavId, Long gcsId) {
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.fail();
         boolean validateUavIdResult = uavDalService.validateUavId(uavId);

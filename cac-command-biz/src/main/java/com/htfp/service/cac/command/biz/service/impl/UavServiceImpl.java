@@ -10,6 +10,7 @@ import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.NavigationStatusEnum;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
+import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.dao.model.log.CommandAndControlLogDO;
 import com.htfp.service.cac.dao.model.log.NavigationLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
@@ -48,7 +49,7 @@ public class UavServiceImpl implements IUavService {
         UavChangeStatusResponse uavChangeStatusResponse = new UavChangeStatusResponse();
         uavChangeStatusResponse.fail();
         try {
-            log.info("无人机状态更新流程start，uavChangeStatusRequest={}", uavChangeStatusRequest);
+            log.info("[command]无人机状态更新流程start，uavChangeStatusRequest={}", uavChangeStatusRequest);
             // 根据Uav与Navigation的mapping关系校验
             UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(uavChangeStatusRequest.getUavId());
             if (uavNavigationMappingInfo != null) {
@@ -64,9 +65,9 @@ public class UavServiceImpl implements IUavService {
             } else {
                 uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
             }
-            log.info("无人机状态更新流程end，uavChangeStatusRequest={}，uavChangeStatusResponse={}", uavChangeStatusRequest, uavChangeStatusResponse);
+            log.info("[command]无人机状态更新流程end，uavChangeStatusRequest={}，uavChangeStatusResponse={}", uavChangeStatusRequest, JsonUtils.object2Json(uavChangeStatusResponse));
         } catch (Exception e) {
-            log.error("无人机状态更新流程异常，uavChangeStatusRequest={}", uavChangeStatusRequest, e);
+            log.error("[command]无人机状态更新流程异常，uavChangeStatusRequest={}", uavChangeStatusRequest, e);
             uavChangeStatusResponse.fail(e.getMessage());
         }
         return uavChangeStatusResponse;
@@ -83,7 +84,7 @@ public class UavServiceImpl implements IUavService {
         SaveUavControlLogResponse saveUavControlLogResponse = new SaveUavControlLogResponse();
         saveUavControlLogResponse.fail();
         try {
-            log.info("存储无人机指控指令流程start，saveUavControlLogRequest={}", saveUavControlLogRequest);
+            log.info("[command]存储无人机指控指令流程start，saveUavControlLogRequest={}", saveUavControlLogRequest);
             // 根据Uav与Navigation的mapping关系校验
             UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(saveUavControlLogRequest.getUavId());
             if (uavNavigationMappingInfo != null) {
@@ -93,9 +94,9 @@ public class UavServiceImpl implements IUavService {
             } else {
                 saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
             }
-            log.info("存储无人机指控指令流程end，saveUavControlLogRequest={}, saveUavControlLogResponse={}", saveUavControlLogRequest, saveUavControlLogResponse);
+            log.info("[command]存储无人机指控指令流程end，saveUavControlLogRequest={}, saveUavControlLogResponse={}", saveUavControlLogRequest, JsonUtils.object2Json(saveUavControlLogResponse));
         } catch (Exception e) {
-            log.error("存储无人机指控指令流程异常，saveUavControlLogRequest={}", saveUavControlLogRequest, e);
+            log.error("[command]存储无人机指控指令流程异常，saveUavControlLogRequest={}", saveUavControlLogRequest, e);
             saveUavControlLogResponse.fail(e.getMessage());
         }
         return saveUavControlLogResponse;
