@@ -96,6 +96,10 @@ public class UavDalService {
         updateUavGcsMapping(uavGcsMappingDO);
     }
 
+    public int deleteUavGcsMappingByUavId(Long uavId) {
+        return uavGcsMappingMapper.deleteByUavId(uavId);
+    }
+
     public boolean validateUavId(Long uavId) {
         List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavId(uavId);
         return CollectionUtils.isNotEmpty(uavInfoDOList);
@@ -166,12 +170,24 @@ public class UavDalService {
         updateUavNavigationMapping(uavNavigationMappingInfo);
     }
 
+    public int deleteUavNavigationMappingByUavId(Long uavId) {
+        return uavNavigationMappingMapper.deleteByUavId(uavId);
+    }
+
     public int insertUavStatusLog(UavStatusLogDO uavStatusLogDO) {
         return uavStatusLogMapper.insertUavStatusLogDO(uavStatusLogDO);
     }
 
+    public int deleteUavStatusById(Long id) {
+        return uavStatusLogMapper.deleteById(id);
+    }
+
     public int insertCommandAndControlLog(CommandAndControlLogDO commandAndControlLogDO) {
         return commandAndControlLogMapper.insertCommandAndControlLog(commandAndControlLogDO);
+    }
+
+    public int deleteCommandAndControlLogById(Long id) {
+        return commandAndControlLogMapper.deleteById(id);
     }
 
     public UavStatusLogDO buildUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {

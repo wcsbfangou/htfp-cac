@@ -9,6 +9,7 @@ import com.htfp.service.cac.command.biz.model.resquest.UavChangeStatusRequest;
 import com.htfp.service.cac.command.biz.service.ICommandService;
 import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
@@ -43,7 +44,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @Author sunjipeng
@@ -83,8 +83,8 @@ public class GcsServiceImpl implements IGcsService {
             log.info("[router]地面站注册start，signRequest={}", signInRequest);
             final Long gcsId = Long.valueOf(signInRequest.getGcsId());
             //校验地面站
-            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
-            if (validateGcsIdResult) {
+            boolean validateGcsResult = gcsDalService.validateGcsType(gcsId, GcsTypeEnum.GCS);
+            if (validateGcsResult) {
                 // 更新或插入地面站与Ip的mapping关系表
                 GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
                 if (gcsIpMappingDO != null) {
@@ -119,8 +119,8 @@ public class GcsServiceImpl implements IGcsService {
             log.info("[router]地面站注销start，signOutRequest={}", signOutRequest);
             final Long gcsId = Long.valueOf(signOutRequest.getGcsId());
             // 校验地面站
-            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
-            if (validateGcsIdResult) {
+            boolean validateGcsResult = gcsDalService.validateGcsType(gcsId, GcsTypeEnum.GCS);
+            if (validateGcsResult) {
                 // 判断地面站是否可下线
                 List<UavGcsMappingDO> uavGcsMappingDOList = uavDalService.queryUavGcsMapping(gcsId, MappingStatusEnum.VALID);
                 if (CollectionUtils.isNotEmpty(uavGcsMappingDOList)) {
@@ -130,14 +130,18 @@ public class GcsServiceImpl implements IGcsService {
                     GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
                     if (gcsIpMappingDO != null) {
                         //(1)校验gcs与Ip的mapping关系
-                        if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
-                            signOutResponse.setMessage("地面站注销时IP与注册时IP不一致，不可下线");
+                        if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))){
+                            if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
+                                signOutResponse.setMessage("地面站注销时IP与注册时IP不一致，不可下线");
+                            } else {
+                                //(2)校验通过后更新gcs与Ip的mapping关系
+                                gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
+                                gcsIpMappingDO.setGmtModify(new Date());
+                                gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
+                                signOutResponse.success();
+                            }
                         } else {
-                            //(2)校验通过后更新gcs与Ip的mapping关系
-                            gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
-                            gcsIpMappingDO.setGmtModify(new Date());
-                            gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
-                            signOutResponse.success();
+                            signOutResponse.setMessage("地面站已下线，不可重复下线");
                         }
                     } else {
                         signOutResponse.setMessage("地面站未注册过，不可下线");
@@ -182,7 +186,6 @@ public class GcsServiceImpl implements IGcsService {
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                         //(5)构造请求体
                         GcsChangeControlUavRequest gcsChangeControlUavRequest = buildGcsChangeControlUavRequest(gcsId, uavId, changeUavParam.getNewArrival(), changeUavParam.getUavStatus(), masterPilotId, deputyPilotId);
-                        // TODO: 2022/6/1 (6)(7)事务
                         //(6)调用指控模块接口，变更在控无人机
                         GcsChangeControlUavResponse gcsChangeControlUavResponse = commandService.gcsChangeUav(gcsChangeControlUavRequest);
                         //(7)插入或更新uav与gcs的mapping关系表
@@ -233,7 +236,6 @@ public class GcsServiceImpl implements IGcsService {
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                         // (3)构造请求体
                         UavChangeStatusRequest uavChangeStatusRequest = buildUavChangeStatusRequest(gcsId, uavId, changeUavStatusParam.getUavStatus());
-                        // TODO: 2022/6/1 (4)(5)事务
                         //(4)调用指控模块接口，变更无人机状态
                         UavChangeStatusResponse uavChangeStatusResponse = uavService.uavChangeStatus(uavChangeStatusRequest);
                         if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(uavChangeStatusResponse.getCode()))) {
@@ -328,7 +330,7 @@ public class GcsServiceImpl implements IGcsService {
     private BaseResponse validateGcs(Long gcsId) {
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.fail();
-        if (gcsDalService.validateGcsId(gcsId)) {
+        if (gcsDalService.validateGcsType(gcsId, GcsTypeEnum.GCS)) {
             if (gcsDalService.validateGcsStatus(gcsId)) {
                 baseResponse.success();
             } else {
@@ -349,7 +351,7 @@ public class GcsServiceImpl implements IGcsService {
                 PilotInfoDO masterPilotInfo = pilotDalService.queryPilotInfo(masterPilotId);
                 PilotInfoDO deputyPilotInfo = deputyPilotId != null ? pilotDalService.queryPilotInfo(deputyPilotId) : masterPilotInfo;
                 if (masterPilotInfo != null && deputyPilotInfo != null) {
-                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & masterPilotInfo.getControllableUavType()) ||
+                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & masterPilotInfo.getControllableUavType()) &&
                             uavInfo.getTypeId() == (uavInfo.getTypeId() & deputyPilotInfo.getControllableUavType())) {
                         baseResponse.success();
                     } else {

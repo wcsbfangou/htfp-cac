@@ -7,6 +7,7 @@ import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
 import com.htfp.service.cac.common.constant.HttpUriConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.common.utils.http.CustomHttpConfig;
@@ -77,16 +78,16 @@ public class RcsServiceImpl implements IRcsService {
         signInResponse.fail();
         try {
             log.info("[router]远程地面站注册start，signRequest={}", signInRequest);
-            final Long gcsId = Long.valueOf(signInRequest.getGcsId());
+            final Long rcsId = Long.valueOf(signInRequest.getGcsId());
             // 校验地面站
-            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
-            if (validateGcsIdResult) {
+            boolean validateRcsResult = gcsDalService.validateGcsType(rcsId, GcsTypeEnum.RCS);
+            if (validateRcsResult) {
                 // 更新或插入地面站与Ip的mapping关系表
-                GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
+                GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(rcsId);
                 if (gcsIpMappingDO != null) {
                     gcsDalService.updateGcsIpMappingIp(gcsIpMappingDO, signInRequest.getGcsIp());
                 } else {
-                    gcsIpMappingDO = gcsDalService.buildGcsIpMappingDO(gcsId, signInRequest.getGcsIp());
+                    gcsIpMappingDO = gcsDalService.buildGcsIpMappingDO(rcsId, signInRequest.getGcsIp());
                     gcsDalService.insertGcsIpMapping(gcsIpMappingDO);
                 }
                 signInResponse.success();
@@ -113,22 +114,26 @@ public class RcsServiceImpl implements IRcsService {
         signOutResponse.fail();
         try {
             log.info("[router]远程地面站注销start，signOutRequest={}", signOutRequest);
-            final Long gcsId = Long.valueOf(signOutRequest.getGcsId());
+            final Long rcsId = Long.valueOf(signOutRequest.getGcsId());
             //校验地面站
-            boolean validateGcsIdResult = gcsDalService.validateGcsId(gcsId);
-            if (validateGcsIdResult) {
+            boolean validateRcsResult = gcsDalService.validateGcsType(rcsId, GcsTypeEnum.RCS);
+            if (validateRcsResult) {
                 // 地面站下线
-                GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
+                GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(rcsId);
                 if (gcsIpMappingDO != null) {
                     //(1)校验gcs与Ip的mapping关系
-                    if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
-                        signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
+                    if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))){
+                        if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
+                            signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
+                        } else {
+                            //(2)校验通过后更新gcs与Ip的mapping关系
+                            gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
+                            gcsIpMappingDO.setGmtModify(new Date());
+                            gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
+                            signOutResponse.success();
+                        }
                     } else {
-                        //(2)校验通过后更新gcs与Ip的mapping关系
-                        gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
-                        gcsIpMappingDO.setGmtModify(new Date());
-                        gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
-                        signOutResponse.success();
+                        signOutResponse.setMessage("地面站已下线，不可重复下线");
                     }
                 } else {
                     signOutResponse.setMessage("远程地面站未注册过，不可下线");

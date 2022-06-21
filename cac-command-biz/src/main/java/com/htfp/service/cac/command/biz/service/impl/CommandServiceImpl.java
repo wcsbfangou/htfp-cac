@@ -46,8 +46,14 @@ public class CommandServiceImpl implements ICommandService {
             log.info("[command]地面站在控无人机变更start，gcsChangeControlUavRequest={}", gcsChangeControlUavRequest);
             Long navigationId;
             // TODO: 2022/6/1 事务
+            UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(gcsChangeControlUavRequest.getUavId());
             // 判断是否为新启动的无人机
             if (gcsChangeControlUavRequest.getNewArrival()) {
+                //校验无人机是否结束航行或未开始航行
+                if (uavNavigationMapping != null && MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))) {
+                    gcsChangeControlUavResponse.fail("无人机处于航行中，非新启动无人机");
+                    return gcsChangeControlUavResponse;
+                }
                 // TODO: 2022/6/1 IDC ID && 机器ID
                 // 生成navigationId
                 navigationId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
@@ -57,7 +63,6 @@ public class CommandServiceImpl implements ICommandService {
                 insertOrUpdateUavNavigationMapping(gcsChangeControlUavRequest.getUavId(), navigationId);
             } else {
                 //校验无人机是否结束航行或未开始航行
-                UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(gcsChangeControlUavRequest.getUavId());
                 if (uavNavigationMapping == null || MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))) {
                     gcsChangeControlUavResponse.fail("无人机已结束航行或未开始航行");
                     return gcsChangeControlUavResponse;

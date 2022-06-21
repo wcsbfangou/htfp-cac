@@ -35,6 +35,10 @@ public class NavigationDalService {
         return navigationLogMapper.insertNavigationLog(navigationLogDO);
     }
 
+    public int deleteNavigationLogById(Long id) {
+        return navigationLogMapper.deleteById(id);
+    }
+
     public void updateNavigationLogStatus(NavigationLogDO navigationLog, NavigationStatusEnum navigationStatusEnum) {
         navigationLog.setNavigationStatus(navigationStatusEnum.getCode());
         navigationLog.setGmtModify(new Date());
