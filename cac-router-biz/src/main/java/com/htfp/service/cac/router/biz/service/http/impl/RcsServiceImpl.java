@@ -122,7 +122,7 @@ public class RcsServiceImpl implements IRcsService {
                 GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(rcsId);
                 if (gcsIpMappingDO != null) {
                     //(1)校验gcs与Ip的mapping关系
-                    if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))){
+                    if (MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))) {
                         if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
                             signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
                         } else {
@@ -159,99 +159,121 @@ public class RcsServiceImpl implements IRcsService {
     public RcsControlUavResponse rcsControlUav(RcsControlUavRequest rcsControlUavRequest) {
         RcsControlUavResponse rcsControlUavResponse = new RcsControlUavResponse();
         rcsControlUavResponse.fail();
-        try{
+        try {
             log.info("[router]远程地面站指控指令执行start，gcsControlUavRequest={}", rcsControlUavRequest);
             List<CommandUavResultParam> commandUavResultParamList = new ArrayList<>();
             Long rcsId = Long.valueOf(rcsControlUavRequest.getGcsId());
-            // 遍历uavList进行处理
-            for (CommandUavParam commandUavParam : rcsControlUavRequest.getUavList()) {
-                Long uavId = Long.valueOf(commandUavParam.getUavId());
-                Long pilotId = Long.valueOf(commandUavParam.getPilotId());
-                //(1)校验无人机是否处于航行中
-                BaseResponse validateUavInNavigationResponse = validateUavInNavigation(uavId);
-                if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavInNavigationResponse.getCode()))){
-                    //(2)校验可控无人机类型
-                    BaseResponse validateControlTypeResponse = validateControlType(uavId, rcsId, pilotId);
-                    if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateControlTypeResponse.getCode()))){
-                        //(3)查询无人机与地面站Mapping关系
+            BaseResponse validateRcsResult = validateRcs(rcsId);
+            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateRcsResult.getCode()))) {
+                // 循环之前查询rcsInfo
+                GcsInfoDO rcsInfo = gcsDalService.queryGcsInfo(rcsId);
+                // 遍历uavList进行处理
+                for (CommandUavParam commandUavParam : rcsControlUavRequest.getUavList()) {
+                    Long uavId = Long.valueOf(commandUavParam.getUavId());
+                    Long pilotId = Long.valueOf(commandUavParam.getPilotId());
+                    //(1)校验可控无人机类型
+                    BaseResponse validateControlTypeResponse = validateControlType(rcsInfo, uavId, pilotId);
+                    if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateControlTypeResponse.getCode()))) {
+                        //(2)查询无人机与地面站Mapping关系
                         UavGcsMappingDO uavGcsMapping = uavDalService.queryUavGcsMapping(uavId);
-                        Long gcsId = uavGcsMapping.getGcsId();
-                        //(4)向地面站发起指控命令HTTP请求
-                        RouterControlUavResponse routerControlUavResponse = routerControlUav(gcsId, rcsId, commandUavParam);
-                        if(routerControlUavResponse != null){
-                            //(5)根据响应体判断结果
-                            Boolean controlResult = getRouterControlResult(routerControlUavResponse);
-                            if(controlResult != null){
-                                //(6)构造响应结果
-                                CommandUavResultParam commandUavResultParam = new CommandUavResultParam();
-                                commandUavResultParam.setUavId(commandUavParam.getUavId());
-                                commandUavResultParam.setCommandResult(controlResult);
-                                //(7)构造请求体
-                                SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), controlResult);
-                                //(8)调用指控模块接口，更新指控记录日志
-                                SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
-                                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
-                                    commandUavResultParamList.add(commandUavResultParam);
-                                    rcsControlUavResponse.success();
+                        if (uavGcsMapping != null && MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(uavGcsMapping.getStatus()))) {
+                            Long gcsId = uavGcsMapping.getGcsId();
+                            //(3)向地面站发起指控命令HTTP请求
+                            //RouterControlUavResponse routerControlUavResponse = routerControlUav(gcsId, rcsId, commandUavParam);
+                            // TODO: 2022/6/22 测试之后删除
+                            RouterControlUavResponse routerControlUavResponse = new RouterControlUavResponse();
+                            routerControlUavResponse.setSuccess(true);
+                            routerControlUavResponse.setData("{\"uavId\":\"111111\",\"commandResult\":true}");
+                            if (routerControlUavResponse != null) {
+                                //(4)根据响应体判断结果
+                                Boolean controlResult = getRouterControlResult(routerControlUavResponse);
+                                if (controlResult != null) {
+                                    //(5)构造响应结果
+                                    CommandUavResultParam commandUavResultParam = new CommandUavResultParam();
+                                    commandUavResultParam.setUavId(commandUavParam.getUavId());
+                                    commandUavResultParam.setCommandResult(controlResult);
+                                    //(6)构造请求体
+                                    SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, rcsId, uavId, pilotId, commandUavParam.getCommandCode(), controlResult);
+                                    //(7)调用指控模块接口，更新指控记录日志
+                                    SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
+                                    if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
+                                        commandUavResultParamList.add(commandUavResultParam);
+                                        rcsControlUavResponse.success();
+                                    } else {
+                                        rcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
+                                        break;
+                                    }
                                 } else {
-                                    rcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
+                                    rcsControlUavResponse.setMessage("请求地面站未获得结果");
                                     break;
                                 }
                             } else {
-                                rcsControlUavResponse.setMessage("请求地面站未获得结果");
+                                rcsControlUavResponse.setMessage("请求地面站异常");
+                                break;
                             }
                         } else {
-                            rcsControlUavResponse.setMessage("请求地面站异常");
+                            rcsControlUavResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
+                            break;
                         }
                     } else {
                         rcsControlUavResponse.fail(validateControlTypeResponse.getCode(), validateControlTypeResponse.getMessage());
                         break;
                     }
-                } else {
-                    rcsControlUavResponse.fail(validateUavInNavigationResponse.getCode(), validateUavInNavigationResponse.getMessage());
-                    break;
                 }
+            } else {
+                rcsControlUavResponse.fail(validateRcsResult.getCode(), validateRcsResult.getMessage());
             }
             rcsControlUavResponse.setCommandUavResultParamList(commandUavResultParamList);
             log.info("[router]远程地面站指控指令执行end，gcsControlUavRequest={}，rcsControlUavResponse={}", rcsControlUavRequest, JsonUtils.object2Json(rcsControlUavResponse));
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("[router]远程地面站指控指令执行异常，gcsControlUavRequest={}", rcsControlUavRequest, e);
             rcsControlUavResponse.fail(e.getMessage());
         }
         return rcsControlUavResponse;
     }
 
-    private BaseResponse validateUavInNavigation(Long uavId){
-        BaseResponse response= new BaseResponse();
-        response.fail();
-        UavNavigationMappingDO uavNavigationMapping = uavDalService.queryUavNavigationMapping(uavId);
-        if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(uavNavigationMapping.getStatus()))){
-            response.success();
-        } else {
-            response.fail(ErrorCodeEnum.UAV_NOT_IN_NAVIGATION);
-        }
-        return response;
-    }
-
-    private BaseResponse validateControlType(Long uavId, Long rcsId, Long pilotId){
-        BaseResponse response= new BaseResponse();
-        response.fail();
-        UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
-        GcsInfoDO rcsInfo = gcsDalService.queryGcsInfo(rcsId);
-        PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
-        if(uavInfo.getTypeId() == (uavInfo.getTypeId() & rcsInfo.getControllableUavType())){
-            if(uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())){
-                response.success();
-            }else{
-                response.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);
+    private BaseResponse validateRcs(Long rcsId) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.fail();
+        if (gcsDalService.validateGcsType(rcsId, GcsTypeEnum.RCS)) {
+            if (gcsDalService.validateGcsStatus(rcsId)) {
+                baseResponse.success();
+            } else {
+                baseResponse.fail(ErrorCodeEnum.GCS_NOT_SIGN_IN);
             }
         } else {
-            response.fail(ErrorCodeEnum.GCS_MISMATCH_UAV);
+            baseResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
         }
+        return baseResponse;
+    }
+
+    private BaseResponse validateControlType(GcsInfoDO rcsInfo, Long uavId, Long pilotId) {
+        BaseResponse response = new BaseResponse();
+        response.fail();
+        UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
+        if (uavInfo != null) {
+            if (uavInfo.getTypeId() == (uavInfo.getTypeId() & rcsInfo.getControllableUavType())) {
+                PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
+                if (pilotInfo != null) {
+                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())) {
+                        response.success();
+                    } else {
+                        response.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);
+                    }
+                } else {
+                    response.fail(ErrorCodeEnum.WRONG_PILOT_ID);
+                }
+            } else {
+                response.fail(ErrorCodeEnum.GCS_MISMATCH_UAV);
+            }
+        } else {
+            response.fail(ErrorCodeEnum.WRONG_UAV_ID);
+        }
+
         return response;
     }
 
-    private SaveUavControlLogRequest buildSaveUavControlLogRequest(Long gcsId, Long rcsId, Long uavId, Long pilotId, Integer commandCode, Boolean commandResult){
+    private SaveUavControlLogRequest buildSaveUavControlLogRequest(Long gcsId, Long rcsId, Long uavId, Long pilotId, Integer commandCode, Boolean commandResult) {
         SaveUavControlLogRequest saveUavControlLogRequest = new SaveUavControlLogRequest();
         saveUavControlLogRequest.setGcsId(gcsId);
         saveUavControlLogRequest.setRcsId(rcsId);
@@ -262,11 +284,11 @@ public class RcsServiceImpl implements IRcsService {
         return saveUavControlLogRequest;
     }
 
-    private RouterControlUavResponse routerControlUav(Long gcsId, Long rcsId, CommandUavParam commandUavParam){
+    private RouterControlUavResponse routerControlUav(Long gcsId, Long rcsId, CommandUavParam commandUavParam) {
         RouterControlUavResponse routerControlUavResponse = null;
-        try{
+        try {
             String url = getUrl(gcsId);
-            if(StringUtils.isNotEmpty(url)){
+            if (StringUtils.isNotEmpty(url)) {
                 RouterControlUavRequest routerControlUavRequest = buildRouterControlUavRequest(rcsId, commandUavParam);
                 HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
                         .contentObject(JsonUtils.object2Json(routerControlUavRequest, false))
@@ -278,21 +300,22 @@ public class RcsServiceImpl implements IRcsService {
                 String httpResponse = HttpAsyncClient.getInstance().executePost(url, customHttpConfig, httpContentWrapper, httpHeader);
                 routerControlUavResponse = decodeHttpResponse(httpResponse);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("[router]请求地面站发生异常", e);
         }
         return routerControlUavResponse;
     }
 
-    private String getUrl(Long gcsId){
+    private String getUrl(Long gcsId) {
         GcsIpMappingDO gcsIpMapping = gcsDalService.queryGcsIpMapping(gcsId);
-        if(gcsIpMapping==null||MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(gcsIpMapping.getStatus()))||gcsIpMapping.getGcsIp()==null){
+        if (gcsIpMapping == null || MappingStatusEnum.INVALID.equals(MappingStatusEnum.getFromCode(gcsIpMapping.getStatus())) || gcsIpMapping.getGcsIp() == null) {
             return null;
         } else {
             return gcsIpMapping.getGcsIp() + "/" + HttpUriConstant.ROUTER_CONTROL_UAV;
         }
     }
-    private RouterControlUavRequest buildRouterControlUavRequest(Long rcsId, CommandUavParam commandUavParam){
+
+    private RouterControlUavRequest buildRouterControlUavRequest(Long rcsId, CommandUavParam commandUavParam) {
         RouterControlUavRequest routerControlUavRequest = new RouterControlUavRequest();
         routerControlUavRequest.setGcsId(rcsId.toString());
         routerControlUavRequest.setUavList(Arrays.asList(commandUavParam));
@@ -301,17 +324,17 @@ public class RcsServiceImpl implements IRcsService {
 
     public Map<String, String> builderRequestHeader() {
         Map<String, String> map = Maps.newHashMap();
-        map.put("Accept","application/json");
+        map.put("Accept", "application/json");
         map.put("Content-Type", "application/json;charset=UTF-8");
         return map;
     }
 
-    private CustomHttpConfig buildCustomHttpConfig(){
+    private CustomHttpConfig buildCustomHttpConfig() {
         return new CustomHttpConfig();
     }
 
     private RouterControlUavResponse decodeHttpResponse(String response) throws Exception {
-        if (response==null ||StringUtils.isBlank(response)) {
+        if (response == null || StringUtils.isBlank(response)) {
             return null;
         } else {
             RouterControlUavResponse routerControlUavResponse = JsonUtils.json2ObjectThrowException(response, RouterControlUavResponse.class);
@@ -319,12 +342,12 @@ public class RcsServiceImpl implements IRcsService {
             return routerControlUavResponse;
         }
     }
-    
-    private Boolean getRouterControlResult(RouterControlUavResponse routerControlUavResponse){
+
+    private Boolean getRouterControlResult(RouterControlUavResponse routerControlUavResponse) {
         Boolean result = null;
-        if(routerControlUavResponse.getSuccess()){
+        if (routerControlUavResponse.getSuccess()) {
             CommandUavResultParam commandUavResultParam = JsonUtils.json2Object(routerControlUavResponse.getData(), CommandUavResultParam.class);
-            if(commandUavResultParam!=null){
+            if (commandUavResultParam != null) {
                 return commandUavResultParam.getCommandResult();
             }
         }

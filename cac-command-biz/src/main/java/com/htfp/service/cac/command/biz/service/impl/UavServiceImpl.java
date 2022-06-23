@@ -63,7 +63,7 @@ public class UavServiceImpl implements IUavService {
                 }
                 uavChangeStatusResponse.success();
             } else {
-                uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
+                uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
             log.info("[command]无人机状态更新流程end，uavChangeStatusRequest={}，uavChangeStatusResponse={}", uavChangeStatusRequest, JsonUtils.object2Json(uavChangeStatusResponse));
         } catch (Exception e) {
@@ -87,12 +87,12 @@ public class UavServiceImpl implements IUavService {
             log.info("[command]存储无人机指控指令流程start，saveUavControlLogRequest={}", saveUavControlLogRequest);
             // 根据Uav与Navigation的mapping关系校验
             UavNavigationMappingDO uavNavigationMappingInfo = uavDalService.queryUavNavigationMapping(saveUavControlLogRequest.getUavId());
-            if (uavNavigationMappingInfo != null) {
+            if (uavNavigationMappingInfo != null && MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(uavNavigationMappingInfo.getStatus()))) {
                 // 插入指挥控制日志
                 insertCommandAndControlLog(saveUavControlLogRequest.getUavId(), uavNavigationMappingInfo.getNavigationId(), saveUavControlLogRequest.getGcsId(), saveUavControlLogRequest.getRcsId(), saveUavControlLogRequest.getPilotId(), saveUavControlLogRequest.getCommandCode(), CommandResultEnum.getFromResult(saveUavControlLogRequest.getCommandResult()));
                 saveUavControlLogResponse.success();
             } else {
-                saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
+                saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
             log.info("[command]存储无人机指控指令流程end，saveUavControlLogRequest={}, saveUavControlLogResponse={}", saveUavControlLogRequest, JsonUtils.object2Json(saveUavControlLogResponse));
         } catch (Exception e) {

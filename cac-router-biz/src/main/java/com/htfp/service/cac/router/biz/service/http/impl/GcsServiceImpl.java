@@ -130,7 +130,7 @@ public class GcsServiceImpl implements IGcsService {
                     GcsIpMappingDO gcsIpMappingDO = gcsDalService.queryGcsIpMapping(gcsId);
                     if (gcsIpMappingDO != null) {
                         //(1)校验gcs与Ip的mapping关系
-                        if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))){
+                        if (MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(gcsIpMappingDO.getStatus()))) {
                             if (!gcsIpMappingDO.getGcsIp().equals(signOutRequest.getGcsIp())) {
                                 signOutResponse.setMessage("地面站注销时IP与注册时IP不一致，不可下线");
                             } else {
@@ -279,14 +279,21 @@ public class GcsServiceImpl implements IGcsService {
             log.error("[router]地面站指控指令执行start，gcsControlUavRequest={}", gcsControlUavRequest);
             Long gcsId = Long.valueOf(gcsControlUavRequest.getGcsId());
             for (CommandUavParam commandUavParam : gcsControlUavRequest.getUavList()) {
-                // 构造请求体
-                SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, Long.valueOf(commandUavParam.getUavId()), Long.valueOf(commandUavParam.getPilotId()), commandUavParam.getCommandCode(), commandUavParam.getCommandResult());
-                //调用指控模块接口，更新指控记录日志
-                SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
-                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
-                    gcsControlUavResponse.success();
+                // 校验请求体
+                BaseResponse validateCommandUavParamResult = validateCommandUavParam(gcsId, Long.valueOf(commandUavParam.getUavId()), Long.valueOf(commandUavParam.getPilotId()));
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateCommandUavParamResult.getCode()))) {
+                    // 构造请求体
+                    SaveUavControlLogRequest saveUavControlLogRequest = buildSaveUavControlLogRequest(gcsId, Long.valueOf(commandUavParam.getUavId()), Long.valueOf(commandUavParam.getPilotId()), commandUavParam.getCommandCode(), commandUavParam.getCommandResult());
+                    //调用指控模块接口，更新指控记录日志
+                    SaveUavControlLogResponse saveUavControlLogResponse = uavService.saveUavControlLog(saveUavControlLogRequest);
+                    if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(saveUavControlLogResponse.getCode()))) {
+                        gcsControlUavResponse.success();
+                    } else {
+                        gcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
+                        break;
+                    }
                 } else {
-                    gcsControlUavResponse.fail(saveUavControlLogResponse.getCode(), saveUavControlLogResponse.getMessage());
+                    gcsControlUavResponse.fail(validateCommandUavParamResult.getCode(), validateCommandUavParamResult.getMessage());
                     break;
                 }
             }
@@ -378,10 +385,40 @@ public class GcsServiceImpl implements IGcsService {
             if (uavGcsMapping != null) {
                 baseResponse.success();
             } else {
-                baseResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
+                baseResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
         } else {
             baseResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);
+        }
+        return baseResponse;
+    }
+
+    private BaseResponse validateCommandUavParam(Long gcsId, Long uavId, Long pilotId) {
+        BaseResponse baseResponse = new BaseResponse();
+        baseResponse.fail();
+        GcsInfoDO gcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        if (gcsInfo != null) {
+            UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
+            if (uavInfo != null) {
+                if (uavInfo.getTypeId() == (uavInfo.getTypeId() & gcsInfo.getControllableUavType())) {
+                    PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
+                    if (pilotInfo != null) {
+                        if (uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())) {
+                            baseResponse.success();
+                        } else {
+                            baseResponse.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);
+                        }
+                    } else {
+                        baseResponse.fail(ErrorCodeEnum.WRONG_PILOT_ID);
+                    }
+                } else {
+                    baseResponse.fail(ErrorCodeEnum.GCS_MISMATCH_UAV);
+                }
+            } else {
+                baseResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);
+            }
+        } else {
+            baseResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
         }
         return baseResponse;
     }

@@ -43,10 +43,10 @@ public class GcsDalService {
         }
     }
 
-    public boolean validateRcsToken(Long gcsId, String gcsToken) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
+    public boolean validateRcsToken(Long rcsId, String rcsToken) {
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(rcsId);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            if (gcsInfoDOList.get(0).getToken().equals(gcsToken) &&
+            if (gcsInfoDOList.get(0).getToken().equals(rcsToken) &&
                     GcsTypeEnum.RCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))) {
                 return true;
             }
