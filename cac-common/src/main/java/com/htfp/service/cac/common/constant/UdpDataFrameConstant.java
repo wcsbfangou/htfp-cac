@@ -8,4 +8,7 @@ package com.htfp.service.cac.common.constant;
 public class UdpDataFrameConstant {
 
     public static final int DATA_FRAME_MIN_LENGTH = 13;
+    public static final String RESP = "receive:";
+    public static final String RCS_IS_NOT_SIGN_IN_OR_HAS_SUBSCRIBED = "rcs is not sign in or has been subscribed";
+    public static final String RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE = "rcs is not sign in or has been canceled subscribe";
 }

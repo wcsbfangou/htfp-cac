@@ -9,6 +9,7 @@ import com.htfp.service.cac.common.constant.HttpUriConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.common.utils.http.CustomHttpConfig;
 import com.htfp.service.cac.common.utils.http.HttpAsyncClient;
@@ -18,7 +19,6 @@ import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
-import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
@@ -41,7 +41,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -127,9 +126,7 @@ public class RcsServiceImpl implements IRcsService {
                             signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
                         } else {
                             //(2)校验通过后更新gcs与Ip的mapping关系
-                            gcsIpMappingDO.setStatus(MappingStatusEnum.INVALID.getCode());
-                            gcsIpMappingDO.setGmtModify(new Date());
-                            gcsDalService.updateGcsIpMapping(gcsIpMappingDO);
+                            gcsDalService.updateGcsIpMappingStatusAndSubscribe(gcsIpMappingDO, MappingStatusEnum.INVALID, SubscribeDataEnum.UN_SUBSCRIBE);
                             signOutResponse.success();
                         }
                     } else {

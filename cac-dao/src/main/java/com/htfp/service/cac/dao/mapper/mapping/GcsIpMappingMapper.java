@@ -85,6 +85,35 @@ public interface GcsIpMappingMapper {
     List<GcsIpMappingDO> selectByGcsIdAndStatus(@Param(value = "gcsId") Long gcsId, @Param(value = "status") Integer status);
 
     /**
+     * 根据subscribe查询
+     *
+     * @param subscribe
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE subscribe = #{subscribe} AND is_del = 0")
+    List<GcsIpMappingDO> selectBySubscribe(@Param(value = "subscribe") Integer subscribe);
+
+    /**
+     * 根据gcsId && subscribe 查询
+     *
+     * @param gcsId
+     * @param subscribe
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE gcs_id = #{gcsId} AND subscribe = #{subscribe} AND is_del = 0")
+    List<GcsIpMappingDO> selectByGcsIdAndSubscribe(@Param(value = "gcsId") Long gcsId, @Param(value = "subscribe") Integer subscribe);
+
+    /**
+     * 根据status && subscribe 查询
+     *
+     * @param status
+     * @param subscribe
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE status = #{status} AND subscribe = #{subscribe} AND is_del = 0")
+    List<GcsIpMappingDO> selectByStatusAndSubscribe(@Param(value = "status") Integer status, @Param(value = "subscribe") Integer subscribe);
+
+    /**
      * 根据gcsId && gcsIp 查询
      *
      * @param gcsId
@@ -131,9 +160,9 @@ public interface GcsIpMappingMapper {
      * @param gcsIpMapping
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, gmt_create, gmt_modify) "
-            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE gcs_ip=#{gcsIpMapping.gcsIp}, status=#{gcsIpMapping.status}, gmt_modify=#{gcsIpMapping.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, subscribe, gmt_create, gmt_modify) "
+            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.subscribe}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE gcs_ip=#{gcsIpMapping.gcsIp}, status=#{gcsIpMapping.status}, subscribe=#{gcsIpMapping.subscribe}, gmt_modify=#{gcsIpMapping.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "gcsIpMapping.id")
     int insertGcsIpMapping(@Param(value = "gcsIpMapping") GcsIpMappingDO gcsIpMapping);
 
@@ -164,6 +193,7 @@ public interface GcsIpMappingMapper {
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"gcsIpMapping.gcsIp != null\"> gcs_ip = #{gcsIpMapping.gcsIp}, </if>"
             + "<if test=\"gcsIpMapping.status != null\"> status = #{gcsIpMapping.status}, </if>"
+            + "<if test=\"gcsIpMapping.subscribe != null\"> subscribe = #{gcsIpMapping.subscribe}, </if>"
             + "<if test=\"gcsIpMapping.isDel != null\"> is_del = #{gcsIpMapping.isDel}, </if>"
             + "<if test=\"gcsIpMapping.gmtModify != null\"> gmt_modify = #{gcsIpMapping.gmtModify} </if>"
             + "</set>"

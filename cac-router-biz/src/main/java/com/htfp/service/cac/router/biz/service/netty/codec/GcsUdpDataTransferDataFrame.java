@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.codec;
 
+import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import lombok.Data;
 
 /**

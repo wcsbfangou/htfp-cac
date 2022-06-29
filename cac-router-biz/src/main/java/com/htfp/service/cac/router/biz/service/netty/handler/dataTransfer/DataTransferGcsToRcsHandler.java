@@ -1,15 +1,21 @@
 package com.htfp.service.cac.router.biz.service.netty.handler.dataTransfer;
 
+import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
+import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
+import com.htfp.service.cac.router.biz.service.NettyBaseContext;
 import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDataFrame;
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
-import com.htfp.service.cac.router.biz.service.netty.server.NettyChannelManager;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -18,21 +24,29 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class DataTransferGcsToRcsHandler implements IDataFrameHandler<GcsUdpDataTransferDataFrame> {
+public class DataTransferGcsToRcsHandler implements IDataFrameHandler {
 
-    @Resource
-    private NettyChannelManager nettyChannelManager;
+    @Value("${gcsUdpDataTransfer.rcsPort}")
+    private int port;
 
     @Resource
     private GcsDalService gcsDalService;
 
     @Override
-    public void execute(Channel channel, GcsUdpDataTransferDataFrame dataFrame) {
+    public void execute(Channel channel, NettyBaseContext baseContext) {
+        GcsUdpDataTransferDataFrame dataFrame = (GcsUdpDataTransferDataFrame) baseContext.getDataFrame();
         if (dataFrame != null) {
             Long gcsId = Long.valueOf(dataFrame.getGcsId());
             String gcsToken = dataFrame.getGcsToken();
             if (gcsDalService.validateGcsToken(gcsId, gcsToken)) {
-                nettyChannelManager.sendAllUser(dataFrame);
+                List<InetSocketAddress> inetSocketAddressList = new ArrayList<>();
+                List<GcsIpMappingDO> gcsIpMappingList = gcsDalService.queryGcsIpMapping(SubscribeDataEnum.SUBSCRIBE);
+                for (GcsIpMappingDO gcsIpMapping : gcsIpMappingList) {
+                    InetSocketAddress inetSocketAddress = new InetSocketAddress(gcsIpMapping.getGcsIp(), port);
+                    inetSocketAddressList.add(inetSocketAddress);
+                }
+                baseContext.setReceiverList(inetSocketAddressList);
+                channel.writeAndFlush(baseContext);
             }
         }
     }

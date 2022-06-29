@@ -1,10 +1,13 @@
 package com.htfp.service.cac.router.biz.service.netty.codec;
 
 import com.htfp.service.cac.common.constant.UdpDataFrameConstant;
+import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
+import com.htfp.service.cac.router.biz.service.NettyBaseContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.CorruptedFrameException;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -15,9 +18,12 @@ import java.util.List;
  * @Description 地面站数据透传解码器
  */
 @Slf4j
-public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
+public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramPacket> {
+
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, DatagramPacket packet, List<Object> out) throws Exception {
+        NettyBaseContext nettyBaseContext = new NettyBaseContext();
+        ByteBuf in = packet.content();
         GcsUdpDataTransferDataFrame gcsUdpDataTransferDataFrame = new GcsUdpDataTransferDataFrame();
         // 标记当前读取位置
         in.markReaderIndex();
@@ -71,8 +77,25 @@ public class GcsUdpDataTransferDecoder extends ByteToMessageDecoder {
         in.readBytes(dataByteArray);
         gcsUdpDataTransferDataFrame.setLength(dataLength);
         gcsUdpDataTransferDataFrame.setData(new String(dataByteArray));
-        out.add(gcsUdpDataTransferDataFrame);
+
+        // 获得 type 对应的 DataFrameHandler 处理器
+        DataFrameTypeEnum dataFrameTypeEnum = getDataFrameType(gcsUdpDataTransferDataFrame);
+        nettyBaseContext.setDataFrameTypeEnum(dataFrameTypeEnum);
+        nettyBaseContext.setDataFrame(gcsUdpDataTransferDataFrame);
+        nettyBaseContext.setOriginSender(packet.sender());
+        out.add(nettyBaseContext);
         // TODO: 2022/6/13 测试之后记得删除此log
         log.info("[decode][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsUdpDataTransferDataFrame.toString());
     }
+
+
+    private DataFrameTypeEnum getDataFrameType(GcsUdpDataTransferDataFrame gcsUdpDataTransferDataFrame) {
+        DataFrameTypeEnum dataFrameTypeEnum = DataFrameTypeEnum.getFromMagicCodeAndType(gcsUdpDataTransferDataFrame.getMagicCode(), gcsUdpDataTransferDataFrame.getType());
+        if (dataFrameTypeEnum != null) {
+            return dataFrameTypeEnum;
+        } else {
+            return null;
+        }
+    }
+
 }

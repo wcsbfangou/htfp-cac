@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.handler;
 
+import com.htfp.service.cac.router.biz.service.NettyBaseContext;
 import com.htfp.service.cac.router.biz.service.netty.codec.BaseDataFrame;
 import io.netty.channel.Channel;
 
@@ -8,15 +9,15 @@ import io.netty.channel.Channel;
  * @Date 2022-06-11 15:30
  * @Description Handler接口
  */
-public interface IDataFrameHandler<T extends BaseDataFrame> {
+public interface IDataFrameHandler {
 
     /**
      * 执行处理消息
      *
      * @param channel   通道
-     * @param dataFrame 数据帧
+     * @param nettyBaseContext 数据帧上下文
      */
-    void execute(Channel channel, T dataFrame);
+    void execute(Channel channel, NettyBaseContext nettyBaseContext);
 
     /**
      * 获取消息类型
