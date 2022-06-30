@@ -23,28 +23,32 @@ public class GcsUdpDataTransferEncoder extends MessageToMessageEncoder<NettyBase
     @Override
     protected void encode(ChannelHandlerContext ctx, NettyBaseContext baseContext, List<Object> list) throws Exception {
         GcsUdpDataTransferDataFrame dataFrame = (GcsUdpDataTransferDataFrame) baseContext.getDataFrame();
-        ByteBuf buf = ctx.alloc().buffer(UdpDataFrameConstant.DATA_FRAME_MIN_LENGTH + dataFrame.getGcsIdLength() + dataFrame.getGcsTokenLength() + dataFrame.getLength());
-        if (dataFrame != null) {
-            buf.writeShort(dataFrame.getMagicCode());
-            buf.writeByte(dataFrame.getVersion());
-            buf.writeByte(dataFrame.getSerializationAlgorithm());
-            buf.writeByte(dataFrame.getType());
-            buf.writeByte(dataFrame.getGcsIdLength());
-            buf.writeBytes(dataFrame.getGcsId().getBytes(), 0, dataFrame.getGcsIdLength());
-            buf.writeByte(dataFrame.getGcsTokenLength());
-            buf.writeBytes(dataFrame.getGcsToken().getBytes(), 0, dataFrame.getGcsTokenLength());
-            buf.writeShort(dataFrame.getSequenceId());
-            buf.writeInt(dataFrame.getLength());
-            buf.writeBytes(dataFrame.getData().getBytes());
-            // TODO: 2022/6/13 测试之后记得删除此log
-            log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
-            list.add(new DatagramPacket(buf, baseContext.getOriginSender()));
-            if (CollectionUtils.isNotEmpty(baseContext.getReceiverList())) {
-                for (InetSocketAddress inetSocketAddress : baseContext.getReceiverList()) {
-                    buf.retain();
-                    list.add(new DatagramPacket(buf, inetSocketAddress));
+        try {
+            ByteBuf buf = ctx.alloc().buffer(UdpDataFrameConstant.DATA_FRAME_MIN_LENGTH + dataFrame.getGcsIdLength() + dataFrame.getGcsTokenLength() + dataFrame.getLength());
+            if (dataFrame != null) {
+                buf.writeShort(dataFrame.getMagicCode());
+                buf.writeByte(dataFrame.getVersion());
+                buf.writeByte(dataFrame.getSerializationAlgorithm());
+                buf.writeByte(dataFrame.getType());
+                buf.writeByte(dataFrame.getGcsIdLength());
+                buf.writeBytes(dataFrame.getGcsId().getBytes(), 0, dataFrame.getGcsIdLength());
+                buf.writeByte(dataFrame.getGcsTokenLength());
+                buf.writeBytes(dataFrame.getGcsToken().getBytes(), 0, dataFrame.getGcsTokenLength());
+                buf.writeShort(dataFrame.getSequenceId());
+                buf.writeInt(dataFrame.getLength());
+                buf.writeBytes(dataFrame.getData().getBytes());
+                // TODO: 2022/6/13 测试之后记得删除此log
+                log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
+                list.add(new DatagramPacket(buf, baseContext.getOriginSender()));
+                if (CollectionUtils.isNotEmpty(baseContext.getReceiverList())) {
+                    for (InetSocketAddress inetSocketAddress : baseContext.getReceiverList()) {
+                        buf.retain();
+                        list.add(new DatagramPacket(buf, inetSocketAddress));
+                    }
                 }
             }
+        } catch (Exception e) {
+            log.error("GcsUdpDataTransferEncoder 发生异常, nettyBaseContext={}", baseContext, e);
         }
     }
 }

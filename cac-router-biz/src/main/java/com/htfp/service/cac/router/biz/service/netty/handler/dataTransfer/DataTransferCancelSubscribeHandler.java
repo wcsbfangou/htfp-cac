@@ -31,24 +31,31 @@ public class DataTransferCancelSubscribeHandler implements IDataFrameHandler {
     @Override
     public void execute(Channel channel, NettyBaseContext baseContext) {
         GcsUdpDataTransferDataFrame dataFrame = (GcsUdpDataTransferDataFrame) baseContext.getDataFrame();
-        if (dataFrame != null) {
-            Long rcsId = Long.valueOf(dataFrame.getGcsId());
-            String rcsToken = dataFrame.getGcsToken();
-            if (gcsDalService.validateRcsToken(rcsId, rcsToken)) {
-                // 远程地面站取消订阅数据报文
-                Boolean cancelSubscribe = subscribeManager.cancelSubscribe(dataFrame.getGcsId());
-                if(cancelSubscribe){
-                    String newData = UdpDataFrameConstant.RESP + dataFrame.getData();
-                    dataFrame.setData(newData);
-                    dataFrame.setLength(newData.length());
+        try {
+            if (dataFrame != null) {
+                Long rcsId = Long.valueOf(dataFrame.getGcsId());
+                String rcsToken = dataFrame.getGcsToken();
+                if (gcsDalService.validateRcsToken(rcsId, rcsToken)) {
+                    // 远程地面站取消订阅数据报文
+                    Boolean cancelSubscribe = subscribeManager.cancelSubscribe(dataFrame.getGcsId());
+                    if (cancelSubscribe) {
+                        String newData = UdpDataFrameConstant.RESP + dataFrame.getData();
+                        dataFrame.setData(newData);
+                        dataFrame.setLength(newData.length());
+                    } else {
+                        dataFrame.setData(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE);
+                        dataFrame.setLength(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE.length());
+                    }
                 } else {
-                    dataFrame.setData(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE);
-                    dataFrame.setLength(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE.length());
+                    dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
+                    dataFrame.setLength(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc().length());
                 }
-            } else {
-                dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
-                dataFrame.setLength(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc().length());
+                channel.writeAndFlush(baseContext);
             }
+        } catch (Exception e) {
+            log.error("取消订阅发生异常, nettyContext= {}", baseContext, e);
+            dataFrame.setData(UdpDataFrameConstant.CANCEL_SUBSCRIBE_EXCEPTION);
+            dataFrame.setLength(UdpDataFrameConstant.CANCEL_SUBSCRIBE_EXCEPTION.length());
             channel.writeAndFlush(baseContext);
         }
     }

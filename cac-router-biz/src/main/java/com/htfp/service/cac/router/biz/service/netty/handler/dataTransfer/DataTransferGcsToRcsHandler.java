@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.handler.dataTransfer;
 
+import com.htfp.service.cac.common.constant.UdpDataFrameConstant;
 import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
@@ -35,19 +36,27 @@ public class DataTransferGcsToRcsHandler implements IDataFrameHandler {
     @Override
     public void execute(Channel channel, NettyBaseContext baseContext) {
         GcsUdpDataTransferDataFrame dataFrame = (GcsUdpDataTransferDataFrame) baseContext.getDataFrame();
-        if (dataFrame != null) {
-            Long gcsId = Long.valueOf(dataFrame.getGcsId());
-            String gcsToken = dataFrame.getGcsToken();
-            if (gcsDalService.validateGcsToken(gcsId, gcsToken)) {
-                List<InetSocketAddress> inetSocketAddressList = new ArrayList<>();
-                List<GcsIpMappingDO> gcsIpMappingList = gcsDalService.queryGcsIpMapping(SubscribeDataEnum.SUBSCRIBE);
-                for (GcsIpMappingDO gcsIpMapping : gcsIpMappingList) {
-                    InetSocketAddress inetSocketAddress = new InetSocketAddress(gcsIpMapping.getGcsIp(), port);
-                    inetSocketAddressList.add(inetSocketAddress);
+        try {
+            if (dataFrame != null) {
+                Long gcsId = Long.valueOf(dataFrame.getGcsId());
+                String gcsToken = dataFrame.getGcsToken();
+                if (gcsDalService.validateGcsToken(gcsId, gcsToken)) {
+                    // TODO: 2022/6/30 本地缓存
+                    List<InetSocketAddress> inetSocketAddressList = new ArrayList<>();
+                    List<GcsIpMappingDO> gcsIpMappingList = gcsDalService.queryGcsIpMapping(SubscribeDataEnum.SUBSCRIBE);
+                    for (GcsIpMappingDO gcsIpMapping : gcsIpMappingList) {
+                        InetSocketAddress inetSocketAddress = new InetSocketAddress(gcsIpMapping.getGcsIp(), port);
+                        inetSocketAddressList.add(inetSocketAddress);
+                    }
+                    baseContext.setReceiverList(inetSocketAddressList);
+                    channel.writeAndFlush(baseContext);
                 }
-                baseContext.setReceiverList(inetSocketAddressList);
-                channel.writeAndFlush(baseContext);
             }
+        } catch (Exception e) {
+            log.error("数据透传发生异常, nettyContext= {}", baseContext, e);
+            dataFrame.setData(UdpDataFrameConstant.DATA_TRANSFER_EXCEPTION);
+            dataFrame.setLength(UdpDataFrameConstant.DATA_TRANSFER_EXCEPTION.length());
+            channel.writeAndFlush(baseContext);
         }
     }
 
