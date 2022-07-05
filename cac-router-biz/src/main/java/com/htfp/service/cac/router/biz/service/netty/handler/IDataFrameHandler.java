@@ -1,7 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.handler;
 
 import com.htfp.service.cac.router.biz.service.NettyBaseContext;
-import com.htfp.service.cac.router.biz.service.netty.codec.BaseDataFrame;
 import io.netty.channel.Channel;
 
 /**

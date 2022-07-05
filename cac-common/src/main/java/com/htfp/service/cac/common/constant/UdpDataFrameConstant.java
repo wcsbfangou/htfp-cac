@@ -14,4 +14,5 @@ public class UdpDataFrameConstant {
     public static final String SUBSCRIBE_EXCEPTION = "subscribe exception";
     public static final String CANCEL_SUBSCRIBE_EXCEPTION = "cancel subscribe exception";
     public static final String DATA_TRANSFER_EXCEPTION = "data transfer exception";
+    public static final String GCS_ID_OR_TOKEN_VALIDATE_FAILED = "gcsId or token validate failed";
 }

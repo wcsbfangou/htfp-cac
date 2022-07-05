@@ -10,6 +10,7 @@ import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDat
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
 import io.netty.channel.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -44,13 +45,21 @@ public class DataTransferGcsToRcsHandler implements IDataFrameHandler {
                     // TODO: 2022/6/30 本地缓存
                     List<InetSocketAddress> inetSocketAddressList = new ArrayList<>();
                     List<GcsIpMappingDO> gcsIpMappingList = gcsDalService.queryGcsIpMapping(SubscribeDataEnum.SUBSCRIBE);
-                    for (GcsIpMappingDO gcsIpMapping : gcsIpMappingList) {
-                        InetSocketAddress inetSocketAddress = new InetSocketAddress(gcsIpMapping.getGcsIp(), port);
-                        inetSocketAddressList.add(inetSocketAddress);
+                    if(CollectionUtils.isNotEmpty(gcsIpMappingList)){
+                        for (GcsIpMappingDO gcsIpMapping : gcsIpMappingList) {
+                            InetSocketAddress inetSocketAddress = new InetSocketAddress(gcsIpMapping.getGcsIp(), port);
+                            inetSocketAddressList.add(inetSocketAddress);
+                        }
+                        baseContext.setReceiverList(inetSocketAddressList);
+                    } else {
+                        dataFrame.setData(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_SUBSCRIBED);
+                        dataFrame.setLength(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_SUBSCRIBED.length());
                     }
-                    baseContext.setReceiverList(inetSocketAddressList);
-                    channel.writeAndFlush(baseContext);
+                } else {
+                    dataFrame.setData(UdpDataFrameConstant.GCS_ID_OR_TOKEN_VALIDATE_FAILED);
+                    dataFrame.setLength(UdpDataFrameConstant.GCS_ID_OR_TOKEN_VALIDATE_FAILED.length());
                 }
+                channel.writeAndFlush(baseContext);
             }
         } catch (Exception e) {
             log.error("数据透传发生异常, nettyContext= {}", baseContext, e);

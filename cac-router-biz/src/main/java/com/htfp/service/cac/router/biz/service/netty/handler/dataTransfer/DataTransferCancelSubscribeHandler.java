@@ -1,7 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.handler.dataTransfer;
 
 import com.htfp.service.cac.common.constant.UdpDataFrameConstant;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.router.biz.service.NettyBaseContext;
@@ -47,8 +46,8 @@ public class DataTransferCancelSubscribeHandler implements IDataFrameHandler {
                         dataFrame.setLength(UdpDataFrameConstant.RCS_IS_NOT_SIGN_IN_OR_HAS_CANCELED_SUBSCRIBE.length());
                     }
                 } else {
-                    dataFrame.setData(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc());
-                    dataFrame.setLength(ErrorCodeEnum.GCS_ID_VALIDATE_FAIL.getDesc().length());
+                    dataFrame.setData(UdpDataFrameConstant.GCS_ID_OR_TOKEN_VALIDATE_FAILED);
+                    dataFrame.setLength(UdpDataFrameConstant.GCS_ID_OR_TOKEN_VALIDATE_FAILED.length());
                 }
                 channel.writeAndFlush(baseContext);
             }
