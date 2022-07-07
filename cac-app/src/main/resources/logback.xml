@@ -5,7 +5,7 @@
 <configuration scan="true" scanPeriod="10 seconds">
 
     <contextName>cacRouter</contextName>
-    <property name="log.path" value="D:/CAC-Router/logs"/>
+    <property name="log.path" value="D:/PROGRAM/CAC-Router/logs"/>
     <property name="info.name" value="info"/>
     <property name="error.name" value="error"/>
     <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->

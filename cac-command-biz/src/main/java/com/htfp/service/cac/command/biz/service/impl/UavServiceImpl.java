@@ -63,7 +63,7 @@ public class UavServiceImpl implements IUavService {
                 }
                 uavChangeStatusResponse.success();
             } else {
-                uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
+                uavChangeStatusResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation的" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
             log.info("[command]无人机状态更新流程end，uavChangeStatusRequest={}，uavChangeStatusResponse={}", uavChangeStatusRequest, JsonUtils.object2Json(uavChangeStatusResponse));
         } catch (Exception e) {
@@ -92,7 +92,7 @@ public class UavServiceImpl implements IUavService {
                 insertCommandAndControlLog(saveUavControlLogRequest.getUavId(), uavNavigationMappingInfo.getNavigationId(), saveUavControlLogRequest.getGcsId(), saveUavControlLogRequest.getRcsId(), saveUavControlLogRequest.getPilotId(), saveUavControlLogRequest.getCommandCode(), CommandResultEnum.getFromResult(saveUavControlLogRequest.getCommandResult()));
                 saveUavControlLogResponse.success();
             } else {
-                saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
+                saveUavControlLogResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与navigation的" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
             log.info("[command]存储无人机指控指令流程end，saveUavControlLogRequest={}, saveUavControlLogResponse={}", saveUavControlLogRequest, JsonUtils.object2Json(saveUavControlLogResponse));
         } catch (Exception e) {

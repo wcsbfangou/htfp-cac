@@ -382,7 +382,7 @@ public class GcsServiceImpl implements IGcsService {
             if (uavGcsMapping != null) {
                 baseResponse.success();
             } else {
-                baseResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
+                baseResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs的" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
             }
         } else {
             baseResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);

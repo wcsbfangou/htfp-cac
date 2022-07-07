@@ -209,7 +209,7 @@ public class RcsServiceImpl implements IRcsService {
                                 break;
                             }
                         } else {
-                            rcsControlUavResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
+                            rcsControlUavResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING.getCode(), "uav与gcs的" + ErrorCodeEnum.LACK_OF_MAPPING.getDesc());
                             break;
                         }
                     } else {
