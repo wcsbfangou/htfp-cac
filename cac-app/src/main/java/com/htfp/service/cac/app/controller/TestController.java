@@ -41,10 +41,10 @@ public class TestController {
     public boolean deleteGcsInfo(@RequestParam(value = "gcsId") String gcsId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(gcsId) ) {
+            if (!StringUtils.isBlank(gcsId)) {
                 int id = gcsDalService.deleteGcsInfoByGcsId(Long.valueOf(gcsId));
                 if (id > 0) {
-                        result = true;
+                    result = true;
                 }
             }
         } catch (Exception e) {
@@ -58,7 +58,7 @@ public class TestController {
     public boolean deleteUavInfo(@RequestParam(value = "uavId") String uavId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(uavId) ) {
+            if (!StringUtils.isBlank(uavId)) {
                 int id = uavDalService.deleteUavInfoByUavId(Long.valueOf(uavId));
                 if (id > 0) {
                     result = true;
@@ -75,7 +75,7 @@ public class TestController {
     public boolean deletePilotIdInfo(@RequestParam(value = "pilotId") String pilotId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(pilotId) ) {
+            if (!StringUtils.isBlank(pilotId)) {
                 int id = pilotDalService.deletePilotInfoByPilotId(Long.valueOf(pilotId));
                 if (id > 0) {
                     result = true;
@@ -92,7 +92,7 @@ public class TestController {
     public boolean deleteGcsIpMappingInfo(@RequestParam(value = "gcsId") String gcsId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(gcsId) ) {
+            if (!StringUtils.isBlank(gcsId)) {
                 int id = gcsDalService.deleteGcsIpMapping(Long.valueOf(gcsId));
                 if (id > 0) {
                     result = true;
@@ -109,7 +109,7 @@ public class TestController {
     public boolean deleteUavGcsMappingInfo(@RequestParam(value = "uavId") String uavId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(uavId) ) {
+            if (!StringUtils.isBlank(uavId)) {
                 int id = uavDalService.deleteUavGcsMappingByUavId(Long.valueOf(uavId));
                 if (id > 0) {
                     result = true;
@@ -126,7 +126,7 @@ public class TestController {
     public boolean deleteUavNavigationMappingInfo(@RequestParam(value = "uavId") String uavId) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(uavId) ) {
+            if (!StringUtils.isBlank(uavId)) {
                 int id = uavDalService.deleteUavNavigationMappingByUavId(Long.valueOf(uavId));
                 if (id > 0) {
                     result = true;
@@ -143,7 +143,7 @@ public class TestController {
     public boolean deleteNavigationLogById(@RequestParam(value = "id") String id) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(id) ) {
+            if (!StringUtils.isBlank(id)) {
                 int res = navigationDalService.deleteNavigationLogById(Long.valueOf(id));
                 if (res > 0) {
                     result = true;
@@ -160,7 +160,7 @@ public class TestController {
     public boolean deleteUavStatusLogById(@RequestParam(value = "id") String id) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(id) ) {
+            if (!StringUtils.isBlank(id)) {
                 int res = uavDalService.deleteUavStatusById(Long.valueOf(id));
                 if (res > 0) {
                     result = true;
@@ -177,7 +177,7 @@ public class TestController {
     public boolean deleteCommandAndControlLogById(@RequestParam(value = "id") String id) {
         boolean result = false;
         try {
-            if (!StringUtils.isBlank(id) ) {
+            if (!StringUtils.isBlank(id)) {
                 int res = uavDalService.deleteCommandAndControlLogById(Long.valueOf(id));
                 if (res > 0) {
                     result = true;
