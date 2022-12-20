@@ -50,7 +50,7 @@ import java.util.List;
  * @Description 地面站服务类
  */
 @Slf4j
-@Service
+@Service("gcsServiceImpl")
 public class GcsServiceImpl implements IGcsService {
 
     @Resource
@@ -351,12 +351,12 @@ public class GcsServiceImpl implements IGcsService {
         baseResponse.fail();
         UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
         if (uavInfo != null) {
-            if (uavInfo.getTypeId() == (uavInfo.getTypeId() & gcsInfo.getControllableUavType())) {
+            if (uavInfo.getUavType() == (uavInfo.getUavType() & gcsInfo.getControllableUavType())) {
                 PilotInfoDO masterPilotInfo = pilotDalService.queryPilotInfo(masterPilotId);
                 PilotInfoDO deputyPilotInfo = deputyPilotId != null ? pilotDalService.queryPilotInfo(deputyPilotId) : masterPilotInfo;
                 if (masterPilotInfo != null && deputyPilotInfo != null) {
-                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & masterPilotInfo.getControllableUavType()) &&
-                            uavInfo.getTypeId() == (uavInfo.getTypeId() & deputyPilotInfo.getControllableUavType())) {
+                    if (uavInfo.getUavType() == (uavInfo.getUavType() & masterPilotInfo.getControllableUavType()) &&
+                            uavInfo.getUavType() == (uavInfo.getUavType() & deputyPilotInfo.getControllableUavType())) {
                         baseResponse.success();
                     } else {
                         baseResponse.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);
@@ -397,10 +397,10 @@ public class GcsServiceImpl implements IGcsService {
         if (gcsInfo != null) {
             UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
             if (uavInfo != null) {
-                if (uavInfo.getTypeId() == (uavInfo.getTypeId() & gcsInfo.getControllableUavType())) {
+                if (uavInfo.getUavType() == (uavInfo.getUavType() & gcsInfo.getControllableUavType())) {
                     PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
                     if (pilotInfo != null) {
-                        if (uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())) {
+                        if (uavInfo.getUavType() == (uavInfo.getUavType() & pilotInfo.getControllableUavType())) {
                             baseResponse.success();
                         } else {
                             baseResponse.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);

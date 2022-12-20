@@ -30,25 +30,24 @@ public class GcsDalService {
     GcsIpMappingMapper gcsIpMappingMapper;
 
     public boolean validateGcsId(Long gcsId) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        return CollectionUtils.isNotEmpty(gcsInfoDOList);
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        return gcsInfoDO != null;
     }
 
     public boolean validateGcsType(Long gcsId, GcsTypeEnum gcsTypeEnum) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            GcsInfoDO gcsInfoDO = gcsInfoDOList.get(0);
-            return gcsTypeEnum.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getTypeId()));
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        if (gcsInfoDO != null) {
+            return gcsTypeEnum.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()));
         } else {
             return false;
         }
     }
 
     public boolean validateRcsToken(Long rcsId, String rcsToken) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(rcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            if (gcsInfoDOList.get(0).getToken().equals(rcsToken) &&
-                    GcsTypeEnum.RCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))) {
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(rcsId);
+        if (gcsInfoDO != null) {
+            if (gcsInfoDO.getToken().equals(rcsToken) &&
+                    GcsTypeEnum.RCS.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()))) {
                 return true;
             }
         }
@@ -56,10 +55,10 @@ public class GcsDalService {
     }
 
     public boolean validateGcsToken(Long gcsId, String gcsToken) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            if (gcsInfoDOList.get(0).getToken().equals(gcsToken) &&
-                    GcsTypeEnum.GCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))) {
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        if (gcsInfoDO != null) {
+            if (gcsInfoDO.getToken().equals(gcsToken) &&
+                    GcsTypeEnum.GCS.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()))) {
                 return true;
             }
         }
@@ -67,7 +66,11 @@ public class GcsDalService {
     }
 
     public GcsInfoDO queryGcsInfo(Long gcsId) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
+        return gcsInfoMapper.selectById(gcsId);
+    }
+
+    public GcsInfoDO queryGcsInfo(String gcsReg) {
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsReg(gcsReg);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
             return gcsInfoDOList.get(0);
         } else {
@@ -75,8 +78,18 @@ public class GcsDalService {
         }
     }
 
+
     public List<GcsInfoDO> queryGcsInfo(GcsTypeEnum gcsTypeEnum) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByTypeId(gcsTypeEnum.getCode());
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsType(gcsTypeEnum.getCode());
+        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
+            return gcsInfoDOList;
+        } else {
+            return null;
+        }
+    }
+
+    public List<GcsInfoDO> queryGcsInfoByOperatorId(Long operatorId) {
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByOperatorId(operatorId);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
             return gcsInfoDOList;
         } else {
@@ -93,11 +106,7 @@ public class GcsDalService {
     }
 
     public int deleteGcsInfoByGcsId(Long gcsId) {
-        return gcsInfoMapper.deleteByGcsId(gcsId);
-    }
-
-    public int deleteGcsInfoById(Long id) {
-        return gcsInfoMapper.deleteById(id);
+        return gcsInfoMapper.deleteById(gcsId);
     }
 
     public int updateGcsInfoControllableUavType(GcsInfoDO gcsInfoDO, Integer controllableUavType) {
@@ -200,13 +209,15 @@ public class GcsDalService {
         return gcsIpMappingDO;
     }
 
-    public GcsInfoDO buildGcsInfoDO(Long gcsId, Integer typeId, Integer controllableUavType, Integer dataLinkType, String token) {
+    public GcsInfoDO buildGcsInfoDO(String gcsReg, String gcsSn, Integer gcsType, Integer controllableUavType, Integer dataLinkType, String token, Long operatorId) {
         GcsInfoDO gcsInfoDO = new GcsInfoDO();
-        gcsInfoDO.setGcsId(gcsId);
-        gcsInfoDO.setTypeId(typeId);
+        gcsInfoDO.setGcsReg(gcsReg);
+        gcsInfoDO.setGcsSn(gcsSn);
+        gcsInfoDO.setGcsType(gcsType);
         gcsInfoDO.setControllableUavType(controllableUavType);
         gcsInfoDO.setDataLinkType(dataLinkType);
         gcsInfoDO.setToken(token);
+        gcsInfoDO.setOperatorId(operatorId);
         gcsInfoDO.setGmtCreate(new Date());
         gcsInfoDO.setGmtModify(new Date());
         return gcsInfoDO;

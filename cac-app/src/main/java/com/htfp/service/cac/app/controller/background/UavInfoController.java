@@ -2,11 +2,16 @@ package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
-import com.htfp.service.cac.dao.model.entity.UavInfoDO;
-import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.cac.router.biz.model.background.request.CancelUavInfoRequest;
+import com.htfp.service.cac.router.biz.model.background.request.RegisterUavInfoRequest;
+import com.htfp.service.cac.router.biz.model.background.response.CancelUavInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.DeleteUavInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.InsertUavInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.QueryUavInfoResponse;
-import com.htfp.service.cac.router.biz.model.background.UavInfoParam;
 import com.htfp.service.cac.router.biz.model.background.request.UavInfoRequest;
+import com.htfp.service.cac.router.biz.model.background.response.RegisterUavInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.UpdateUavInfoResponse;
+import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -27,11 +32,11 @@ import javax.annotation.Resource;
 @RequestMapping("/background/uav")
 public class UavInfoController {
 
-    @Resource
-    private HttpValidator httpValidator;
+    @Resource(name = "staticInfoServiceImpl")
+    private IStaticInfoService staticInfoService;
 
     @Resource
-    private UavDalService uavDalService;
+    private HttpValidator httpValidator;
 
     /**
      * 根据uavId查询uav信息
@@ -47,48 +52,63 @@ public class UavInfoController {
         try {
             if (StringUtils.isBlank(uavId)) {
                 queryUavInfoResponse.fail(ErrorCodeEnum.LACK_OF_UAV_ID);
-            }
-            UavInfoDO uavInfo = uavDalService.queryUavInfo(Long.valueOf(uavId));
-            if (uavInfo != null) {
-                UavInfoParam uavInfoParam = new UavInfoParam();
-                uavInfoParam.setUavId(uavInfo.getUavId().toString());
-                uavInfoParam.setTypeId(uavInfo.getTypeId());
-                queryUavInfoResponse.setData(uavInfoParam);
-                queryUavInfoResponse.success();
             } else {
-                queryUavInfoResponse.fail("无此uav数据");
+                queryUavInfoResponse = staticInfoService.queryUavInfo(Long.valueOf(uavId));
             }
         } catch (Exception e) {
-            log.error("查询无人机信息异常, uavId={}", uavId, e);
+            log.error("查询uav信息异常, uavId={}", uavId, e);
+            queryUavInfoResponse.fail("查询uav信息异常");
         }
         return queryUavInfoResponse;
     }
 
     /**
-     * 更新uav类型
+     * 根据uavReg查询uav信息
      *
-     * @param uavId
-     * @param typeId
+     * @param uavReg
      * @return
      */
-    @RequestMapping(value = "/updateUavInfoType", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryUavInfoByUavReg", method = RequestMethod.POST)
     @ResponseBody
-    public boolean updateUavInfoType(@RequestParam(value = "uavId") String uavId, @RequestParam(value = "typeId") Integer typeId) {
-        boolean result = false;
+    public QueryUavInfoResponse queryUavByUavIdByUavReg(@RequestParam(value = "uavReg") String uavReg) {
+        QueryUavInfoResponse queryUavInfoResponse = new QueryUavInfoResponse();
+        queryUavInfoResponse.fail();
         try {
-            if (!StringUtils.isBlank(uavId) && typeId != null) {
-                UavInfoDO uavInfo = uavDalService.queryUavInfo(Long.valueOf(uavId));
-                if (uavInfo != null) {
-                    int id = uavDalService.updateUavInfoTypeId(uavInfo, typeId);
-                    if (id > 0) {
-                        result = true;
-                    }
-                }
+            if (StringUtils.isBlank(uavReg)) {
+                queryUavInfoResponse.fail(ErrorCodeEnum.LACK_OF_UAV_REG);
+            } else {
+                queryUavInfoResponse = staticInfoService.queryUavInfoByUavReg(uavReg);
             }
         } catch (Exception e) {
-            log.error("更新无人机类型异常, uavId={}, typeId={}", uavId, typeId, e);
+            log.error("查询uav信息异常, uavReg={}", uavReg, e);
+            queryUavInfoResponse.fail("查询uav信息异常");
         }
-        return result;
+        return queryUavInfoResponse;
+    }
+
+    /**
+     * 更新uav数据
+     *
+     * @param uavInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/updateUavInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public UpdateUavInfoResponse updateUavInfo(@RequestBody UavInfoRequest uavInfoRequest) {
+        UpdateUavInfoResponse updateUavInfoResponse = new UpdateUavInfoResponse();
+        updateUavInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(uavInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                updateUavInfoResponse = staticInfoService.updateUavInfo(uavInfoRequest);
+            } else {
+                updateUavInfoResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e) {
+            log.error("更新uav信息异常, uavInfoRequest={}", uavInfoRequest, e);
+            updateUavInfoResponse.fail("更新uav数据异常");
+        }
+        return updateUavInfoResponse;
     }
 
     /**
@@ -99,20 +119,21 @@ public class UavInfoController {
      */
     @RequestMapping(value = "/insertUavInfo", method = RequestMethod.POST)
     @ResponseBody
-    public boolean insertUavInfo(@RequestBody UavInfoRequest uavInfoRequest) {
-        boolean result = false;
+    public InsertUavInfoResponse insertUavInfo(@RequestBody UavInfoRequest uavInfoRequest) {
+        InsertUavInfoResponse insertUavInfoResponse = new InsertUavInfoResponse();
+        insertUavInfoResponse.fail();
         try {
-            if (ErrorCodeEnum.SUCCESS.equals(httpValidator.httpRequestValidate(uavInfoRequest))) {
-                UavInfoDO uavInfo = uavDalService.buildUavInfoDO(Long.valueOf(uavInfoRequest.getUavId()), uavInfoRequest.getTypeId());
-                int id = uavDalService.insertUavInfo(uavInfo);
-                if (id > 0) {
-                    result = true;
-                }
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(uavInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                insertUavInfoResponse = staticInfoService.typeInUavInfo(uavInfoRequest);
+            } else {
+                insertUavInfoResponse.fail(errorCodeEnum);
             }
         } catch (Exception e) {
-            log.error("插入无人机信息异常, uavInfoRequest={}", uavInfoRequest, e);
+            log.error("插入uav信息异常, uavInfoRequest={}", uavInfoRequest, e);
+            insertUavInfoResponse.fail("插入uav数据异常");
         }
-        return result;
+        return insertUavInfoResponse;
     }
 
     /**
@@ -123,19 +144,69 @@ public class UavInfoController {
      */
     @RequestMapping(value = "/deleteUavInfoByUavId", method = RequestMethod.POST)
     @ResponseBody
-    public boolean deleteUavInfoByUavId(@RequestParam(value = "uavId") String uavId) {
-        boolean result = false;
+    public DeleteUavInfoResponse deleteUavInfoByUavId(@RequestParam(value = "uavId") String uavId) {
+        DeleteUavInfoResponse deleteUavInfoResponse = new DeleteUavInfoResponse();
+        deleteUavInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(uavId)) {
-                int id = uavDalService.deleteUavInfoByUavId(Long.valueOf(uavId));
-                if (id > 0) {
-                    result = true;
-                }
+                deleteUavInfoResponse = staticInfoService.deleteUavInfo(Long.valueOf(uavId));
+            } else {
+                deleteUavInfoResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);
             }
-
         } catch (Exception e) {
-            log.error("删除无人机信息异常, uavId={}", uavId, e);
+            log.error("删除uav信息异常, uavId={}", uavId, e);
+            deleteUavInfoResponse.fail("删除uav数据失败");
         }
-        return result;
+        return deleteUavInfoResponse;
+    }
+
+    /**
+     * 注册uav信息
+     *
+     * @param registerUavInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/registerUavInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public RegisterUavInfoResponse registerUavInfo(@RequestBody RegisterUavInfoRequest registerUavInfoRequest) {
+        RegisterUavInfoResponse registerUavInfoResponse = new RegisterUavInfoResponse();
+        registerUavInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(registerUavInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                registerUavInfoResponse = staticInfoService.registerUavInfo(registerUavInfoRequest);
+            } else {
+                registerUavInfoResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e) {
+            log.error("注册uav信息异常, registerUavInfoRequest={}", registerUavInfoRequest, e);
+            registerUavInfoResponse.fail("注册uav信息异常");
+        }
+        return registerUavInfoResponse;
+    }
+
+    /**
+     * 注销uav信息
+     *
+     * @param cancelUavInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/cancelUavInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public CancelUavInfoResponse cancelUavInfo(@RequestBody CancelUavInfoRequest cancelUavInfoRequest) {
+        CancelUavInfoResponse cancelUavInfoResponse = new CancelUavInfoResponse();
+        cancelUavInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(cancelUavInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                cancelUavInfoResponse = staticInfoService.cancelUavInfo(cancelUavInfoRequest);
+            } else {
+                cancelUavInfoResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e) {
+            log.error("注销uav信息异常, cancelUavInfoRequest={}", cancelUavInfoRequest, e);
+            cancelUavInfoResponse.fail("注销uav信息异常");
+        }
+        return cancelUavInfoResponse;
     }
 }

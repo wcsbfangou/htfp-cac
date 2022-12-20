@@ -2,11 +2,17 @@ package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
-import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.service.PilotDalService;
-import com.htfp.service.cac.router.biz.model.background.PilotInfoParam;
+import com.htfp.service.cac.router.biz.model.background.request.CancelPilotInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.PilotInfoRequest;
+import com.htfp.service.cac.router.biz.model.background.request.RegisterPilotInfoRequest;
+import com.htfp.service.cac.router.biz.model.background.response.CancelPilotInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.DeletePilotInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.InsertPilotInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.QueryPilotInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.RegisterPilotInfoResponse;
+import com.htfp.service.cac.router.biz.model.background.response.UpdatePilotInfoResponse;
+import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -27,11 +33,11 @@ import javax.annotation.Resource;
 @RequestMapping("/background/pilot")
 public class PilotInfoController {
 
-    @Resource
-    private HttpValidator httpValidator;
+    @Resource(name = "staticInfoServiceImpl")
+    private IStaticInfoService staticInfoService;
 
     @Resource
-    private PilotDalService pilotDalService;
+    private HttpValidator httpValidator;
 
 
     /**
@@ -48,49 +54,66 @@ public class PilotInfoController {
         try {
             if (StringUtils.isBlank(pilotId)) {
                 queryPilotInfoResponse.fail(ErrorCodeEnum.LACK_OF_PILOT_ID);
-            }
-            PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(Long.valueOf(pilotId));
-            if (pilotInfo != null) {
-                PilotInfoParam pilotInfoParam = new PilotInfoParam();
-                pilotInfoParam.setPilotId(pilotInfo.getPilotId().toString());
-                pilotInfoParam.setPilotName(pilotInfo.getPilotName());
-                pilotInfoParam.setControllableUavType(pilotInfo.getControllableUavType());
-                queryPilotInfoResponse.setData(pilotInfoParam);
-                queryPilotInfoResponse.success();
             } else {
-                queryPilotInfoResponse.fail("无此pilot数据");
+                queryPilotInfoResponse = staticInfoService.queryPilotInfo(Long.valueOf(pilotId));
             }
         } catch (Exception e) {
-            log.error("查询驾驶员信息异常, pilotId={}", pilotId, e);
+            log.error("查询pilot信息异常, pilotId={}", pilotId, e);
+            queryPilotInfoResponse.fail("查询pilot信息异常");
         }
         return queryPilotInfoResponse;
     }
 
     /**
-     * 更新pilot可控无人机类型
+     * 根据idCardType和idCardNumber查询pilot信息
      *
-     * @param pilotId
-     * @param controllableUavType
+     * @param
+     * @param
      * @return
      */
-    @RequestMapping(value = "/updatePilotInfoControllableUavType", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryPilotInfoByIdCardInfo", method = RequestMethod.POST)
     @ResponseBody
-    public boolean updatePilotInfoControllableUavType(@RequestParam(value = "pilotId") String pilotId, @RequestParam(value = "controllableUavType") Integer controllableUavType) {
-        boolean result = false;
+    public QueryPilotInfoResponse queryPilotByIdCardInfo(@RequestParam(value = "idCardType") Integer idCardType, @RequestParam(value = "idCardNumber") String idCardNumber) {
+        QueryPilotInfoResponse queryPilotInfoResponse = new QueryPilotInfoResponse();
+        queryPilotInfoResponse.fail();
         try {
-            if (!StringUtils.isBlank(pilotId) && controllableUavType != null) {
-                PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(Long.valueOf(pilotId));
-                if (pilotInfo != null) {
-                    int id = pilotDalService.updatePilotInfoControllableUavType(pilotInfo, controllableUavType);
-                    if (id > 0) {
-                        result = true;
-                    }
-                }
+            if (idCardType == null) {
+                queryPilotInfoResponse.fail(ErrorCodeEnum.LACK_OF_ID_CARD_TYPE);
+            }
+            if (StringUtils.isBlank(idCardNumber)) {
+                queryPilotInfoResponse.fail(ErrorCodeEnum.LACK_OF_ID_CARD_NUMBER);
+            }
+            queryPilotInfoResponse = staticInfoService.queryPilotInfoByIdCardInfo(idCardType, idCardNumber);
+        } catch (Exception e) {
+            log.error("查询pilot信息异常, pilotIdCardType={}, pilotIdCardNumber={}", idCardType, idCardNumber, e);
+            queryPilotInfoResponse.fail("查询pilot信息异常");
+        }
+        return queryPilotInfoResponse;
+    }
+
+    /**
+     * 更新pilot数据
+     *
+     * @param pilotInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/updatePilotInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public UpdatePilotInfoResponse updatePilotInfo(@RequestBody PilotInfoRequest pilotInfoRequest) {
+        UpdatePilotInfoResponse updatePilotInfoResponse = new UpdatePilotInfoResponse();
+        updatePilotInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(pilotInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                updatePilotInfoResponse = staticInfoService.updatePilotInfo(pilotInfoRequest);
+            } else {
+                updatePilotInfoResponse.fail(errorCodeEnum);
             }
         } catch (Exception e) {
-            log.error("更新驾驶员可控无人机类型异常, pilotId={}, controllableUavType={}", pilotId, controllableUavType, e);
+            log.error("更新pilot信息异常, pilotInfoRequest={}", pilotInfoRequest, e);
+            updatePilotInfoResponse.fail("更新pilot数据异常");
         }
-        return result;
+        return updatePilotInfoResponse;
     }
 
     /**
@@ -101,20 +124,21 @@ public class PilotInfoController {
      */
     @RequestMapping(value = "/insertPilotInfo", method = RequestMethod.POST)
     @ResponseBody
-    public boolean insertPilotInfo(@RequestBody PilotInfoRequest pilotInfoRequest) {
-        boolean result = false;
+    public InsertPilotInfoResponse insertPilotInfo(@RequestBody PilotInfoRequest pilotInfoRequest) {
+        InsertPilotInfoResponse insertPilotInfoResponse = new InsertPilotInfoResponse();
+        insertPilotInfoResponse.fail();
         try {
-            if (ErrorCodeEnum.SUCCESS.equals(httpValidator.httpRequestValidate(pilotInfoRequest))) {
-                PilotInfoDO pilotInfoDO = pilotDalService.buildPilotInfoDO(Long.valueOf(pilotInfoRequest.getPilotId()), pilotInfoRequest.getPilotName(), pilotInfoRequest.getControllableUavType());
-                int id = pilotDalService.insertPilotInfo(pilotInfoDO);
-                if (id > 0) {
-                    result = true;
-                }
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(pilotInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                insertPilotInfoResponse = staticInfoService.typeInPilotInfo(pilotInfoRequest);
+            } else {
+                insertPilotInfoResponse.fail(errorCodeEnum);
             }
         } catch (Exception e) {
-            log.error("插入驾驶员信息异常, pilotInfoRequest={}", pilotInfoRequest, e);
+            log.error("插入pilot信息异常, pilotInfoRequest={}", pilotInfoRequest, e);
+            insertPilotInfoResponse.fail("插入pilot数据异常");
         }
-        return result;
+        return insertPilotInfoResponse;
     }
 
     /**
@@ -125,19 +149,69 @@ public class PilotInfoController {
      */
     @RequestMapping(value = "/deletePilotInfoByPilotId", method = RequestMethod.POST)
     @ResponseBody
-    public boolean deletePilotInfoByPilotId(@RequestParam(value = "pilotId") String pilotId) {
-        boolean result = false;
+    public DeletePilotInfoResponse deletePilotInfoByPilotId(@RequestParam(value = "pilotId") String pilotId) {
+        DeletePilotInfoResponse deletePilotInfoResponse = new DeletePilotInfoResponse();
+        deletePilotInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(pilotId)) {
-                int id = pilotDalService.deletePilotInfoByPilotId(Long.valueOf(pilotId));
-                if (id > 0) {
-                    result = true;
-                }
+                deletePilotInfoResponse = staticInfoService.deletePilotInfo(Long.valueOf(pilotId));
+            } else {
+                deletePilotInfoResponse.fail(ErrorCodeEnum.WRONG_PILOT_ID);
             }
-
         } catch (Exception e) {
-            log.error("删除驾驶员信息异常, pilotId={}", pilotId, e);
+            log.error("删除pilot信息异常, pilotId={}", pilotId, e);
+            deletePilotInfoResponse.fail("删除pilot数据失败");
         }
-        return result;
+        return deletePilotInfoResponse;
+    }
+
+    /**
+     * 注册pilot信息
+     *
+     * @param registerPilotInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/registerPilotInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public RegisterPilotInfoResponse registerPilotInfo(@RequestBody RegisterPilotInfoRequest registerPilotInfoRequest) {
+        RegisterPilotInfoResponse registerPilotInfoResponse = new RegisterPilotInfoResponse();
+        registerPilotInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(registerPilotInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                registerPilotInfoResponse = staticInfoService.registerPilotInfo(registerPilotInfoRequest);
+            } else {
+                registerPilotInfoResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e) {
+            log.error("注册pilot信息异常, registerPilotInfoRequest={}", registerPilotInfoRequest, e);
+            registerPilotInfoResponse.fail("注册pilot信息异常");
+        }
+        return registerPilotInfoResponse;
+    }
+
+    /**
+     * 注销pilot信息
+     *
+     * @param cancelPilotInfoRequest
+     * @return
+     */
+    @RequestMapping(value = "/cancelPilotInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public CancelPilotInfoResponse cancelPilotInfo(@RequestBody CancelPilotInfoRequest cancelPilotInfoRequest) {
+        CancelPilotInfoResponse cancelPilotInfoResponse = new CancelPilotInfoResponse();
+        cancelPilotInfoResponse.fail();
+        try {
+            ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(cancelPilotInfoRequest);
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                cancelPilotInfoResponse = staticInfoService.cancelPilotInfo(cancelPilotInfoRequest);
+            } else {
+                cancelPilotInfoResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e) {
+            log.error("注销pilot信息异常, cancelPilotInfoRequest={}", cancelPilotInfoRequest, e);
+            cancelPilotInfoResponse.fail("注销pilot信息异常");
+        }
+        return cancelPilotInfoResponse;
     }
 }

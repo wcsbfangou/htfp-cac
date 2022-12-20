@@ -17,8 +17,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 
 @SpringBootApplication
-@ComponentScan(value = {"com.htfp.service.cac"})
-@MapperScan("com.htfp.service.cac.dao.mapper")
+@ComponentScan(value = {"com.htfp.service.cac", "com.htfp.service.oac"})
+@MapperScan(value = {"com.htfp.service.cac.dao.mapper", "com.htfp.service.oac.dao.mapper"})
 @EnableTransactionManagement
 @PropertySource({"classpath:/nettySetting.properties"})
 public class CacAppApplication {

@@ -13,17 +13,26 @@ import org.apache.commons.lang3.StringUtils;
 public class GcsInfoParam implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
-    private Integer typeId;
+    private String gcsReg;
+    private String gcsSn;
+    private Integer gcsType;
     private Integer controllableUavType;
     private Integer dataLinkType;
     private String token;
+    private String operatorId;
 
     @Override
     public ErrorCodeEnum validate() {
-        if (StringUtils.isBlank(gcsId)) {
-            return ErrorCodeEnum.LACK_OF_GCS_ID;
-        } else if (typeId == null || controllableUavType == null || dataLinkType == null) {
-            return ErrorCodeEnum.LACK_OF_OTHER_FILED;
+        if (StringUtils.isBlank(gcsReg)) {
+            return ErrorCodeEnum.LACK_OF_GCS_REG;
+        } else if (gcsType == null) {
+            return ErrorCodeEnum.LACK_OF_GCS_TYPE;
+        } else if (controllableUavType == null) {
+            return ErrorCodeEnum.LACK_OF_CONTROLLABLE_UAV_TYPE;
+        } else if (dataLinkType == null) {
+            return ErrorCodeEnum.LACK_OF_DATA_LINK_TYPE;
+        } else if (StringUtils.isBlank(operatorId)) {
+            return ErrorCodeEnum.LACK_OF_OPERATOR_ID;
         } else {
             return ErrorCodeEnum.SUCCESS;
         }

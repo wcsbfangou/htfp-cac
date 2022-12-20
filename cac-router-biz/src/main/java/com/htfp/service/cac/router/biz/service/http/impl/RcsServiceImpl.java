@@ -50,7 +50,7 @@ import java.util.Map;
  * @Description 远程地面站服务类
  */
 @Slf4j
-@Service
+@Service("rcsServiceImpl")
 public class RcsServiceImpl implements IRcsService {
 
     @Resource
@@ -249,10 +249,10 @@ public class RcsServiceImpl implements IRcsService {
         response.fail();
         UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
         if (uavInfo != null) {
-            if (uavInfo.getTypeId() == (uavInfo.getTypeId() & rcsInfo.getControllableUavType())) {
+            if (uavInfo.getUavType() == (uavInfo.getUavType() & rcsInfo.getControllableUavType())) {
                 PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
                 if (pilotInfo != null) {
-                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())) {
+                    if (uavInfo.getUavType() == (uavInfo.getUavType() & pilotInfo.getControllableUavType())) {
                         response.success();
                     } else {
                         response.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);

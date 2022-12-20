@@ -43,7 +43,7 @@ public class GcsPingJob extends QuartzJobBean {
         List<GcsInfoDO> gcsInfoDOList = gcsDalService.queryGcsInfo(GcsTypeEnum.GCS);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
             for (GcsInfoDO gcsInfoDO : gcsInfoDOList) {
-                GcsIpMappingDO gcsIpMapping = gcsDalService.queryGcsIpMapping(gcsInfoDO.getGcsId(), MappingStatusEnum.VALID);
+                GcsIpMappingDO gcsIpMapping = gcsDalService.queryGcsIpMapping(gcsInfoDO.getId(), MappingStatusEnum.VALID);
                 if (gcsIpMapping != null) {
                     // TODO: 2022/6/14 报警
                     boolean pingResult = pingGcs(gcsIpMapping.getGcsId(), gcsIpMapping.getGcsIp());

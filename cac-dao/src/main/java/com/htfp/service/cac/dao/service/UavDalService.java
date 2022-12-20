@@ -101,12 +101,16 @@ public class UavDalService {
     }
 
     public boolean validateUavId(Long uavId) {
-        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavId(uavId);
-        return CollectionUtils.isNotEmpty(uavInfoDOList);
+        UavInfoDO uavInfoDO = uavInfoMapper.selectById(uavId);
+        return uavInfoDO != null;
     }
 
     public UavInfoDO queryUavInfo(Long uavId) {
-        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavId(uavId);
+        return uavInfoMapper.selectById(uavId);
+    }
+
+    public UavInfoDO queryUavInfo(String uavReg) {
+        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavReg(uavReg);
         if (CollectionUtils.isNotEmpty(uavInfoDOList)) {
             return uavInfoDOList.get(0);
         } else {
@@ -114,8 +118,17 @@ public class UavDalService {
         }
     }
 
-    public List<UavInfoDO> queryUavInfo(Integer typeId) {
-        return uavInfoMapper.selectByTypeId(typeId);
+    public List<UavInfoDO> queryUavInfoByOperatorId(Long operatorId) {
+        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByOperatorId(operatorId);
+        if (CollectionUtils.isNotEmpty(uavInfoDOList)) {
+            return uavInfoDOList;
+        } else {
+            return null;
+        }
+    }
+
+    public List<UavInfoDO> queryUavInfo(Integer uavType) {
+        return uavInfoMapper.selectByUavType(uavType);
     }
 
     public int insertUavInfo(UavInfoDO uavInfoDO) {
@@ -126,8 +139,27 @@ public class UavDalService {
         return uavInfoMapper.updateByUavInfo(uavInfoDO);
     }
 
+    public int updateUavInfoStatus(UavInfoDO uavInfoDO, Integer status) {
+        uavInfoDO.setStatus(status);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
+    public int updateUavInfoCpnAndStatus(UavInfoDO uavInfoDO, String cpn, Integer status) {
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setStatus(status);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
+    public int updateUavInfoCpn(UavInfoDO uavInfoDO, String cpn) {
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
     public int deleteUavInfoByUavId(Long uavId) {
-        return uavInfoMapper.deleteByUavId(uavId);
+        return uavInfoMapper.deleteById(uavId);
     }
 
     public int deleteUavInfoById(Long id) {
@@ -135,7 +167,7 @@ public class UavDalService {
     }
 
     public int updateUavInfoTypeId(UavInfoDO uavInfoDO, Integer typeId) {
-        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setUavType(typeId);
         uavInfoDO.setGmtModify(new Date());
         return updateUavInfo(uavInfoDO);
     }
@@ -235,10 +267,26 @@ public class UavDalService {
         return commandAndControlLogDO;
     }
 
-    public UavInfoDO buildUavInfoDO(Long uavId, Integer typeId) {
+    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, Integer status) {
         UavInfoDO uavInfoDO = new UavInfoDO();
-        uavInfoDO.setUavId(uavId);
-        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setUavReg(uavReg);
+        uavInfoDO.setUavName(uavName);
+        uavInfoDO.setUavType(uavType);
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setVin(vin);
+        uavInfoDO.setPvin(pvin);
+        uavInfoDO.setSn(sn);
+        uavInfoDO.setFlightControlSn(flightControlSn);
+        uavInfoDO.setImei(imei);
+        uavInfoDO.setImsi(imsi);
+        uavInfoDO.setManufacturerName(manufacturerName);
+        uavInfoDO.setProductName(productName);
+        uavInfoDO.setProductType(productType);
+        uavInfoDO.setProductSizeType(productSizeType);
+        uavInfoDO.setMaxFlyTime(maxFlyTime);
+        uavInfoDO.setOperationScenarioType(operationScenarioType);
+        uavInfoDO.setOperatorId(operatorId);
+        uavInfoDO.setStatus(status);
         uavInfoDO.setGmtCreate(new Date());
         uavInfoDO.setGmtModify(new Date());
         return uavInfoDO;

@@ -21,6 +21,12 @@
         <module>cac-router-biz</module>
         <module>cac-dao</module>
         <module>cac-common</module>
+        <module>cac-client</module>
+        <module>oac-app</module>
+        <module>oac-biz</module>
+        <module>oac-common</module>
+        <module>oac-client</module>
+        <module>oac-dao</module>
     </modules>
 
     <properties>
