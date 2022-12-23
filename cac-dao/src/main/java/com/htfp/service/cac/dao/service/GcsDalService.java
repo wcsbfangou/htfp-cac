@@ -1,6 +1,9 @@
 package com.htfp.service.cac.dao.service;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
+import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author sunjipeng
@@ -28,6 +32,14 @@ public class GcsDalService {
     GcsInfoMapper gcsInfoMapper;
     @Resource
     GcsIpMappingMapper gcsIpMappingMapper;
+
+    private Cache<Long,Integer> gcsLinkStatusCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(365, TimeUnit.DAYS)
+            .expireAfterAccess(365, TimeUnit.DAYS)
+            .concurrencyLevel(10)
+            .recordStats()
+            .build();
 
     public boolean validateGcsId(Long gcsId) {
         GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
@@ -175,6 +187,7 @@ public class GcsDalService {
     public int updateGcsIpMappingIp(GcsIpMappingDO gcsIpMappingDO, String gcsIp) {
         gcsIpMappingDO.setGcsIp(gcsIp);
         gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
         gcsIpMappingDO.setGmtModify(new Date());
         return updateGcsIpMapping(gcsIpMappingDO);
     }
@@ -185,8 +198,29 @@ public class GcsDalService {
         return updateGcsIpMapping(gcsIpMappingDO);
     }
 
+    public int updateGcsIpMappingLinkStatus(GcsIpMappingDO gcsIpMappingDO, LinkStatusEnum linkStatusEnum) {
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
+    public int updateGcsIpMappingStatusAndLinkStatus(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
+        gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
     public int updateGcsIpMappingStatusAndSubscribe(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, SubscribeDataEnum subscribeDataEnum) {
         gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setSubscribe(subscribeDataEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
+    public int updateGcsIpMappingStatusAndLinkStatusAndSubscribe(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum, SubscribeDataEnum subscribeDataEnum) {
+        gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
         gcsIpMappingDO.setSubscribe(subscribeDataEnum.getCode());
         gcsIpMappingDO.setGmtModify(new Date());
         return updateGcsIpMapping(gcsIpMappingDO);
@@ -203,6 +237,7 @@ public class GcsDalService {
         gcsIpMappingDO.setGcsId(gcsId);
         gcsIpMappingDO.setGcsIp(gcsIp);
         gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
         gcsIpMappingDO.setSubscribe(SubscribeDataEnum.UN_SUBSCRIBE.getCode());
         gcsIpMappingDO.setGmtCreate(new Date());
         gcsIpMappingDO.setGmtModify(new Date());

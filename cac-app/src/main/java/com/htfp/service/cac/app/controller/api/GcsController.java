@@ -1,14 +1,19 @@
 package com.htfp.service.cac.app.controller.api;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
+import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.GcsChangeUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.GcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.SignInRequest;
 import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
+import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.GcsChangeUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.GcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignInResponse;
@@ -43,7 +48,7 @@ public class GcsController {
     private IGcsService gcsService;
 
     /**
-     * 地面站注册
+     * 地面站上线
      *
      * @param signInRequest
      * @param httpServletRequest
@@ -68,20 +73,20 @@ public class GcsController {
                     signInRequest.setGcsIp(gcsIp);
                 }
             }
-            // 注册地面站
+            // 地面站上线
             SignInResponse signInResponse = gcsService.gcsSignIn(signInRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(signInResponse.getCode())) {
                 return BaseHttpResponse.fail(signInResponse.getCode(), signInResponse.getMessage());
             }
         } catch (Exception e) {
-            log.error("地面站注册失败, signInRequest={}", signInRequest, e);
+            log.error("地面站上线失败, signInRequest={}", signInRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;
     }
 
     /**
-     * 地面站注销
+     * 地面站下线
      *
      * @param signOutRequest
      * @param httpServletRequest
@@ -112,7 +117,70 @@ public class GcsController {
                 return BaseHttpResponse.fail(signOutResponse.getCode(), signOutResponse.getMessage());
             }
         } catch (Exception e) {
-            log.error("地面站注销失败, signOutRequest={}", signOutRequest, e);
+            log.error("地面站下线失败, signOutRequest={}", signOutRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 飞行计划申请
+     *
+     * @param flightPlanApplyRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flightPlanApply", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flightPlanApply(@RequestBody FlightPlanApplyRequest flightPlanApplyRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flightPlanApplyRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 飞行计划申请
+            FlightPlanApplyResponse flightPlanApplyResponse = gcsService.flightPlanApply(flightPlanApplyRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flightPlanApplyResponse.getCode())) {
+                return BaseHttpResponse.fail(flightPlanApplyResponse.getCode(), flightPlanApplyResponse.getMessage());
+            } else {
+                httpResponse.setData(flightPlanApplyResponse.getApplyFlightPlanId());
+            }
+        } catch (Exception e) {
+            log.error("飞行计划申请失败, flightPlanApplyRequest={}", flightPlanApplyRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+
+    /**
+     * 飞行计划查询
+     *
+     * @param flightPlanQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flightPlanQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flightPlanQuery(@RequestBody FlightPlanQueryRequest flightPlanQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flightPlanQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 飞行计划申请
+            FlightPlanQueryResponse flightPlanQueryResponse = gcsService.flightPlanQuery(flightPlanQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flightPlanQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(flightPlanQueryResponse.getCode(), flightPlanQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(flightPlanQueryResponse.getFlightPlanQueryResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("飞行计划查询失败, flightPlanQueryRequest={}", flightPlanQueryRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

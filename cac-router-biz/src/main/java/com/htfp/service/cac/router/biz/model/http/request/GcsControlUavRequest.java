@@ -1,12 +1,10 @@
 package com.htfp.service.cac.router.biz.model.http.request;
 
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.CommandCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -17,22 +15,25 @@ import java.util.List;
 public class GcsControlUavRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
-    private List<CommandUavParam> uavList;
+    private String uavId;
+    private String pilotId;
+    private Integer commandCode;
+    private Boolean commandResult;
 
 
     @Override
     public ErrorCodeEnum validate() {
         if (StringUtils.isBlank(gcsId)) {
             return ErrorCodeEnum.LACK_OF_GCS_ID;
-        } else if (CollectionUtils.isEmpty(uavList)) {
-            return ErrorCodeEnum.LACK_OF_OTHER_FILED;
+        } else if (StringUtils.isBlank(uavId)) {
+            return ErrorCodeEnum.LACK_OF_UAV_ID;
+        } else if (StringUtils.isBlank(pilotId)) {
+            return ErrorCodeEnum.LACK_OF_PILOT_ID;
+        } else if (CommandCodeEnum.getFromCode(commandCode) == null) {
+            return ErrorCodeEnum.LACK_OF_COMMAND_CODE;
+        } else if (commandResult == null) {
+            return ErrorCodeEnum.LACK_OF_COMMAND_RESULT;
         } else {
-            for (CommandUavParam commandUavParam : uavList) {
-                ErrorCodeEnum commandUavParamValidateResult = commandUavParam.validate();
-                if (!ErrorCodeEnum.SUCCESS.equals(commandUavParamValidateResult)) {
-                    return commandUavParamValidateResult;
-                }
-            }
             return ErrorCodeEnum.SUCCESS;
         }
     }

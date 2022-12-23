@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.validator;
 
 import com.htfp.service.cac.common.constant.HttpHeaderConstant;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.router.biz.model.BaseValidate;

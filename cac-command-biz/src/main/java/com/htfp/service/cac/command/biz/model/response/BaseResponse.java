@@ -1,6 +1,6 @@
 package com.htfp.service.cac.command.biz.model.response;
 
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import lombok.Data;
 
 /**

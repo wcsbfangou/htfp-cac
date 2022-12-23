@@ -1,24 +1,32 @@
 package com.htfp.service.cac.dao.service;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.CommandResultEnum;
+import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
 import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavGcsMappingMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavNavigationMappingMapper;
+import com.htfp.service.cac.dao.mapper.mapping.UavOacMappingMapper;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.log.CommandAndControlLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
+import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author sunjipeng
@@ -43,6 +51,17 @@ public class UavDalService {
 
     @Resource
     CommandAndControlLogMapper commandAndControlLogMapper;
+
+    @Resource
+    UavOacMappingMapper uavOacMappingMapper;
+
+    private Cache<Long, String> uavReportCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(365, TimeUnit.DAYS)
+            .expireAfterAccess(365, TimeUnit.DAYS)
+            .concurrencyLevel(10)
+            .recordStats()
+            .build();
 
     public List<UavGcsMappingDO> queryUavGcsMapping(Long gcsId, MappingStatusEnum status) {
         return uavGcsMappingMapper.selectByGcsIdAndStatus(gcsId, status.getCode());
@@ -220,6 +239,84 @@ public class UavDalService {
 
     public int deleteCommandAndControlLogById(Long id) {
         return commandAndControlLogMapper.deleteById(id);
+    }
+
+    public UavOacMappingDO queryUavOacMapping(Long uavId) {
+        return uavOacMappingMapper.selectByUavId(uavId);
+    }
+
+    public String queryUavReportCode(Long uavId) {
+        String reportCode = uavReportCache.getIfPresent(uavId);
+        if(StringUtils.isEmpty(reportCode)){
+            return uavOacMappingMapper.selectByUavId(uavId).getReportCode();
+        } else {
+            return reportCode;
+        }
+
+    }
+
+    public UavOacMappingDO queryUavOacMapping(Long uavId, MappingStatusEnum mappingStatusEnum) {
+        return uavOacMappingMapper.selectByUavIdAndStatus(uavId, mappingStatusEnum.getCode());
+    }
+
+    public UavOacMappingDO queryUavOacMapping(Long uavId, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
+        return uavOacMappingMapper.selectByUavIdAndStatusAndLinkStatus(uavId, mappingStatusEnum.getCode(), linkStatusEnum.getCode());
+    }
+
+    public int updateUavOacMapping(UavOacMappingDO uavOacMappingDO) {
+        return uavOacMappingMapper.updateByUavOacMapping(uavOacMappingDO);
+    }
+
+    public int insertUavOacMapping(UavOacMappingDO uavOacMappingDO) {
+        int id = uavOacMappingMapper.insertUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCache.put(uavOacMappingDO.getUavId(), uavOacMappingDO.getReportCode());
+        }
+        return id;
+    }
+
+    public int deleteUavOacMapping(Long uavId) {
+        return uavOacMappingMapper.deleteByUavId(uavId);
+    }
+
+    public int updateUavOacMappingReportCode(UavOacMappingDO uavOacMappingDO, String reportCode) {
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if(id>0){
+            uavReportCache.put(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
+    public int updateUavOacMappingStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum) {
+        uavOacMappingDO.setStatus(statusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public int updateUavOacMappingLinkStatus(UavOacMappingDO uavOacMappingDO, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setStatus(statusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode) {
+        UavOacMappingDO gcsIpMappingDO = new UavOacMappingDO();
+        gcsIpMappingDO.setUavId(uavId);
+        gcsIpMappingDO.setReportCode(reportCode);
+        gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
+        gcsIpMappingDO.setGmtCreate(new Date());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return gcsIpMappingDO;
     }
 
     public UavStatusLogDO buildUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {

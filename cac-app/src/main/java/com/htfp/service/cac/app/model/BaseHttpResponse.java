@@ -1,6 +1,6 @@
 package com.htfp.service.cac.app.model;
 
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 
 /**
  * @Author sunjipeng

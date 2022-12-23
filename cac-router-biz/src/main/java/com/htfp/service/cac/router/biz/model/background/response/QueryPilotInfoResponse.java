@@ -1,6 +1,6 @@
 package com.htfp.service.cac.router.biz.model.background.response;
 
-import com.htfp.service.cac.router.biz.model.background.PilotInfoParam;
+import com.htfp.service.cac.router.biz.model.background.param.PilotInfoParam;
 import lombok.Data;
 
 /**

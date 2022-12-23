@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.CancelUavInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.RegisterUavInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.response.CancelUavInfoResponse;

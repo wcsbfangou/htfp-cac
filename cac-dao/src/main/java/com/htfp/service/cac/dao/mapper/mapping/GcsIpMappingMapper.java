@@ -160,9 +160,9 @@ public interface GcsIpMappingMapper {
      * @param gcsIpMapping
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, subscribe, gmt_create, gmt_modify) "
-            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.subscribe}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE gcs_ip=#{gcsIpMapping.gcsIp}, status=#{gcsIpMapping.status}, subscribe=#{gcsIpMapping.subscribe}, gmt_modify=#{gcsIpMapping.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (gcs_id, gcs_ip, status, link_status, subscribe, gmt_create, gmt_modify) "
+            + "VALUES (#{gcsIpMapping.gcsId}, #{gcsIpMapping.gcsIp}, #{gcsIpMapping.status}, #{gcsIpMapping.linkStatus}, #{gcsIpMapping.subscribe}, #{gcsIpMapping.gmtCreate}, #{gcsIpMapping.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE gcs_ip=#{gcsIpMapping.gcsIp}, status=#{gcsIpMapping.status}, link_status=#{gcsIpMapping.linkStatus}, subscribe=#{gcsIpMapping.subscribe}, gmt_modify=#{gcsIpMapping.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "gcsIpMapping.id")
     int insertGcsIpMapping(@Param(value = "gcsIpMapping") GcsIpMappingDO gcsIpMapping);
 
@@ -185,7 +185,7 @@ public interface GcsIpMappingMapper {
     int deleteById(@Param(value = "id") Long id);
 
     /**
-     * 根据gcsIp更新gcsIpMapping
+     * 根据gcsId更新gcsIpMapping
      *
      * @param gcsIpMapping
      * @return
@@ -193,6 +193,7 @@ public interface GcsIpMappingMapper {
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"gcsIpMapping.gcsIp != null\"> gcs_ip = #{gcsIpMapping.gcsIp}, </if>"
             + "<if test=\"gcsIpMapping.status != null\"> status = #{gcsIpMapping.status}, </if>"
+            + "<if test=\"gcsIpMapping.linkStatus != null\"> link_status = #{gcsIpMapping.linkStatus}, </if>"
             + "<if test=\"gcsIpMapping.subscribe != null\"> subscribe = #{gcsIpMapping.subscribe}, </if>"
             + "<if test=\"gcsIpMapping.isDel != null\"> is_del = #{gcsIpMapping.isDel}, </if>"
             + "<if test=\"gcsIpMapping.gmtModify != null\"> gmt_modify = #{gcsIpMapping.gmtModify} </if>"

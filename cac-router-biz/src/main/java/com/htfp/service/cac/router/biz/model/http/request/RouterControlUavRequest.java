@@ -1,5 +1,6 @@
 package com.htfp.service.cac.router.biz.model.http.request;
 
+import com.htfp.service.cac.router.biz.model.http.request.param.CommandUavParam;
 import lombok.Data;
 
 import java.util.List;

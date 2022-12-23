@@ -1,8 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
-import com.htfp.service.cac.dao.service.GcsDalService;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.GcsInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.response.DeleteGcsInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.InsertGcsInfoResponse;

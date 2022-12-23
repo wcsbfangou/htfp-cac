@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.CancelOperatorInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.OperatorInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.RegisterOperatorInfoRequest;
@@ -132,6 +132,7 @@ public class OperatorInfoController {
             if (StringUtils.isBlank(idCardNumber)) {
                 queryOperatorInfoResponse.fail(ErrorCodeEnum.LACK_OF_ID_CARD_NUMBER);
             }
+            queryOperatorInfoResponse = staticInfoService.queryOperatorInfoByIdCardInfo(idCardType, idCardNumber);
         } catch (Exception e) {
             log.error("查询operator信息异常, operatorIdCardType={}, operatorIdCardNumber={}", idCardType, idCardNumber, e);
             queryOperatorInfoResponse.fail("查询operator信息异常");
