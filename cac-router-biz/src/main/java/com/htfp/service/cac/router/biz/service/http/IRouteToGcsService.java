@@ -1,4 +1,5 @@
-package com.htfp.service.cac.client.service;
+package com.htfp.service.cac.router.biz.service.http;
+
 
 import com.htfp.service.cac.client.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
@@ -8,12 +9,12 @@ import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
  * @Date 2022/12/23
  * @Description 描述
  */
-public interface IOacService {
+public interface IRouteToGcsService {
 
     /**
      * 飞行计划回复
-     * @param flightPlanQueryRequest
+     * @param flightPlanReplyRequest
      * @return
      */
-    FlightPlanReplyResponse flightPlanReply(FlightPlanReplyRequest flightPlanQueryRequest);
+    FlightPlanReplyResponse flightPlanReply(FlightPlanReplyRequest flightPlanReplyRequest);
 }

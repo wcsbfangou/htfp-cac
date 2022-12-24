@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
  * @Description 描述
  */
 @Data
-public class FlightPlanIssuedRequest implements BaseValidate<ErrorCodeEnum> {
+public class FlightPlanReplyRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String cpn;
     private String applyFlightPlanId;

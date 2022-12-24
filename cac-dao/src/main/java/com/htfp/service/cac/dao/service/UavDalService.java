@@ -128,7 +128,11 @@ public class UavDalService {
         return uavInfoMapper.selectById(uavId);
     }
 
-    public UavInfoDO queryUavInfo(String uavReg) {
+    public UavInfoDO queryUavInfoByCpn(String cpn) {
+        return uavInfoMapper.selectByCpn(cpn);
+    }
+
+    public UavInfoDO queryUavInfoByUavReg(String uavReg) {
         List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavReg(uavReg);
         if (CollectionUtils.isNotEmpty(uavInfoDOList)) {
             return uavInfoDOList.get(0);

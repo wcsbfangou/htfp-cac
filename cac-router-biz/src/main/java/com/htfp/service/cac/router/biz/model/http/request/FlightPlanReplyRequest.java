@@ -10,6 +10,7 @@ import lombok.Data;
 @Data
 public class FlightPlanReplyRequest {
 
+    private String uavId;
     private String applyFlightPlanId;
     private String replyFlightPlanId;
     private Boolean flightPlanPass;

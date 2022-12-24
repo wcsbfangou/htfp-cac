@@ -164,7 +164,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         try {
             OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfo(Long.valueOf(uavInfoRequest.getOperatorId()));
             if (queryOperatorInfo != null) {
-                UavInfoDO queryUavInfo = uavDalService.queryUavInfo(uavInfoRequest.getUavReg());
+                UavInfoDO queryUavInfo = uavDalService.queryUavInfoByUavReg(uavInfoRequest.getUavReg());
                 if (queryUavInfo == null) {
                     UavInfoDO uavInfo = uavDalService.buildUavInfoDO(uavInfoRequest.getUavReg(), uavInfoRequest.getUavName(), uavInfoRequest.getUavType(), null, uavInfoRequest.getVin(), uavInfoRequest.getPvin(), uavInfoRequest.getSn(), uavInfoRequest.getFlightControlSn(), uavInfoRequest.getImei(), uavInfoRequest.getImsi(), uavInfoRequest.getManufacturerName(), uavInfoRequest.getProductName(), uavInfoRequest.getProductType(), uavInfoRequest.getProductSizeType(), uavInfoRequest.getMaxFlyTime(), uavInfoRequest.getOperationScenarioType(), Long.valueOf(uavInfoRequest.getOperatorId()), StaticInfoStatusEnum.TYPE_IN.getCode());
                     int id = uavDalService.insertUavInfo(uavInfo);
@@ -734,7 +734,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         QueryUavInfoResponse queryUavInfoResponse = new QueryUavInfoResponse();
         queryUavInfoResponse.fail();
         try {
-            UavInfoDO uavInfo = uavDalService.queryUavInfo(uavReg);
+            UavInfoDO uavInfo = uavDalService.queryUavInfoByUavReg(uavReg);
             if (uavInfo != null) {
                 UavInfoParam uavInfoParam = buildUavInfoParam(uavInfo);
                 queryUavInfoResponse.setData(uavInfoParam);

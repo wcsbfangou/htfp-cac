@@ -1,5 +1,7 @@
 package com.htfp.service.oac.biz.service.impl;
 
+import com.htfp.service.cac.client.request.FlightPlanReplyRequest;
+import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.client.service.IOacService;
 import com.htfp.service.oac.biz.model.request.FlightPlanIssuedRequest;
 import com.htfp.service.oac.biz.model.response.FlightPlanIssuedResponse;
@@ -161,9 +163,9 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
                     } else {
                         flightPlanIssuedResponse.setCpn(flightPlanIssuedRequest.getCpn());
                     }
-                    com.htfp.service.cac.client.request.FlightPlanIssuedRequest cacFlightPlanIssuedRequest = buildCacFlightPlanIssuedRequest(flightPlanIssuedRequest, queryApplyFlightPlanLog.getApplyFlightPlanId());
-                    com.htfp.service.cac.client.response.FlightPlanIssuedResponse cacFlightPlanIssuedResponse = oacService.flightPlanIssued(cacFlightPlanIssuedRequest);
-                    flightPlanIssuedResponse = buildFlightPlanIssuedResponse(cacFlightPlanIssuedResponse);
+                    FlightPlanReplyRequest cacFlightPlanReplyRequest = buildCacFlightPlanReplyRequest(flightPlanIssuedRequest, queryApplyFlightPlanLog.getApplyFlightPlanId());
+                    FlightPlanReplyResponse cacFlightPlanReplyResponse = oacService.flightPlanReply(cacFlightPlanReplyRequest);
+                    flightPlanIssuedResponse = buildFlightPlanIssuedResponse(cacFlightPlanReplyResponse);
                     log.info("[oac]飞行计划下发end，flightPlanIssuedRequest={},flightPlanIssuedResponse={}", flightPlanIssuedRequest, JsonUtils.object2Json(flightPlanIssuedResponse));
                 } else {
                     flightPlanIssuedResponse.fail("飞行计划已下发，不允许重复下发");
@@ -178,20 +180,20 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
         return flightPlanIssuedResponse;
     }
 
-    com.htfp.service.cac.client.request.FlightPlanIssuedRequest buildCacFlightPlanIssuedRequest(FlightPlanIssuedRequest flightPlanIssuedRequest, String applyFlightPlanId) {
-        com.htfp.service.cac.client.request.FlightPlanIssuedRequest cacFlightPlanIssuedRequest = new com.htfp.service.cac.client.request.FlightPlanIssuedRequest();
-        cacFlightPlanIssuedRequest.setCpn(flightPlanIssuedRequest.getCpn());
-        cacFlightPlanIssuedRequest.setApplyFlightPlanId(applyFlightPlanId);
-        cacFlightPlanIssuedRequest.setReplyFlightPlanId(flightPlanIssuedRequest.getFlightPlanId());
-        cacFlightPlanIssuedRequest.setPass(flightPlanIssuedRequest.getPass());
-        return cacFlightPlanIssuedRequest;
+    FlightPlanReplyRequest buildCacFlightPlanReplyRequest(FlightPlanIssuedRequest flightPlanIssuedRequest, String applyFlightPlanId) {
+        FlightPlanReplyRequest cacFlightPlanReplyRequest = new FlightPlanReplyRequest();
+        cacFlightPlanReplyRequest.setCpn(flightPlanIssuedRequest.getCpn());
+        cacFlightPlanReplyRequest.setApplyFlightPlanId(applyFlightPlanId);
+        cacFlightPlanReplyRequest.setReplyFlightPlanId(flightPlanIssuedRequest.getFlightPlanId());
+        cacFlightPlanReplyRequest.setPass(flightPlanIssuedRequest.getPass());
+        return cacFlightPlanReplyRequest;
     }
 
-    FlightPlanIssuedResponse buildFlightPlanIssuedResponse(com.htfp.service.cac.client.response.FlightPlanIssuedResponse cacFlightPlanIssuedResponse) {
+    FlightPlanIssuedResponse buildFlightPlanIssuedResponse(FlightPlanReplyResponse cacFlightPlanReplyResponse) {
         FlightPlanIssuedResponse flightPlanIssuedResponse = new FlightPlanIssuedResponse();
-        flightPlanIssuedResponse.setSuccess(cacFlightPlanIssuedResponse.getSuccess());
-        flightPlanIssuedResponse.setCode(cacFlightPlanIssuedResponse.getCode());
-        flightPlanIssuedResponse.setMessage(cacFlightPlanIssuedResponse.getMessage());
+        flightPlanIssuedResponse.setSuccess(cacFlightPlanReplyResponse.getSuccess());
+        flightPlanIssuedResponse.setCode(cacFlightPlanReplyResponse.getCode());
+        flightPlanIssuedResponse.setMessage(cacFlightPlanReplyResponse.getMessage());
         return flightPlanIssuedResponse;
     }
 
