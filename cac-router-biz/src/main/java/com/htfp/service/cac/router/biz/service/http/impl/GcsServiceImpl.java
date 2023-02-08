@@ -14,6 +14,7 @@ import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.enums.StaticInfoStatusEnum;
 import com.htfp.service.cac.common.enums.UavStatusEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
@@ -21,10 +22,12 @@ import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.log.ApplyFlightPlanLogDO;
+import com.htfp.service.cac.dao.model.log.ApplyUavVerifyLogDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
 import com.htfp.service.cac.dao.service.ApplyFlightPlanLogDalService;
+import com.htfp.service.cac.dao.service.ApplyUavVerifyLogDalService;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
@@ -58,7 +61,9 @@ import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlightPlanQueryResultParam;
+import com.htfp.service.cac.router.biz.model.http.response.param.UavVerifyResultParam;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
+import com.htfp.service.oac.client.service.IFlyingService;
 import com.htfp.service.oac.client.service.IPreFlightService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -88,10 +93,16 @@ public class GcsServiceImpl implements IGcsService {
     PilotDalService pilotDalService;
 
     @Resource
-    IPreFlightService preFlightService;
+    IPreFlightService preFlightServiceImpl;
+
+    @Resource
+    IFlyingService flyingServiceImpl;
 
     @Resource
     ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
+
+    @Resource
+    ApplyUavVerifyLogDalService applyUavVerifyLogDalService;
 
     @Resource(name = "uavServiceImpl")
     IUavService uavService;
@@ -227,7 +238,7 @@ public class GcsServiceImpl implements IGcsService {
             // TODO: 2022/12/22 IDC ID && 机器ID
             // 生成applyFlightPlanId
             Long applyFlightPlanId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(flightPlanApplyRequest.getUavId());
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flightPlanApplyRequest.getUavId()));
             String applicantSubject;
             if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType()))) {
                 applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantOrganizationParam());
@@ -241,7 +252,7 @@ public class GcsServiceImpl implements IGcsService {
             int id = applyFlightPlanLogDalService.insertApplyFlightPlanLog(applyFlightPlanLog);
             if (id > 0) {
                 com.htfp.service.oac.client.request.FlightPlanApplyRequest oacFlightPlanApplyRequest = buildOacFlightPlanApplyRequest(flightPlanApplyRequest, applyFlightPlanId, queryUavInfo.getCpn());
-                com.htfp.service.oac.client.response.FlightPlanApplyResponse oacFlightPlanApplyResponse = preFlightService.flightPlanApply(oacFlightPlanApplyRequest);
+                com.htfp.service.oac.client.response.FlightPlanApplyResponse oacFlightPlanApplyResponse = preFlightServiceImpl.flightPlanApply(oacFlightPlanApplyRequest);
                 // TODO: 2022/12/22 校验oacFlightPlanApplyResponse
                 flightPlanApplyResponse = buildFlightPlanApplyResponse(oacFlightPlanApplyResponse);
                 if (flightPlanApplyResponse.getSuccess()) {
@@ -369,7 +380,7 @@ public class GcsServiceImpl implements IGcsService {
                 flightPlanQueryResponse.setFlightPlanQueryResultParam(flightPlanQueryResultParam);
             } else {
                 com.htfp.service.oac.client.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = buildOacFlightPlanQueryRequest(queryApplyFlightPlanLog.getReplyFlightPlanId());
-                com.htfp.service.oac.client.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightService.flightPlanQuery(oacFlightPlanQueryRequest);
+                com.htfp.service.oac.client.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightServiceImpl.flightPlanQuery(oacFlightPlanQueryRequest);
                 // TODO: 2022/12/22 校验oacFliPlanQueryResponse
                 flightPlanQueryResponse = buildOacFlightPlanQueryResponse(oacFlightPlanQueryResponse);
                 if (flightPlanQueryResponse.getSuccess() && !queryApplyFlightPlanLog.getStatus().equals(flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus())) {
@@ -413,7 +424,111 @@ public class GcsServiceImpl implements IGcsService {
      */
     @Override
     public UavVerifyApplyResponse uavVerifyApply(UavVerifyApplyRequest uavVerifyApplyRequest) {
-        return null;
+        UavVerifyApplyResponse uavVerifyApplyResponse = new UavVerifyApplyResponse();
+        uavVerifyApplyResponse.fail();
+        try {
+            log.info("[router]无人机接入校验申请start，uavVerifyApplyRequest={}", uavVerifyApplyRequest);
+            Long uavId = Long.valueOf(uavVerifyApplyRequest.getUavId());
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(uavId);
+            if (StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus()))) {
+                UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(uavId);
+                if (queryUavOacMapping != null) {
+                    if (LinkStatusEnum.OFFLINE.equals(LinkStatusEnum.getFromCode(queryUavOacMapping.getLinkStatus()))) {
+                        uavVerifyApplyResponse = uavVerify(uavVerifyApplyRequest, queryUavInfo, queryUavOacMapping);
+                    } else {
+                        uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_HAS_VERIFIED);
+                    }
+                } else {
+                    UavOacMappingDO uavOacMappingDO = uavDalService.buildUavOacMappingDO(uavId, queryUavInfo.getCpn());
+                    uavDalService.insertUavOacMapping(uavOacMappingDO);
+                }
+            } else {
+                uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_NOT_REGISTER);
+            }
+            log.info("[router]无人机接入校验申请end，uavVerifyApplyRequest={},uavVerifyApplyRequest={}", uavVerifyApplyRequest, JsonUtils.object2Json(uavVerifyApplyResponse));
+        } catch (Exception e) {
+            log.error("[router]无人机接入校验申请异常，uavVerifyApplyRequest={}", uavVerifyApplyRequest, e);
+            uavVerifyApplyResponse.fail(e.getMessage());
+        }
+        return uavVerifyApplyResponse;
+    }
+
+    UavVerifyApplyResponse uavVerify(UavVerifyApplyRequest uavVerifyApplyRequest, UavInfoDO queryUavInfo, UavOacMappingDO queryUavOacMapping) {
+        UavVerifyApplyResponse uavVerifyApplyResponse = new UavVerifyApplyResponse();
+        uavVerifyApplyResponse.fail();
+        UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(queryUavInfo.getId());
+        // TODO: 2023/1/11 IDC ID && 机器ID
+        // 生成applyUavVerifyId
+        Long applyUavVerifyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
+        com.htfp.service.oac.client.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = buildOacUavVerifyApplyRequest(uavVerifyApplyRequest, applyUavVerifyId, queryUavInfo.getCpn());
+        com.htfp.service.oac.client.response.UavVerifyApplyResponse oacUavVerifyApplyResponse = flyingServiceImpl.uavVerifyApply(oacUavVerifyApplyRequest);
+        // TODO: 2022/12/22 校验oacUavVerifyApplyResponse
+        uavVerifyApplyResponse = buildUavVerifyApplyResponse(oacUavVerifyApplyResponse);
+        if (uavVerifyApplyResponse.getSuccess()) {
+            String replyUavVerifyId = uavVerifyApplyResponse.getUavVerifyResultParam().getReplyUavVerifyId();
+            ApplyStatusEnum uavVerifyApplyStatusEnum = uavVerifyApplyResponse.getUavVerifyResultParam().getUavVerifyPass() ? ApplyStatusEnum.APPROVED : ApplyStatusEnum.UNAPPROVED;
+            ApplyUavVerifyLogDO applyUavVerifyLog = applyUavVerifyLogDalService.buildApplyUavVerifyLog(applyUavVerifyId, replyUavVerifyId, queryUavGcsMapping.getGcsId().toString(), queryUavInfo.getId().toString(), queryUavInfo.getUavReg(),
+                    queryUavInfo.getCpn(), uavVerifyApplyRequest.getLng(), uavVerifyApplyRequest.getLat(), uavVerifyApplyRequest.getAlt(), uavVerifyApplyRequest.getGroundSpeed(), uavVerifyApplyRequest.getRelativeHeight(),
+                    uavVerifyApplyRequest.getFlightControlSn(), uavVerifyApplyRequest.getFlightControlVersion(), JsonUtils.object2Json(uavVerifyApplyRequest.getUavDynamicParam()), JsonUtils.object2Json(uavVerifyApplyRequest.getUavStaticParam()), uavVerifyApplyStatusEnum.getCode());
+            int id = applyUavVerifyLogDalService.insertApplyUavVerifyLog(applyUavVerifyLog);
+            if (id <= 0) {
+                uavVerifyApplyResponse.fail("无人机接入校验失败，插入数据失败");
+            }
+        }
+        return uavVerifyApplyResponse;
+    }
+
+    com.htfp.service.oac.client.request.UavVerifyApplyRequest buildOacUavVerifyApplyRequest(UavVerifyApplyRequest uavVerifyApplyRequest, Long applyUavVerifyId, String cpn){
+        com.htfp.service.oac.client.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = new com.htfp.service.oac.client.request.UavVerifyApplyRequest();
+        com.htfp.service.oac.client.request.param.UavDynamicParam oacUavDynamicParam = new com.htfp.service.oac.client.request.param.UavDynamicParam();
+        com.htfp.service.oac.client.request.param.UavStaticParam oacUavStaticParam = new com.htfp.service.oac.client.request.param.UavStaticParam();
+        oacUavDynamicParam.setTrueCourse(uavVerifyApplyRequest.getUavDynamicParam().getTrueCourse());
+        oacUavDynamicParam.setPitchAngle(uavVerifyApplyRequest.getUavDynamicParam().getPitchAngle());
+        oacUavDynamicParam.setRollAngle(uavVerifyApplyRequest.getUavDynamicParam().getRollAngle());
+        oacUavDynamicParam.setVoltage(uavVerifyApplyRequest.getUavDynamicParam().getVoltage());
+        oacUavDynamicParam.setFuel(uavVerifyApplyRequest.getUavDynamicParam().getFuel());
+        oacUavDynamicParam.setBattery(uavVerifyApplyRequest.getUavDynamicParam().getBattery());
+        oacUavDynamicParam.setFlyMode(uavVerifyApplyRequest.getUavDynamicParam().getFlyMode());
+        oacUavDynamicParam.setCameraOn(uavVerifyApplyRequest.getUavDynamicParam().getCameraOn());
+        oacUavDynamicParam.setEngineOn(uavVerifyApplyRequest.getUavDynamicParam().getEngineOn());
+        oacUavDynamicParam.setAirOn(uavVerifyApplyRequest.getUavDynamicParam().getAirOn());
+        oacUavDynamicParam.setAbsoluteSpeed(uavVerifyApplyRequest.getUavDynamicParam().getAbsoluteSpeed());
+        oacUavDynamicParam.setAmbientTemperature(uavVerifyApplyRequest.getUavDynamicParam().getAmbientTemperature());
+        oacUavDynamicParam.setCurrentFaultCode(uavVerifyApplyRequest.getUavDynamicParam().getCurrentFaultCode());
+        oacUavStaticParam.setImei(uavVerifyApplyRequest.getUavStaticParam().getImei());
+        oacUavStaticParam.setImsi(uavVerifyApplyRequest.getUavStaticParam().getImsi());
+        oacUavStaticParam.setPhoneNumber(uavVerifyApplyRequest.getUavStaticParam().getPhoneNumber());
+        oacUavStaticParam.setPowerType(uavVerifyApplyRequest.getUavStaticParam().getPowerType());
+        oacUavStaticParam.setHorizontalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getHorizontalPositionAcc());
+        oacUavStaticParam.setVerticalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getVerticalPositionAcc());
+        oacUavStaticParam.setTotalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getTotalPositionAcc());
+        oacUavVerifyApplyRequest.setCpn(cpn);
+        oacUavVerifyApplyRequest.setApplyUavVerifyId(applyUavVerifyId.toString());
+        oacUavVerifyApplyRequest.setLng(uavVerifyApplyRequest.getLng());
+        oacUavVerifyApplyRequest.setLat(uavVerifyApplyRequest.getLat());
+        oacUavVerifyApplyRequest.setAlt(uavVerifyApplyRequest.getAlt());
+        oacUavVerifyApplyRequest.setGroundSpeed(uavVerifyApplyRequest.getGroundSpeed());
+        oacUavVerifyApplyRequest.setRelativeHeight(uavVerifyApplyRequest.getRelativeHeight());
+        oacUavVerifyApplyRequest.setFlightControlSn(uavVerifyApplyRequest.getFlightControlSn());
+        oacUavVerifyApplyRequest.setFlightControlVersion(uavVerifyApplyRequest.getFlightControlVersion());
+        oacUavVerifyApplyRequest.setUavDynamicParam(oacUavDynamicParam);
+        oacUavVerifyApplyRequest.setUavStaticParam(oacUavStaticParam);
+        return oacUavVerifyApplyRequest;
+    }
+
+    UavVerifyApplyResponse buildUavVerifyApplyResponse(com.htfp.service.oac.client.response.UavVerifyApplyResponse oacUavVerifyApplyResponse){
+        UavVerifyApplyResponse uavVerifyApplyResponse = new UavVerifyApplyResponse();
+        uavVerifyApplyResponse.setSuccess(oacUavVerifyApplyResponse.getSuccess());
+        uavVerifyApplyResponse.setCode(oacUavVerifyApplyResponse.getCode());
+        uavVerifyApplyResponse.setMessage(oacUavVerifyApplyResponse.getMessage());
+        if (oacUavVerifyApplyResponse.getSuccess() && oacUavVerifyApplyResponse.getUavVerifyResultParam() != null) {
+            UavVerifyResultParam uavVerifyResultParam = new UavVerifyResultParam();
+            uavVerifyResultParam.setApplyUavVerifyId(oacUavVerifyApplyResponse.getUavVerifyResultParam().getApplyUavVerifyId());
+            uavVerifyResultParam.setReplyUavVerifyId(oacUavVerifyApplyResponse.getUavVerifyResultParam().getReplyUavVerifyId());
+            uavVerifyResultParam.setUavVerifyPass(oacUavVerifyApplyResponse.getUavVerifyResultParam().getUavVerifyPass());
+            uavVerifyApplyResponse.setUavVerifyResultParam(uavVerifyResultParam);
+        }
+        return uavVerifyApplyResponse;
     }
 
     /**

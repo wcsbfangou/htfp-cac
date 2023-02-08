@@ -2,6 +2,8 @@ package com.htfp.service.cac.router.biz.model.http.request;
 
 import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
+import com.htfp.service.cac.router.biz.model.http.request.param.UavDynamicParam;
+import com.htfp.service.cac.router.biz.model.http.request.param.UavStaticParam;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,34 +17,16 @@ public class UavVerifyApplyRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String gcsId;
     private String uavId;
-    private String verifyApplyTimeStamp;
     private Integer lng;
     private Integer lat;
     private Integer alt;
     private Integer groundSpeed;
-    private Integer absoluteSpeed;
     private Integer relativeHeight;
-    private Integer trueCourse;
-    private Integer pitchAngle;
-    private Integer rollAngle;
-    private Integer voltage;
-    private Integer fuel;
-    private Integer battery;
-    private Integer flyMode;
-    private Boolean cameraOn;
-    private Boolean engineOn;
-    private Boolean airOn;
-    private Integer imsi;
-    private Integer imei;
-    private String phoneNumber;
-    private Integer powerType;
-    private Integer ambientTemperature;
     private String flightControlSn;
     private String flightControlVersion;
-    private Integer horizontalPositionAcc;
-    private Integer verticalPositionAcc;
-    private Integer totalPositionAcc;
-    private Integer currentFaultCode;
+    private UavDynamicParam uavDynamicParam;
+    private UavStaticParam uavStaticParam;
+
 
     @Override
     public ErrorCodeEnum validate() {
@@ -50,8 +34,6 @@ public class UavVerifyApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
         } else if (StringUtils.isBlank(gcsId)) {
             return ErrorCodeEnum.LACK_OF_GCS_ID;
-        } else if (StringUtils.isBlank(verifyApplyTimeStamp)) {
-            return ErrorCodeEnum.LACK_OF_TIME;
         } else if (alt == null) {
             return ErrorCodeEnum.LACK_OF_ALT;
         } else if (lng == null) {

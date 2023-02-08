@@ -12,6 +12,7 @@ import com.htfp.service.cac.router.biz.model.http.request.SignInRequest;
 import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
+import com.htfp.service.cac.router.biz.model.http.request.UavVerifyApplyRequest;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.GcsChangeUavResponse;
@@ -19,6 +20,7 @@ import com.htfp.service.cac.router.biz.model.http.response.GcsControlUavResponse
 import com.htfp.service.cac.router.biz.model.http.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeResponse;
+import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyResponse;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -181,6 +183,37 @@ public class GcsController {
             }
         } catch (Exception e) {
             log.error("飞行计划查询失败, flightPlanQueryRequest={}", flightPlanQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 无人机接入校验
+     *
+     * @param uavVerifyApplyRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/uavVerifyApply", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse uavVerifyApply(@RequestBody UavVerifyApplyRequest uavVerifyApplyRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(uavVerifyApplyRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 无人机接入校验申请
+            UavVerifyApplyResponse uavVerifyApplyResponse = gcsService.uavVerifyApply(uavVerifyApplyRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(uavVerifyApplyResponse.getCode())) {
+                return BaseHttpResponse.fail(uavVerifyApplyResponse.getCode(), uavVerifyApplyResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(uavVerifyApplyResponse.getUavVerifyResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("无人机接入校验失败, uavVerifyApplyRequest={}", uavVerifyApplyRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

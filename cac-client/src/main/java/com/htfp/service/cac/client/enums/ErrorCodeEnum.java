@@ -118,8 +118,12 @@ public enum ErrorCodeEnum {
     LACK_OF_MAPPING(5001, "mapping关系缺失"),
     GCS_MISMATCH_UAV(5002, "地面站可控机型与无人机类型不一致"),
     PILOT_MISMATCH_UAV(5003, "驾驶员准驾机型与无人机类型不一致"),
-    GCS_NOT_SIGN_IN(5004, "地面站未注册"),
+    GCS_NOT_SIGN_IN(5004, "地面站未上线"),
     UAV_NOT_IN_NAVIGATION(5005, "无人机未处于航行中"),
+    UAV_NOT_REGISTER(5006, "无人机未注册"),
+    PILOT_NOT_REGISTER(5007, "驾驶员未注册"),
+    OPERATOR_NOT_REGISTER(5008, "运营主体未注册"),
+    UAV_HAS_VERIFIED(5009, "无人机已完成校验，无需重复校验"),
     OTHER_BIZ_ERROR(5900, "其他业务失败"),
     ;
 

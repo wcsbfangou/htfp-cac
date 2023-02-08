@@ -4,36 +4,52 @@ import com.htfp.service.cac.client.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.client.service.IOacService;
 import com.htfp.service.oac.biz.model.request.FlightPlanIssuedRequest;
+import com.htfp.service.oac.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.biz.model.response.FlightPlanIssuedResponse;
+import com.htfp.service.oac.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.biz.service.IFlightManagementService;
 import com.htfp.service.oac.client.enums.ApplicantTypeEnum;
 import com.htfp.service.oac.client.enums.ApplyStatusEnum;
 import com.htfp.service.oac.client.enums.FlightPlanStatusTypeEnum;
+import com.htfp.service.oac.client.request.FinishFlightPlanRequest;
 import com.htfp.service.oac.client.request.FlightPlanApplyRequest;
 import com.htfp.service.oac.client.request.FlightPlanQueryRequest;
+import com.htfp.service.oac.client.request.FlyApplyRequest;
+import com.htfp.service.oac.client.request.FlyQueryRequest;
+import com.htfp.service.oac.client.request.UavVerifyApplyRequest;
+import com.htfp.service.oac.client.response.FinishFlightPlanResponse;
 import com.htfp.service.oac.client.response.FlightPlanApplyResponse;
 import com.htfp.service.oac.client.response.FlightPlanQueryResponse;
+import com.htfp.service.oac.client.response.FlyApplyResponse;
+import com.htfp.service.oac.client.response.FlyQueryResponse;
+import com.htfp.service.oac.client.response.UavVerifyApplyResponse;
 import com.htfp.service.oac.client.response.param.FlightPlanQueryResultParam;
+import com.htfp.service.oac.client.response.param.UavVerifyResultParam;
 import com.htfp.service.oac.common.utils.DateUtils;
+import com.htfp.service.oac.common.utils.GpsDistanceUtils;
 import com.htfp.service.oac.common.utils.JsonUtils;
 import com.htfp.service.oac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.oac.dao.model.AirportInfoDO;
 import com.htfp.service.oac.dao.model.ApplyFlightPlanLogDO;
+import com.htfp.service.oac.dao.model.ApplyUavVerifyLogDO;
 import com.htfp.service.oac.dao.model.DynamicRouteInfoDO;
 import com.htfp.service.oac.dao.model.DynamicUavInfoDO;
 import com.htfp.service.oac.dao.model.OperatorInfoDO;
 import com.htfp.service.oac.dao.model.UavInfoDO;
 import com.htfp.service.oac.dao.service.AirportInfoDalService;
 import com.htfp.service.oac.dao.service.ApplyFlightPlanLogDalService;
+import com.htfp.service.oac.dao.service.ApplyUavVerifyLogDalService;
 import com.htfp.service.oac.dao.service.DynamicRouteInfoDalService;
 import com.htfp.service.oac.dao.service.DynamicUavInfoDalService;
 import com.htfp.service.oac.dao.service.OperatorDalService;
 import com.htfp.service.oac.dao.service.UavDalService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -55,6 +71,9 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
 
     @Resource
     ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
+
+    @Resource
+    ApplyUavVerifyLogDalService applyUavVerifyLogDalService;
 
     @Resource
     DynamicUavInfoDalService dynamicUavInfoDalService;
@@ -222,5 +241,133 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
             }
         }
         return result;
+    }
+
+    /**
+     * 无人机系统接入校验
+     *
+     * @param uavVerifyApplyRequest
+     * @return
+     */
+    @Override
+    public UavVerifyApplyResponse uavVerifyApply(UavVerifyApplyRequest uavVerifyApplyRequest) {
+        UavVerifyApplyResponse uavVerifyApplyResponse = new UavVerifyApplyResponse();
+        uavVerifyApplyResponse.fail();
+        try {
+            log.info("[oac]无人机系统接入校验start，uavVerifyApplyRequest={}", uavVerifyApplyRequest);
+            // TODO: 2022/12/22 IDC ID && 机器ID
+            // 雪花算法生成replyUavVerifyId
+            Long replyUavVerifyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
+            // 校验无人机
+            Long replyFlightPlanId = uavVerify(uavVerifyApplyRequest);
+            ApplyStatusEnum uavVerifyApplyStatusEnum;
+            UavVerifyResultParam uavVerifyResultParam = new UavVerifyResultParam();
+            uavVerifyResultParam.setApplyUavVerifyId(uavVerifyApplyRequest.getApplyUavVerifyId());
+            if (replyFlightPlanId != null) {
+                uavVerifyResultParam.setReplyUavVerifyId(replyUavVerifyId.toString());
+                uavVerifyResultParam.setUavVerifyPass(true);
+                uavVerifyApplyStatusEnum = ApplyStatusEnum.APPROVED;
+                // 更新无人机动态信息表
+                updateDynamicUavInfo(uavVerifyApplyRequest, replyFlightPlanId);
+            } else {
+                uavVerifyResultParam.setUavVerifyPass(false);
+                uavVerifyApplyStatusEnum = ApplyStatusEnum.UNAPPROVED;
+            }
+            ApplyUavVerifyLogDO applyUavVerifyLog = applyUavVerifyLogDalService.buildApplyUavVerifyLog(uavVerifyApplyRequest.getApplyUavVerifyId(), replyUavVerifyId, uavVerifyApplyRequest.getCpn(), uavVerifyApplyRequest.getLng(), uavVerifyApplyRequest.getLat(), uavVerifyApplyRequest.getAlt(), uavVerifyApplyRequest.getGroundSpeed(), uavVerifyApplyRequest.getRelativeHeight(),
+                    uavVerifyApplyRequest.getFlightControlSn(), uavVerifyApplyRequest.getFlightControlVersion(), JsonUtils.object2Json(uavVerifyApplyRequest.getUavDynamicParam()), JsonUtils.object2Json(uavVerifyApplyRequest.getUavStaticParam()), uavVerifyApplyStatusEnum.getCode());
+            int id = applyUavVerifyLogDalService.insertApplyUavVerifyLog(applyUavVerifyLog);
+            if (id > 0) {
+                uavVerifyApplyResponse.success();
+                uavVerifyApplyResponse.setUavVerifyResultParam(uavVerifyResultParam);
+            } else {
+                uavVerifyApplyResponse.fail("无人机系统接入校验失败，插入数据失败");
+            }
+
+            log.info("[oac]无人机系统接入校验end，uavVerifyApplyRequest={},uavVerifyApplyResponse={}", uavVerifyApplyRequest, JsonUtils.object2Json(uavVerifyApplyResponse));
+        } catch (Exception e) {
+            log.error("[oac]无人机系统接入校验异常，uavVerifyApplyRequest={}", uavVerifyApplyRequest, e);
+            uavVerifyApplyResponse.fail(e.getMessage());
+        }
+        return uavVerifyApplyResponse;
+    }
+
+    // TODO: 2023/2/8 验证无人机信息
+    Long uavVerify(UavVerifyApplyRequest uavVerifyApplyRequest) {
+        Long replyFlightPlanId = null;
+        UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(uavVerifyApplyRequest.getCpn());
+        if (queryUavInfo != null) {
+            List<ApplyFlightPlanLogDO> applyFlightPlanLogDOList = applyFlightPlanLogDalService.queryApplyFlightPlanLogByCpn(uavVerifyApplyRequest.getCpn());
+            for (ApplyFlightPlanLogDO applyFlightPlanLogDO : applyFlightPlanLogDOList) {
+                if (ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(applyFlightPlanLogDO.getStatus()))) {
+                    replyFlightPlanId = applyFlightPlanLogDO.getReplyFlightPlanId();
+                    break;
+                }
+            }
+        }
+        return replyFlightPlanId;
+    }
+
+    Boolean updateDynamicUavInfo(UavVerifyApplyRequest uavVerifyApplyRequest, Long replyFlightPlanId) {
+        String currentTime = DateUtils.getDateFormatString(new Date(), DateUtils.DATETIME_MSEC_PATTERN);
+        DynamicUavInfoDO dynamicUavInfoDO = dynamicUavInfoDalService.queryDynamicUavInfoByReplyFlyId(replyFlightPlanId);
+        dynamicUavInfoDO.setLng(uavVerifyApplyRequest.getLng());
+        dynamicUavInfoDO.setLat(uavVerifyApplyRequest.getLat());
+        dynamicUavInfoDO.setAlt(uavVerifyApplyRequest.getAlt());
+        dynamicUavInfoDO.setSpeed(uavVerifyApplyRequest.getGroundSpeed());
+        dynamicUavInfoDO.setCourse(uavVerifyApplyRequest.getUavDynamicParam().getTrueCourse());
+        dynamicUavInfoDO.setFuel(uavVerifyApplyRequest.getUavDynamicParam().getFuel());
+        dynamicUavInfoDO.setBattery(uavVerifyApplyRequest.getUavDynamicParam().getBattery());
+        dynamicUavInfoDO.setUpdateTime(currentTime);
+        dynamicUavInfoDO.setDistanceToLandingPoint(GpsDistanceUtils.getDistance(uavVerifyApplyRequest.getLng(), uavVerifyApplyRequest.getLat(), dynamicUavInfoDO.getLandingLng(), dynamicUavInfoDO.getLandingLat()));
+        int id = dynamicUavInfoDalService.updateDynamicUavInfo(dynamicUavInfoDO);
+        if (id > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 放飞申请
+     *
+     * @param flyApplyRequest
+     * @return
+     */
+    @Override
+    public FlyApplyResponse flyApply(FlyApplyRequest flyApplyRequest) {
+        return null;
+    }
+
+    /**
+     * 放飞申请查询
+     *
+     * @param flyQueryRequest
+     * @return
+     */
+    @Override
+    public FlyQueryResponse flyQuery(FlyQueryRequest flyQueryRequest) {
+        return null;
+    }
+
+    /**
+     * 放飞结果下发
+     *
+     * @param flyIssuedRequest
+     * @return
+     */
+    @Override
+    public FlyIssuedResponse flyIssued(FlyIssuedRequest flyIssuedRequest) {
+        return null;
+    }
+
+    /**
+     * 结束飞行计划
+     *
+     * @param finishFlightPlanRequest
+     * @return
+     */
+    @Override
+    public FinishFlightPlanResponse finishFlightPlan(FinishFlightPlanRequest finishFlightPlanRequest) {
+        return null;
     }
 }

@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class UavVerifyResultParam {
 
-    private String verifyUavVerifyId;
+    private String applyUavVerifyId;
     private String replyUavVerifyId;
     private Boolean uavVerifyPass;
 

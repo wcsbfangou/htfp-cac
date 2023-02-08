@@ -313,14 +313,14 @@ public class UavDalService {
     }
 
     public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode) {
-        UavOacMappingDO gcsIpMappingDO = new UavOacMappingDO();
-        gcsIpMappingDO.setUavId(uavId);
-        gcsIpMappingDO.setReportCode(reportCode);
-        gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
-        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
-        gcsIpMappingDO.setGmtCreate(new Date());
-        gcsIpMappingDO.setGmtModify(new Date());
-        return gcsIpMappingDO;
+        UavOacMappingDO uavOacMappingDO = new UavOacMappingDO();
+        uavOacMappingDO.setUavId(uavId);
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        uavOacMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
+        uavOacMappingDO.setGmtCreate(new Date());
+        uavOacMappingDO.setGmtModify(new Date());
+        return uavOacMappingDO;
     }
 
     public UavStatusLogDO buildUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {
