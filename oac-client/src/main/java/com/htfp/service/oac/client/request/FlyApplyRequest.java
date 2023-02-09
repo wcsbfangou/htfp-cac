@@ -15,7 +15,9 @@ import java.util.List;
 @Data
 public class FlyApplyRequest implements BaseValidate<ErrorCodeEnum> {
 
+    private String applyFlyId;
     private String applyFlightPlanId;
+    private String replyFlightPlanId;
     private String cpn;
     private List<String> airspaceNumbers;
     private String operationScenarioType;
@@ -30,7 +32,11 @@ public class FlyApplyRequest implements BaseValidate<ErrorCodeEnum> {
     @Override
     public ErrorCodeEnum validate() {
         if(StringUtils.isBlank(applyFlightPlanId)){
+            return ErrorCodeEnum.LACK_OF_APPLY_FLY_ID;
+        } else if(StringUtils.isBlank(applyFlightPlanId)){
             return ErrorCodeEnum.LACK_OF_APPLY_FLIGHT_PLAN_ID;
+        } else if(StringUtils.isBlank(replyFlightPlanId)){
+            return ErrorCodeEnum.LACK_OF_REPLY_FLIGHT_PLAN_ID;
         } else if(StringUtils.isBlank(cpn)){
             return ErrorCodeEnum.LACK_OF_UAV_CPN;
         } else if(CollectionUtils.isEmpty(airspaceNumbers)){

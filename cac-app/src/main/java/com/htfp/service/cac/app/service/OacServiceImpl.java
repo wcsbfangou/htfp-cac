@@ -2,7 +2,9 @@ package com.htfp.service.cac.app.service;
 
 import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.client.request.FlightPlanReplyRequest;
+import com.htfp.service.cac.client.request.FlyReplyRequest;
 import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
+import com.htfp.service.cac.client.response.FlyReplyResponse;
 import com.htfp.service.cac.client.service.IOacService;
 import com.htfp.service.cac.router.biz.service.http.IRouteToGcsService;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,30 @@ public class OacServiceImpl implements IOacService {
             flightPlanReplyResponse.fail("飞行计划回复异常");
         }
         return flightPlanReplyResponse;
+    }
+
+    /**
+     * 放飞计划回复
+     *
+     * @param flyReplyRequest
+     * @return
+     */
+    @Override
+    public FlyReplyResponse flyReply(FlyReplyRequest flyReplyRequest) {
+        FlyReplyResponse flyReplyResponse = new FlyReplyResponse();
+        flyReplyResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = flyReplyRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                flyReplyResponse = routeToGcsService.flyReply(flyReplyRequest);
+            } else {
+                flyReplyResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("放飞计划回复异常, flyReplyRequest={}", flyReplyRequest, e);
+            flyReplyResponse.fail("放飞计划回复异常");
+        }
+        return flyReplyResponse;
     }
 
 }

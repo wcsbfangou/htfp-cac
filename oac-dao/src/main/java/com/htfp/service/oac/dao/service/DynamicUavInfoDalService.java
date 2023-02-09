@@ -26,8 +26,8 @@ public class DynamicUavInfoDalService {
         return dynamicUavInfoMapper.selectById(id);
     }
 
-    public DynamicUavInfoDO queryDynamicUavInfoByReplyFlyId(Long flyId){
-        return dynamicUavInfoMapper.selectByReplyFlyId(flyId);
+    public DynamicUavInfoDO queryDynamicUavInfoByReplyFlyId(Long replyFlyId){
+        return dynamicUavInfoMapper.selectByReplyFlyId(replyFlyId);
     }
 
     public DynamicUavInfoDO queryDynamicUavInfoByReplyFlightPlanId(Long replyFlightPlanId){

@@ -22,11 +22,13 @@ import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.log.ApplyFlightPlanLogDO;
+import com.htfp.service.cac.dao.model.log.ApplyFlyLogDO;
 import com.htfp.service.cac.dao.model.log.ApplyUavVerifyLogDO;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
 import com.htfp.service.cac.dao.service.ApplyFlightPlanLogDalService;
+import com.htfp.service.cac.dao.service.ApplyFlyLogDalService;
 import com.htfp.service.cac.dao.service.ApplyUavVerifyLogDalService;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
@@ -61,6 +63,7 @@ import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlightPlanQueryResultParam;
+import com.htfp.service.cac.router.biz.model.http.response.param.FlyQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.UavVerifyResultParam;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
 import com.htfp.service.oac.client.service.IFlyingService;
@@ -104,6 +107,9 @@ public class GcsServiceImpl implements IGcsService {
     @Resource
     ApplyUavVerifyLogDalService applyUavVerifyLogDalService;
 
+    @Resource
+    ApplyFlyLogDalService applyFlyLogDalService;
+
     @Resource(name = "uavServiceImpl")
     IUavService uavService;
 
@@ -111,7 +117,7 @@ public class GcsServiceImpl implements IGcsService {
     ICommandService commandService;
 
     /**
-     * 地面站注册
+     * 地面站上线
      *
      * @param signInRequest
      * @return
@@ -539,7 +545,65 @@ public class GcsServiceImpl implements IGcsService {
      */
     @Override
     public FlyApplyResponse flyApply(FlyApplyRequest flyApplyRequest) {
-        return null;
+        FlyApplyResponse flyApplyResponse = new FlyApplyResponse();
+        flyApplyResponse.fail();
+        try {
+            log.info("[router]放飞申请start，flyApplyRequest={}", flyApplyRequest);
+            // TODO: 2022/12/22 IDC ID && 机器ID
+            // 生成applyFlyId
+            Long applyFlyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flyApplyRequest.getUavId()));
+            ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
+            // TODO: 2023/2/9 获取navigationId
+            Long navigationId = null;
+            ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.buildApplyFlyLogDO(applyFlyId, null, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), navigationId,
+                    flyApplyRequest.getGcsId(), flyApplyRequest.getUavId(), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), JsonUtils.object2Json(flyApplyRequest.getAirspaceNumbers()), flyApplyRequest.getOperationScenarioType(),
+                    flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
+            int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
+            if (id > 0) {
+                com.htfp.service.oac.client.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                com.htfp.service.oac.client.response.FlyApplyResponse oacFlyApplyResponse = flyingServiceImpl.flyApply(oacFlyApplyRequest);
+                // TODO: 2022/12/22 校验oacFlyApplyResponse
+                flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
+                if (flyApplyResponse.getSuccess()) {
+                    applyFlyLogDalService.updateApplyFlyLogReplyFlyIdById(applyFlyLogDO.getId(), oacFlyApplyResponse.getReplyFlyId());
+                    flyApplyResponse.setApplyFlyId(applyFlyId.toString());
+                }
+            } else {
+                flyApplyResponse.fail("放飞申请失败，插入数据失败");
+            }
+            log.info("[router]放飞申请end，flyApplyRequest={},flyApplyResponse={}", flyApplyRequest, JsonUtils.object2Json(flyApplyResponse));
+        } catch (Exception e) {
+            log.error("[router]放飞申请异常，flyApplyRequest={}", flyApplyRequest, e);
+            flyApplyResponse.fail(e.getMessage());
+        }
+        return flyApplyResponse;
+    }
+
+    com.htfp.service.oac.client.request.FlyApplyRequest buildOacFlyApplyRequest(FlyApplyRequest flyApplyRequest, Long applyFlyId, Long applyFlightPlanId, String replyFlightPlanId, String cpn) {
+        com.htfp.service.oac.client.request.FlyApplyRequest oacFlyApplyRequest = new com.htfp.service.oac.client.request.FlyApplyRequest();
+        oacFlyApplyRequest.setApplyFlyId(applyFlyId.toString());
+        oacFlyApplyRequest.setApplyFlightPlanId(applyFlightPlanId.toString());
+        oacFlyApplyRequest.setReplyFlightPlanId(replyFlightPlanId);
+        oacFlyApplyRequest.setCpn(cpn);
+        oacFlyApplyRequest.setAirspaceNumbers(flyApplyRequest.getAirspaceNumbers());
+        oacFlyApplyRequest.setOperationScenarioType(flyApplyRequest.getOperationScenarioType());
+        oacFlyApplyRequest.setFlyLng(flyApplyRequest.getFlyLng());
+        oacFlyApplyRequest.setFlyLat(flyApplyRequest.getFlyLat());
+        oacFlyApplyRequest.setFlyAlt(flyApplyRequest.getFlyAlt());
+        oacFlyApplyRequest.setVin(flyApplyRequest.getVin());
+        oacFlyApplyRequest.setPvin(flyApplyRequest.getPvin());
+        oacFlyApplyRequest.setFlightControlSn(flyApplyRequest.getFlightControlSn());
+        oacFlyApplyRequest.setImei(flyApplyRequest.getImei());
+        return oacFlyApplyRequest;
+    }
+
+    FlyApplyResponse buildFlyApplyResponse(com.htfp.service.oac.client.response.FlyApplyResponse oacFlyApplyResponse){
+        FlyApplyResponse flyApplyResponse = new FlyApplyResponse();
+        flyApplyResponse.setSuccess(oacFlyApplyResponse.getSuccess());
+        flyApplyResponse.setCode(oacFlyApplyResponse.getCode());
+        flyApplyResponse.setMessage(oacFlyApplyResponse.getMessage());
+        return flyApplyResponse;
     }
 
     /**
@@ -550,7 +614,54 @@ public class GcsServiceImpl implements IGcsService {
      */
     @Override
     public FlyQueryResponse flyQuery(FlyQueryRequest flyQueryRequest) {
-        return null;
+        FlyQueryResponse flyQueryResponse = new FlyQueryResponse();
+        flyQueryResponse.fail();
+        try {
+            log.info("[router]放飞申请查询start，flyQueryRequest={}", flyQueryRequest);
+            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(flyQueryRequest.getApplyFlyId()));
+            if (!ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus()))) {
+                flyQueryResponse.success();
+                FlyQueryResultParam flyQueryResultParam = new FlyQueryResultParam();
+                flyQueryResultParam.setApplyFlyId(flyQueryRequest.getApplyFlyId());
+                flyQueryResultParam.setReplyFlyId(queryApplyFlyLog.getReplyFlyId());
+                flyQueryResultParam.setStatus(queryApplyFlyLog.getStatus());
+                flyQueryResponse.setFlyQueryResultParam(flyQueryResultParam);
+            } else {
+                com.htfp.service.oac.client.request.FlyQueryRequest oacFlyQueryRequest = buildOacFlyQueryRequest(queryApplyFlyLog.getReplyFlyId());
+                com.htfp.service.oac.client.response.FlyQueryResponse oacFlyQueryResponse = flyingServiceImpl.flyQuery(oacFlyQueryRequest);
+                // TODO: 2022/12/22 校验oacFlyResponse
+                flyQueryResponse = buildOacFlyQueryResponse(oacFlyQueryResponse);
+                if (flyQueryResponse.getSuccess() && !queryApplyFlyLog.getStatus().equals(flyQueryResponse.getFlyQueryResultParam().getStatus())) {
+                    applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyQueryResponse.getFlyQueryResultParam().getStatus());
+                }
+            }
+            log.info("[router]放飞申请查询end，flyQueryRequest={},flyQueryResponse={}", flyQueryRequest, JsonUtils.object2Json(flyQueryResponse));
+        } catch (Exception e) {
+            log.error("[router]放飞申请查询异常，flyQueryRequest={}", flyQueryRequest, e);
+            flyQueryResponse.fail(e.getMessage());
+        }
+        return flyQueryResponse;
+    }
+
+    com.htfp.service.oac.client.request.FlyQueryRequest buildOacFlyQueryRequest(String replyFlyId) {
+        com.htfp.service.oac.client.request.FlyQueryRequest oacFlyQueryRequest = new com.htfp.service.oac.client.request.FlyQueryRequest();
+        oacFlyQueryRequest.setReplyFlyId(replyFlyId);
+        return oacFlyQueryRequest;
+    }
+
+    FlyQueryResponse buildOacFlyQueryResponse(com.htfp.service.oac.client.response.FlyQueryResponse oacFlyQueryResponse) {
+        FlyQueryResponse flyQueryResponse = new FlyQueryResponse();
+        if (oacFlyQueryResponse.getSuccess() && oacFlyQueryResponse.getFlyQueryResultParam() != null) {
+            FlyQueryResultParam flyQueryResultParam = new FlyQueryResultParam();
+            flyQueryResultParam.setApplyFlyId(oacFlyQueryResponse.getFlyQueryResultParam().getApplyFlyId());
+            flyQueryResultParam.setReplyFlyId(oacFlyQueryResponse.getFlyQueryResultParam().getReplyFlyId());
+            flyQueryResultParam.setStatus(oacFlyQueryResponse.getFlyQueryResultParam().getStatus());
+            flyQueryResponse.setFlyQueryResultParam(flyQueryResultParam);
+        }
+        flyQueryResponse.setSuccess(oacFlyQueryResponse.getSuccess());
+        flyQueryResponse.setCode(oacFlyQueryResponse.getCode());
+        flyQueryResponse.setMessage(oacFlyQueryResponse.getMessage());
+        return flyQueryResponse;
     }
 
     /**

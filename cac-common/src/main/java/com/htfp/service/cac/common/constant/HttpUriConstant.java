@@ -11,4 +11,5 @@ public class HttpUriConstant {
     public static final String GCS_PING = "gcs/ping";
     public static final String RCS_PING = "rcs/ping";
     public static final String FLIGHT_PLAN_REPLY = "gcs/flightPlanReply";
+    public static final String FLY_REPLY = "gcs/flyReply";
 }
