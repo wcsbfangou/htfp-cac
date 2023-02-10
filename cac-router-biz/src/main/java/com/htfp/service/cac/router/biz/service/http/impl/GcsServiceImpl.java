@@ -867,7 +867,63 @@ public class GcsServiceImpl implements IGcsService {
      */
     @Override
     public FinishFlightPlanResponse finishFlightPlan(FinishFlightPlanRequest finishFlightPlanRequest) {
-        return null;
+        FinishFlightPlanResponse finishFlightPlanResponse = new FinishFlightPlanResponse();
+        finishFlightPlanResponse.fail();
+        try {
+            log.info("[router]飞行计划结束start，finishFlightPlanRequest={}", finishFlightPlanRequest);
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(finishFlightPlanRequest.getUavId()));
+            UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(finishFlightPlanRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
+            ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getApplyFlightPlanId()));
+            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getApplyFlightPlanId()));
+            if(queryUavInfo!=null && queryUavOacMapping!=null && queryApplyFlightPlanLog!=null && queryApplyFlyLog!=null){
+                ApplyStatusEnum flightPlanStatus = ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus());
+                ApplyStatusEnum flyStatus = ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus());
+                if (ApplyStatusEnum.APPROVED.equals(flightPlanStatus) && !ApplyStatusEnum.PENDING.equals(flyStatus)) {
+                    com.htfp.service.oac.client.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = buildOacFinishFlightPlanRequest(finishFlightPlanRequest, queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                    com.htfp.service.oac.client.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingServiceImpl.finishFlightPlan(oacFinishFlightPlanRequest);
+                    finishFlightPlanResponse = buildFinishFlightPlanResponse(oacFinishFlightPlanResponse);
+                    if(finishFlightPlanResponse.getSuccess()){
+                        // 更新reportCode和连接状态
+                        uavDalService.updateUavOacMappingReportCodeAndLinkStatus(queryUavOacMapping, queryUavInfo.getCpn(), LinkStatusEnum.OFFLINE);
+                        // 更新飞行计划状态
+                        applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.COMPLETE.getCode());
+                        // 飞行计划处于通过状态，则结束飞行计划
+                        if(ApplyStatusEnum.APPROVED.equals(flyStatus)){
+                            applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, ApplyStatusEnum.COMPLETE.getCode());
+                        }
+                    }
+                } else {
+                    finishFlightPlanResponse.fail("飞行计划未处于通过状态或飞行计划，不需要结束");
+                }
+            } else {
+                finishFlightPlanResponse.fail("未查询到相应数据");
+            }
+
+            log.info("[router]飞行计划结束end，finishFlightPlanRequest={}, finishFlightPlanResponse={}", finishFlightPlanRequest, JsonUtils.object2Json(finishFlightPlanResponse));
+        } catch (Exception e) {
+            log.error("[router]飞行计划结束异常，finishFlightPlanRequest={}", finishFlightPlanRequest, e);
+            finishFlightPlanResponse.fail(e.getMessage());
+        }
+        return finishFlightPlanResponse;
+    }
+
+    com.htfp.service.oac.client.request.FinishFlightPlanRequest buildOacFinishFlightPlanRequest(FinishFlightPlanRequest finishFlightPlanRequest, String replyFlightPlanId , String cpn){
+        com.htfp.service.oac.client.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = new com.htfp.service.oac.client.request.FinishFlightPlanRequest();
+        oacFinishFlightPlanRequest.setCpn(cpn);
+        oacFinishFlightPlanRequest.setReplyFlightPlanId(replyFlightPlanId);
+        oacFinishFlightPlanRequest.setTotalRoutePoint(finishFlightPlanRequest.getTotalRoutePoint());
+        oacFinishFlightPlanRequest.setCurrentRoutePointIndex(finishFlightPlanRequest.getCurrentRoutePointIndex());
+        oacFinishFlightPlanRequest.setIsOver(finishFlightPlanRequest.getIsOver());
+        oacFinishFlightPlanRequest.setMessage(finishFlightPlanRequest.getMessage());
+        return oacFinishFlightPlanRequest;
+    }
+
+    FinishFlightPlanResponse buildFinishFlightPlanResponse(com.htfp.service.oac.client.response.FinishFlightPlanResponse oacFinishFlightPlanResponse){
+        FinishFlightPlanResponse finishFlightPlanResponse = new FinishFlightPlanResponse();
+        finishFlightPlanResponse.setSuccess(oacFinishFlightPlanResponse.getSuccess());
+        finishFlightPlanResponse.setCode(oacFinishFlightPlanResponse.getCode());
+        finishFlightPlanResponse.setMessage(oacFinishFlightPlanResponse.getMessage());
+        return finishFlightPlanResponse;
     }
 
     private GcsChangeControlUavRequest buildGcsChangeControlUavRequest(Long gcsId, Long uavId, Boolean newArrival, Integer uavStatus, Long masterPilot, Long deputyPilot) {

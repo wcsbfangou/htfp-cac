@@ -4,6 +4,7 @@ import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.client.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
 import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlyApplyRequest;
@@ -15,6 +16,7 @@ import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavVerifyApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlyApplyResponse;
@@ -368,6 +370,35 @@ public class GcsController {
             }
         } catch (Exception e) {
             log.error("飞行计划查询失败, flyQueryRequest={}", flyQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 结束飞行计划
+     *
+     * @param finishFlightPlanRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/finishUavFlightPlan", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse finishFlightPlan(@RequestBody FinishFlightPlanRequest finishFlightPlanRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(finishFlightPlanRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 结束飞行计划
+            FinishFlightPlanResponse finishFlightPlanResponse = gcsService.finishFlightPlan(finishFlightPlanRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(finishFlightPlanResponse.getCode())) {
+                return BaseHttpResponse.fail(finishFlightPlanResponse.getCode(), finishFlightPlanResponse.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("结束飞行计划失败, finishFlightPlanRequest={}", finishFlightPlanRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

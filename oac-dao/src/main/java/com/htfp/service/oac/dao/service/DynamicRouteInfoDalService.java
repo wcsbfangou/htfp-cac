@@ -25,7 +25,7 @@ public class DynamicRouteInfoDalService {
         return dynamicRouteInfoMapper.selectById(id);
     }
 
-    public DynamicRouteInfoDO queryDynamicRouteInfoByFlyId(Long flyId){
+    public DynamicRouteInfoDO queryDynamicRouteInfoByReplyFlyId(Long flyId){
         return dynamicRouteInfoMapper.selectByReplyFlyId(flyId);
     }
 

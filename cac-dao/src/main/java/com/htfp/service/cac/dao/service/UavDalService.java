@@ -294,6 +294,17 @@ public class UavDalService {
         return id;
     }
 
+    public int updateUavOacMappingReportCodeAndLinkStatus(UavOacMappingDO uavOacMappingDO, String reportCode, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCache.put(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
     public int updateUavOacMappingStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum) {
         uavOacMappingDO.setStatus(statusEnum.getCode());
         uavOacMappingDO.setGmtModify(new Date());
