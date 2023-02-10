@@ -121,7 +121,7 @@ public class ApplyFlyLogDalService {
         return updateApplyFlyLog(applyFlyLogDO);
     }
 
-    public ApplyFlyLogDO buildApplyFlyLogDO(Long applyFlyId, String replyFlyId, Long applyFlightPlanId, String replyFlightPlanId, Long navigationId, String gcsId, String uavId, String uavReg, String cpn, String airspaceNumbers, String operationScenarioType, Integer flyLng, Integer flyLat, Integer flyAlt, String vin, String pvin, String flightControlSn, String imei, Integer status) {
+    public ApplyFlyLogDO buildApplyFlyLogDO(Long applyFlyId, String replyFlyId, Long applyFlightPlanId, String replyFlightPlanId, Long navigationId, Long gcsId, Long uavId, String uavReg, String cpn, String airspaceNumbers, String operationScenarioType, Integer flyLng, Integer flyLat, Integer flyAlt, String vin, String pvin, String flightControlSn, String imei, Integer status) {
         ApplyFlyLogDO applyFlyLogDO = new ApplyFlyLogDO();
         applyFlyLogDO.setApplyFlyId(applyFlyId);
         applyFlyLogDO.setReplyFlyId(replyFlyId);

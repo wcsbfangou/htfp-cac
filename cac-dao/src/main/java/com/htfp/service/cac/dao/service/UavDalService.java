@@ -251,12 +251,13 @@ public class UavDalService {
 
     public String queryUavReportCode(Long uavId) {
         String reportCode = uavReportCache.getIfPresent(uavId);
-        if(StringUtils.isEmpty(reportCode)){
-            return uavOacMappingMapper.selectByUavId(uavId).getReportCode();
-        } else {
-            return reportCode;
+        if (StringUtils.isEmpty(reportCode)) {
+            UavOacMappingDO uavOacMapping = uavOacMappingMapper.selectByUavId(uavId);
+            if (uavOacMapping != null) {
+                reportCode = uavOacMapping.getReportCode();
+            }
         }
-
+        return reportCode;
     }
 
     public UavOacMappingDO queryUavOacMapping(Long uavId, MappingStatusEnum mappingStatusEnum) {
@@ -287,7 +288,7 @@ public class UavDalService {
         uavOacMappingDO.setReportCode(reportCode);
         uavOacMappingDO.setGmtModify(new Date());
         int id = updateUavOacMapping(uavOacMappingDO);
-        if(id>0){
+        if (id > 0) {
             uavReportCache.put(uavOacMappingDO.getUavId(), reportCode);
         }
         return id;

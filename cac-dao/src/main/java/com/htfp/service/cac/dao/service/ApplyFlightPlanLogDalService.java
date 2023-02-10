@@ -113,7 +113,7 @@ public class ApplyFlightPlanLogDalService {
         return updateApplyFlightPlanLog(applyFlightPlanLogDO);
     }
 
-    public ApplyFlightPlanLogDO buildApplyFlightPlanLogDO(Long applyFlightPlanId, String replyFlightPlanId, String gcsId, String uavId, String uavReg, String cpn, Integer applicantType, String applicantSubject, String pilots, String airspaceNumbers, String routePointCoordinates, String takeoffAirportId, String landingAirportId, String takeoffSite, String landingSite, Integer missionType, String startTime, String endTime, String emergencyProcedure, String operationScenarioType, Boolean isEmergency, Boolean isVlos, Integer status) {
+    public ApplyFlightPlanLogDO buildApplyFlightPlanLogDO(Long applyFlightPlanId, String replyFlightPlanId, Long gcsId, Long uavId, String uavReg, String cpn, Integer applicantType, String applicantSubject, String pilots, String airspaceNumbers, String routePointCoordinates, String takeoffAirportId, String landingAirportId, String takeoffSite, String landingSite, Integer missionType, String startTime, String endTime, String emergencyProcedure, String operationScenarioType, Boolean isEmergency, Boolean isVlos, Integer status) {
         ApplyFlightPlanLogDO applyFlightPlanLogDO = new ApplyFlightPlanLogDO();
         applyFlightPlanLogDO.setApplyFlightPlanId(applyFlightPlanId);
         applyFlightPlanLogDO.setReplyFlightPlanId(replyFlightPlanId);

@@ -70,10 +70,10 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                     queryApplyFlightPlanLog.getReplyFlightPlanId().equals(flightPlanReplyRequest.getReplyFlightPlanId())) {
                 if (queryUavInfo != null &&
                         queryApplyFlightPlanLog.getUavId() != null &&
-                        queryUavInfo.getId().toString().equals(queryApplyFlightPlanLog.getUavId())) {
+                        queryUavInfo.getId().equals(queryApplyFlightPlanLog.getUavId())) {
                     int id = applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, flightPlanReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
                     if (id > 0) {
-                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(Long.valueOf(queryApplyFlightPlanLog.getGcsId()));
+                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlightPlanLog.getGcsId());
                         if (queryGcsIpMapping != null &&
                                 queryGcsIpMapping.getGcsIp() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
@@ -98,13 +98,13 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return flightPlanReplyResponse;
     }
 
-    public FlightPlanReplyResponse flightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, String uavId, String gcsId, String url) {
+    public FlightPlanReplyResponse flightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId, Long gcsId, String url) {
         FlightPlanReplyResponse flightPlanReplyResponse = null;
         try {
             com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest gcsFlightPlanReplyRequest = buildGcsFlightPlanReplyRequest(flightPlanReplyRequest, uavId);
             HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
                     .contentObject(JsonUtils.object2Json(gcsFlightPlanReplyRequest, false))
-                    .gcsId(Long.valueOf(gcsId))
+                    .gcsId(gcsId)
                     .contentType(HttpContentTypeConstant.JSON_TYPE)
                     .create();
             Map<String, String> httpHeader = builderRequestHeader();
@@ -129,10 +129,10 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return new CustomHttpConfig();
     }
 
-    com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest buildGcsFlightPlanReplyRequest(FlightPlanReplyRequest flightPlanReplyRequest, String uavId) {
+    com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest buildGcsFlightPlanReplyRequest(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId) {
         com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest gcsFlightPlanReplyRequest = new com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest();
         gcsFlightPlanReplyRequest.setFlightPlanPass(flightPlanReplyRequest.getPass());
-        gcsFlightPlanReplyRequest.setUavId(uavId);
+        gcsFlightPlanReplyRequest.setUavId(uavId.toString());
         gcsFlightPlanReplyRequest.setApplyFlightPlanId(flightPlanReplyRequest.getApplyFlightPlanId());
         gcsFlightPlanReplyRequest.setReplyFlightPlanId(flightPlanReplyRequest.getReplyFlightPlanId());
         return gcsFlightPlanReplyRequest;
@@ -174,13 +174,13 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                     queryApplyFlyLog.getReplyFlyId().equals(flyReplyRequest.getReplyFlyId())) {
                 if (queryUavInfo != null &&
                         queryApplyFlyLog.getUavId() != null &&
-                        queryUavInfo.getId().toString().equals(queryApplyFlyLog.getUavId())) {
+                        queryUavInfo.getId().equals(queryApplyFlyLog.getUavId())) {
                     // 修改状态和上报编码
                     int id = applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
-                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), flyReplyRequest.getApplyFlyId(), flyReplyRequest.getPass());
+                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), flyReplyRequest.getReplyFlyId(), flyReplyRequest.getPass());
                     if (id > 0 && updateReportCodeResult) {
                         // 查询无人机信息
-                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(Long.valueOf(queryApplyFlyLog.getGcsId()));
+                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());
                         if (queryGcsIpMapping != null &&
                                 queryGcsIpMapping.getGcsIp() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
@@ -221,13 +221,13 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return result;
     }
 
-    public FlyReplyResponse flyReplyToGcs(FlyReplyRequest flyReplyRequest, String uavId, String gcsId, String url) {
+    public FlyReplyResponse flyReplyToGcs(FlyReplyRequest flyReplyRequest, Long uavId, Long gcsId, String url) {
         FlyReplyResponse flyReplyResponse = null;
         try {
             com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest gcsFlyReplyRequest = buildGcsFlyReplyRequest(flyReplyRequest, uavId);
             HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
                     .contentObject(JsonUtils.object2Json(gcsFlyReplyRequest, false))
-                    .gcsId(Long.valueOf(gcsId))
+                    .gcsId(gcsId)
                     .contentType(HttpContentTypeConstant.JSON_TYPE)
                     .create();
             Map<String, String> httpHeader = builderRequestHeader();
@@ -241,10 +241,10 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return flyReplyResponse;
     }
 
-    com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest buildGcsFlyReplyRequest(FlyReplyRequest flyReplyRequest, String uavId) {
+    com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest buildGcsFlyReplyRequest(FlyReplyRequest flyReplyRequest, Long uavId) {
         com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest gcsFlyReplyRequest = new com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest();
         gcsFlyReplyRequest.setFlyPass(flyReplyRequest.getPass());
-        gcsFlyReplyRequest.setUavId(uavId);
+        gcsFlyReplyRequest.setUavId(uavId.toString());
         gcsFlyReplyRequest.setApplyFlyId(flyReplyRequest.getApplyFlyId());
         gcsFlyReplyRequest.setReplyFlyId(flyReplyRequest.getReplyFlyId());
         return gcsFlyReplyRequest;

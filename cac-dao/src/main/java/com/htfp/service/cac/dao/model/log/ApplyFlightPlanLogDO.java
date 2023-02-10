@@ -16,8 +16,8 @@ public class ApplyFlightPlanLogDO implements Serializable {
     private Long id;
     private Long applyFlightPlanId;
     private String replyFlightPlanId;
-    private String gcsId;
-    private String uavId;
+    private Long gcsId;
+    private Long uavId;
     private String uavReg;
     private String cpn;
     private Integer applicantType;

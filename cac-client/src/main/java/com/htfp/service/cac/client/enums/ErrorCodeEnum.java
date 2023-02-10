@@ -124,6 +124,9 @@ public enum ErrorCodeEnum {
     PILOT_NOT_REGISTER(5007, "驾驶员未注册"),
     OPERATOR_NOT_REGISTER(5008, "运营主体未注册"),
     UAV_HAS_VERIFIED(5009, "无人机已完成校验，无需重复校验"),
+    AIRSPACE_NOT_APPROVED(5010, "空域申请未通过"),
+    FLIGHT_PLAN_NOT_APPROVED(5011, "飞行计划未通过"),
+    FlY_NOT_APPROVED(5012, "放飞申请未通过"),
     OTHER_BIZ_ERROR(5900, "其他业务失败"),
     ;
 
