@@ -275,12 +275,13 @@ public class UavDalService {
     public int insertUavOacMapping(UavOacMappingDO uavOacMappingDO) {
         int id = uavOacMappingMapper.insertUavOacMapping(uavOacMappingDO);
         if (id > 0) {
-            uavReportCache.put(uavOacMappingDO.getUavId(), uavOacMappingDO.getReportCode());
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), uavOacMappingDO.getReportCode());
         }
         return id;
     }
 
     public int deleteUavOacMapping(Long uavId) {
+        uavReportCache.invalidate(uavId);
         return uavOacMappingMapper.deleteByUavId(uavId);
     }
 
@@ -289,7 +290,7 @@ public class UavDalService {
         uavOacMappingDO.setGmtModify(new Date());
         int id = updateUavOacMapping(uavOacMappingDO);
         if (id > 0) {
-            uavReportCache.put(uavOacMappingDO.getUavId(), reportCode);
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
         }
         return id;
     }
@@ -300,9 +301,28 @@ public class UavDalService {
         uavOacMappingDO.setGmtModify(new Date());
         int id = updateUavOacMapping(uavOacMappingDO);
         if (id > 0) {
-            uavReportCache.put(uavOacMappingDO.getUavId(), reportCode);
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
         }
         return id;
+    }
+
+    public int updateUavOacMappingReportCodeAndStatus(UavOacMappingDO uavOacMappingDO, String reportCode, MappingStatusEnum mappingStatusEnum) {
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
+    void uavReportCacheSaveReportCode(Long uavId, String reportCode) {
+        if (StringUtils.isNotBlank(reportCode)) {
+            uavReportCache.put(uavId, reportCode);
+        } else {
+            uavReportCache.invalidate(uavId);
+        }
     }
 
     public int updateUavOacMappingStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum) {

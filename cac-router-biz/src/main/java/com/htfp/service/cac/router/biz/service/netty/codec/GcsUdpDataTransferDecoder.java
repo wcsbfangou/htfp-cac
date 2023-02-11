@@ -62,6 +62,19 @@ public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramP
             gcsUdpDataTransferDataFrame.setGcsTokenLength(gcsTokenLengthByte);
             gcsUdpDataTransferDataFrame.setGcsToken(new String(gcsTokenByteArray));
 
+            // 获取无人机编号长度以及无人机编号
+            byte uavIdLengthByte = in.readByte();
+            int uavIdLength = Byte.toUnsignedInt(uavIdLengthByte);
+            if (in.readableBytes() < uavIdLength) {
+                in.resetReaderIndex();
+                log.error("[GcsUdpDataTransferDecoder][连接({}) 解析消息失败，数据剩余可读长度小于uavId长度，in={}]", ctx.channel().id(), in.toString());
+                return;
+            }
+            byte[] uavIdByteArray = new byte[uavIdLength];
+            in.readBytes(uavIdByteArray);
+            gcsUdpDataTransferDataFrame.setUavIdLength(uavIdLengthByte);
+            gcsUdpDataTransferDataFrame.setUavId(new String(uavIdByteArray));
+
             gcsUdpDataTransferDataFrame.setSequenceId(in.readShort());
 
             // 获取数据长度以及数据

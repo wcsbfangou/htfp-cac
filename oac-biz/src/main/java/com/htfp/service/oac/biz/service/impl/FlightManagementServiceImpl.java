@@ -511,7 +511,7 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
             DynamicRouteInfoDO queryDynamicRouteInfoDO = dynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getReplyFlightPlanId()));
             ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByReplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getReplyFlightPlanId()));
             ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByReplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getReplyFlightPlanId()));
-            if (queryDynamicRouteInfoDO!=null && queryDynamicUavInfo != null && queryApplyFlightPlanLog != null && queryApplyFlyLog != null) {
+            if (queryDynamicRouteInfoDO != null && queryDynamicUavInfo != null && queryApplyFlightPlanLog != null && queryApplyFlyLog != null) {
                 ApplyStatusEnum flightPlanStatus = ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus());
                 ApplyStatusEnum flyStatus = ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus());
                 if (ApplyStatusEnum.APPROVED.equals(flightPlanStatus) && !ApplyStatusEnum.PENDING.equals(flyStatus)) {

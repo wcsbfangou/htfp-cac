@@ -80,7 +80,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     @Resource
     private UavDalService uavDalService;
 
-    @Resource
+    @Resource(name = "basicInfoServiceImpl")
     private IBasicInfoService basicInfoService;
 
     /**
