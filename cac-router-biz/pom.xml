@@ -41,12 +41,7 @@
         </dependency>
         <dependency>
             <groupId>com.htfp.service</groupId>
-            <artifactId>cac-client</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.htfp.service</groupId>
-            <artifactId>oac-client</artifactId>
+            <artifactId>oac-app</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

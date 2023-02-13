@@ -1,10 +1,10 @@
 package com.htfp.service.cac.router.biz.service.http;
 
 
-import com.htfp.service.cac.client.request.FlightPlanReplyRequest;
-import com.htfp.service.cac.client.request.FlyReplyRequest;
-import com.htfp.service.cac.client.response.FlightPlanReplyResponse;
-import com.htfp.service.cac.client.response.FlyReplyResponse;
+import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
+import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 
 /**
  * @Author sunjipeng

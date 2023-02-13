@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.api;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
 import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;

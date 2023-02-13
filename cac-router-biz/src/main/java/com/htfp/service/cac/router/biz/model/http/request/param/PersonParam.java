@@ -1,6 +1,6 @@
 package com.htfp.service.cac.router.biz.model.http.request.param;
 
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.IdCardTypeEnum;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;

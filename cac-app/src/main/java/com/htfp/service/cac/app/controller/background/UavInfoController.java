@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.CancelUavInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.RegisterUavInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.response.CancelUavInfoResponse;
@@ -11,7 +11,7 @@ import com.htfp.service.cac.router.biz.model.background.response.QueryUavInfoRes
 import com.htfp.service.cac.router.biz.model.background.request.UavInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.response.RegisterUavInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.UpdateUavInfoResponse;
-import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
+import com.htfp.service.cac.router.biz.service.http.IStaticInformationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -32,8 +32,8 @@ import javax.annotation.Resource;
 @RequestMapping("/background/uav")
 public class UavInfoController {
 
-    @Resource(name = "staticInfoServiceImpl")
-    private IStaticInfoService staticInfoService;
+    @Resource(name = "staticInformationServiceImpl")
+    private IStaticInformationService staticInformationService;
 
     @Resource
     private HttpValidator httpValidator;
@@ -53,7 +53,7 @@ public class UavInfoController {
             if (StringUtils.isBlank(uavId)) {
                 queryUavInfoResponse.fail(ErrorCodeEnum.LACK_OF_UAV_ID);
             } else {
-                queryUavInfoResponse = staticInfoService.queryUavInfo(Long.valueOf(uavId));
+                queryUavInfoResponse = staticInformationService.queryUavInfo(Long.valueOf(uavId));
             }
         } catch (Exception e) {
             log.error("查询uav信息异常, uavId={}", uavId, e);
@@ -77,7 +77,7 @@ public class UavInfoController {
             if (StringUtils.isBlank(uavReg)) {
                 queryUavInfoResponse.fail(ErrorCodeEnum.LACK_OF_UAV_REG);
             } else {
-                queryUavInfoResponse = staticInfoService.queryUavInfoByUavReg(uavReg);
+                queryUavInfoResponse = staticInformationService.queryUavInfoByUavReg(uavReg);
             }
         } catch (Exception e) {
             log.error("查询uav信息异常, uavReg={}", uavReg, e);
@@ -100,7 +100,7 @@ public class UavInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(uavInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                updateUavInfoResponse = staticInfoService.updateUavInfo(uavInfoRequest);
+                updateUavInfoResponse = staticInformationService.updateUavInfo(uavInfoRequest);
             } else {
                 updateUavInfoResponse.fail(errorCodeEnum);
             }
@@ -125,7 +125,7 @@ public class UavInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(uavInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                insertUavInfoResponse = staticInfoService.typeInUavInfo(uavInfoRequest);
+                insertUavInfoResponse = staticInformationService.typeInUavInfo(uavInfoRequest);
             } else {
                 insertUavInfoResponse.fail(errorCodeEnum);
             }
@@ -149,7 +149,7 @@ public class UavInfoController {
         deleteUavInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(uavId)) {
-                deleteUavInfoResponse = staticInfoService.deleteUavInfo(Long.valueOf(uavId));
+                deleteUavInfoResponse = staticInformationService.deleteUavInfo(Long.valueOf(uavId));
             } else {
                 deleteUavInfoResponse.fail(ErrorCodeEnum.WRONG_UAV_ID);
             }
@@ -174,7 +174,7 @@ public class UavInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(registerUavInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                registerUavInfoResponse = staticInfoService.registerUavInfo(registerUavInfoRequest);
+                registerUavInfoResponse = staticInformationService.registerUavInfo(registerUavInfoRequest);
             } else {
                 registerUavInfoResponse.fail(errorCodeEnum);
             }
@@ -199,7 +199,7 @@ public class UavInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(cancelUavInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                cancelUavInfoResponse = staticInfoService.cancelUavInfo(cancelUavInfoRequest);
+                cancelUavInfoResponse = staticInformationService.cancelUavInfo(cancelUavInfoRequest);
             } else {
                 cancelUavInfoResponse.fail(errorCodeEnum);
             }

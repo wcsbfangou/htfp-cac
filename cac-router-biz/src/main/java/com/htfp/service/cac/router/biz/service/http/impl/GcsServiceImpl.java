@@ -10,7 +10,7 @@ import com.htfp.service.cac.command.biz.service.ICommandService;
 import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.enums.ApplicantTypeEnum;
 import com.htfp.service.cac.common.enums.ApplyStatusEnum;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
@@ -64,8 +64,10 @@ import com.htfp.service.cac.router.biz.model.http.response.param.FlightPlanQuery
 import com.htfp.service.cac.router.biz.model.http.response.param.FlyQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.UavVerifyResultParam;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
-import com.htfp.service.oac.client.service.IFlyingService;
-import com.htfp.service.oac.client.service.IPreFlightService;
+import com.htfp.service.oac.biz.model.inner.request.param.UavDynamicParam;
+import com.htfp.service.oac.biz.model.inner.request.param.UavStaticParam;
+import com.htfp.service.oac.app.service.IFlyingService;
+import com.htfp.service.oac.app.service.IPreFlightService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -256,8 +258,8 @@ public class GcsServiceImpl implements IGcsService {
                         flightPlanApplyRequest.getOperationScenarioType(), flightPlanApplyRequest.getIsEmergency(), flightPlanApplyRequest.getIsVlos(), ApplyStatusEnum.PENDING.getCode());
                 int id = applyFlightPlanLogDalService.insertApplyFlightPlanLog(applyFlightPlanLog);
                 if (id > 0) {
-                    com.htfp.service.oac.client.request.FlightPlanApplyRequest oacFlightPlanApplyRequest = buildOacFlightPlanApplyRequest(flightPlanApplyRequest, applyFlightPlanId, queryUavInfo.getCpn());
-                    com.htfp.service.oac.client.response.FlightPlanApplyResponse oacFlightPlanApplyResponse = preFlightService.flightPlanApply(oacFlightPlanApplyRequest);
+                    com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest oacFlightPlanApplyRequest = buildOacFlightPlanApplyRequest(flightPlanApplyRequest, applyFlightPlanId, queryUavInfo.getCpn());
+                    com.htfp.service.oac.biz.model.inner.response.FlightPlanApplyResponse oacFlightPlanApplyResponse = preFlightService.flightPlanApply(oacFlightPlanApplyRequest);
                     // TODO: 2022/12/22 校验oacFlightPlanApplyResponse
                     flightPlanApplyResponse = buildFlightPlanApplyResponse(oacFlightPlanApplyResponse);
                     if (flightPlanApplyResponse.getSuccess()) {
@@ -278,8 +280,8 @@ public class GcsServiceImpl implements IGcsService {
         return flightPlanApplyResponse;
     }
 
-    com.htfp.service.oac.client.request.FlightPlanApplyRequest buildOacFlightPlanApplyRequest(FlightPlanApplyRequest flightPlanApplyRequest, Long applyFlightPlanId, String cpn) {
-        com.htfp.service.oac.client.request.FlightPlanApplyRequest oacFlightPlanApplyRequest = new com.htfp.service.oac.client.request.FlightPlanApplyRequest();
+    com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest buildOacFlightPlanApplyRequest(FlightPlanApplyRequest flightPlanApplyRequest, Long applyFlightPlanId, String cpn) {
+        com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest oacFlightPlanApplyRequest = new com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest();
         oacFlightPlanApplyRequest.setCpn(cpn);
         oacFlightPlanApplyRequest.setApplyFlightPlanId(applyFlightPlanId.toString());
         oacFlightPlanApplyRequest.setApplicantType(flightPlanApplyRequest.getApplicantType());
@@ -305,8 +307,8 @@ public class GcsServiceImpl implements IGcsService {
         return oacFlightPlanApplyRequest;
     }
 
-    com.htfp.service.oac.client.request.param.OrganizationParam buildOacPersonParam(OrganizationParam applicantOrganizationParam) {
-        com.htfp.service.oac.client.request.param.OrganizationParam oacApplicantOrganizationParam = new com.htfp.service.oac.client.request.param.OrganizationParam();
+    com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam buildOacPersonParam(OrganizationParam applicantOrganizationParam) {
+        com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam oacApplicantOrganizationParam = new com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam();
         oacApplicantOrganizationParam.setOrgType(applicantOrganizationParam.getOrgType());
         oacApplicantOrganizationParam.setOrgName(applicantOrganizationParam.getOrgName());
         oacApplicantOrganizationParam.setSocialCreditCode(applicantOrganizationParam.getSocialCreditCode());
@@ -317,8 +319,8 @@ public class GcsServiceImpl implements IGcsService {
         return oacApplicantOrganizationParam;
     }
 
-    com.htfp.service.oac.client.request.param.PersonParam buildOacPersonParam(PersonParam applicantPersonParam) {
-        com.htfp.service.oac.client.request.param.PersonParam oacPersonParam = new com.htfp.service.oac.client.request.param.PersonParam();
+    com.htfp.service.oac.biz.model.inner.request.param.PersonParam buildOacPersonParam(PersonParam applicantPersonParam) {
+        com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPersonParam = new com.htfp.service.oac.biz.model.inner.request.param.PersonParam();
         oacPersonParam.setPersonName(applicantPersonParam.getPersonName());
         oacPersonParam.setNationality(applicantPersonParam.getNationality());
         oacPersonParam.setIdCardType(applicantPersonParam.getIdCardType());
@@ -331,34 +333,34 @@ public class GcsServiceImpl implements IGcsService {
         return oacPersonParam;
     }
 
-    List<com.htfp.service.oac.client.request.param.PersonParam> buildOacPilots(List<PersonParam> pilots) {
-        List<com.htfp.service.oac.client.request.param.PersonParam> oacPilots = new ArrayList<>();
+    List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> buildOacPilots(List<PersonParam> pilots) {
+        List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> oacPilots = new ArrayList<>();
         for (PersonParam pilot : pilots) {
-            com.htfp.service.oac.client.request.param.PersonParam oacPilot = buildOacPersonParam(pilot);
+            com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPilot = buildOacPersonParam(pilot);
             oacPilots.add(oacPilot);
         }
         return oacPilots;
     }
 
 
-    com.htfp.service.oac.client.request.param.PositionParam buildOacPositionParam(PositionParam positionParam) {
-        com.htfp.service.oac.client.request.param.PositionParam oacPositionParam = new com.htfp.service.oac.client.request.param.PositionParam();
+    com.htfp.service.oac.biz.model.inner.request.param.PositionParam buildOacPositionParam(PositionParam positionParam) {
+        com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacPositionParam = new com.htfp.service.oac.biz.model.inner.request.param.PositionParam();
         oacPositionParam.setAlt(positionParam.getAlt());
         oacPositionParam.setLat(positionParam.getLat());
         oacPositionParam.setLng(positionParam.getLng());
         return oacPositionParam;
     }
 
-    List<com.htfp.service.oac.client.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionParam> routePointCoordinates) {
-        List<com.htfp.service.oac.client.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
+    List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionParam> routePointCoordinates) {
+        List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
         for (PositionParam routePointCoordinate : routePointCoordinates) {
-            com.htfp.service.oac.client.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
+            com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
             oacRoutePointCoordinates.add(oacRoutePointCoordinate);
         }
         return oacRoutePointCoordinates;
     }
 
-    FlightPlanApplyResponse buildFlightPlanApplyResponse(com.htfp.service.oac.client.response.FlightPlanApplyResponse oacFlightPlanApplyResponse) {
+    FlightPlanApplyResponse buildFlightPlanApplyResponse(com.htfp.service.oac.biz.model.inner.response.FlightPlanApplyResponse oacFlightPlanApplyResponse) {
         FlightPlanApplyResponse flightPlanApplyResponse = new FlightPlanApplyResponse();
         flightPlanApplyResponse.setSuccess(oacFlightPlanApplyResponse.getSuccess());
         flightPlanApplyResponse.setCode(oacFlightPlanApplyResponse.getCode());
@@ -387,8 +389,8 @@ public class GcsServiceImpl implements IGcsService {
                 flightPlanQueryResultParam.setStatus(queryApplyFlightPlanLog.getStatus());
                 flightPlanQueryResponse.setFlightPlanQueryResultParam(flightPlanQueryResultParam);
             } else {
-                com.htfp.service.oac.client.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = buildOacFlightPlanQueryRequest(queryApplyFlightPlanLog.getReplyFlightPlanId());
-                com.htfp.service.oac.client.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightService.flightPlanQuery(oacFlightPlanQueryRequest);
+                com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = buildOacFlightPlanQueryRequest(queryApplyFlightPlanLog.getReplyFlightPlanId());
+                com.htfp.service.oac.biz.model.inner.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightService.flightPlanQuery(oacFlightPlanQueryRequest);
                 // TODO: 2022/12/22 校验oacFlightPlanQueryResponse
                 flightPlanQueryResponse = buildOacFlightPlanQueryResponse(oacFlightPlanQueryResponse);
                 if (flightPlanQueryResponse.getSuccess() && !queryApplyFlightPlanLog.getStatus().equals(flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus())) {
@@ -403,13 +405,13 @@ public class GcsServiceImpl implements IGcsService {
         return flightPlanQueryResponse;
     }
 
-    com.htfp.service.oac.client.request.FlightPlanQueryRequest buildOacFlightPlanQueryRequest(String replyFlightPlanId) {
-        com.htfp.service.oac.client.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = new com.htfp.service.oac.client.request.FlightPlanQueryRequest();
+    com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest buildOacFlightPlanQueryRequest(String replyFlightPlanId) {
+        com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = new com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest();
         oacFlightPlanQueryRequest.setReplyFlightPlanId(replyFlightPlanId);
         return oacFlightPlanQueryRequest;
     }
 
-    FlightPlanQueryResponse buildOacFlightPlanQueryResponse(com.htfp.service.oac.client.response.FlightPlanQueryResponse oacFliPlanQueryResponse) {
+    FlightPlanQueryResponse buildOacFlightPlanQueryResponse(com.htfp.service.oac.biz.model.inner.response.FlightPlanQueryResponse oacFliPlanQueryResponse) {
         FlightPlanQueryResponse flightPlanQueryResponse = new FlightPlanQueryResponse();
         if (oacFliPlanQueryResponse.getSuccess() && oacFliPlanQueryResponse.getFlightPlanQueryResultParam() != null) {
             FlightPlanQueryResultParam flightPlanQueryResultParam = new FlightPlanQueryResultParam();
@@ -490,8 +492,8 @@ public class GcsServiceImpl implements IGcsService {
         // TODO: 2023/1/11 IDC ID && 机器ID
         // 生成applyUavVerifyId
         Long applyUavVerifyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-        com.htfp.service.oac.client.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = buildOacUavVerifyApplyRequest(uavVerifyApplyRequest, applyUavVerifyId, queryUavInfo.getCpn());
-        com.htfp.service.oac.client.response.UavVerifyApplyResponse oacUavVerifyApplyResponse = flyingService.uavVerifyApply(oacUavVerifyApplyRequest);
+        com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = buildOacUavVerifyApplyRequest(uavVerifyApplyRequest, applyUavVerifyId, queryUavInfo.getCpn());
+        com.htfp.service.oac.biz.model.inner.response.UavVerifyApplyResponse oacUavVerifyApplyResponse = flyingService.uavVerifyApply(oacUavVerifyApplyRequest);
         // TODO: 2022/12/22 校验oacUavVerifyApplyResponse
         uavVerifyApplyResponse = buildUavVerifyApplyResponse(oacUavVerifyApplyResponse);
         if (uavVerifyApplyResponse.getSuccess()) {
@@ -508,10 +510,10 @@ public class GcsServiceImpl implements IGcsService {
         return uavVerifyApplyResponse;
     }
 
-    com.htfp.service.oac.client.request.UavVerifyApplyRequest buildOacUavVerifyApplyRequest(UavVerifyApplyRequest uavVerifyApplyRequest, Long applyUavVerifyId, String cpn) {
-        com.htfp.service.oac.client.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = new com.htfp.service.oac.client.request.UavVerifyApplyRequest();
-        com.htfp.service.oac.client.request.param.UavDynamicParam oacUavDynamicParam = new com.htfp.service.oac.client.request.param.UavDynamicParam();
-        com.htfp.service.oac.client.request.param.UavStaticParam oacUavStaticParam = new com.htfp.service.oac.client.request.param.UavStaticParam();
+    com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest buildOacUavVerifyApplyRequest(UavVerifyApplyRequest uavVerifyApplyRequest, Long applyUavVerifyId, String cpn) {
+        com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = new com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest();
+        UavDynamicParam oacUavDynamicParam = new UavDynamicParam();
+        UavStaticParam oacUavStaticParam = new UavStaticParam();
         oacUavDynamicParam.setTrueCourse(uavVerifyApplyRequest.getUavDynamicParam().getTrueCourse());
         oacUavDynamicParam.setPitchAngle(uavVerifyApplyRequest.getUavDynamicParam().getPitchAngle());
         oacUavDynamicParam.setRollAngle(uavVerifyApplyRequest.getUavDynamicParam().getRollAngle());
@@ -546,7 +548,7 @@ public class GcsServiceImpl implements IGcsService {
         return oacUavVerifyApplyRequest;
     }
 
-    UavVerifyApplyResponse buildUavVerifyApplyResponse(com.htfp.service.oac.client.response.UavVerifyApplyResponse oacUavVerifyApplyResponse) {
+    UavVerifyApplyResponse buildUavVerifyApplyResponse(com.htfp.service.oac.biz.model.inner.response.UavVerifyApplyResponse oacUavVerifyApplyResponse) {
         UavVerifyApplyResponse uavVerifyApplyResponse = new UavVerifyApplyResponse();
         uavVerifyApplyResponse.setSuccess(oacUavVerifyApplyResponse.getSuccess());
         uavVerifyApplyResponse.setCode(oacUavVerifyApplyResponse.getCode());
@@ -586,8 +588,8 @@ public class GcsServiceImpl implements IGcsService {
                         flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
                 int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
                 if (id > 0) {
-                    com.htfp.service.oac.client.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
-                    com.htfp.service.oac.client.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
+                    com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                    com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
                     // TODO: 2022/12/22 校验oacFlyApplyResponse
                     flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
                     if (flyApplyResponse.getSuccess()) {
@@ -608,8 +610,8 @@ public class GcsServiceImpl implements IGcsService {
         return flyApplyResponse;
     }
 
-    com.htfp.service.oac.client.request.FlyApplyRequest buildOacFlyApplyRequest(FlyApplyRequest flyApplyRequest, Long applyFlyId, Long applyFlightPlanId, String replyFlightPlanId, String cpn) {
-        com.htfp.service.oac.client.request.FlyApplyRequest oacFlyApplyRequest = new com.htfp.service.oac.client.request.FlyApplyRequest();
+    com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest buildOacFlyApplyRequest(FlyApplyRequest flyApplyRequest, Long applyFlyId, Long applyFlightPlanId, String replyFlightPlanId, String cpn) {
+        com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = new com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest();
         oacFlyApplyRequest.setApplyFlyId(applyFlyId.toString());
         oacFlyApplyRequest.setApplyFlightPlanId(applyFlightPlanId.toString());
         oacFlyApplyRequest.setReplyFlightPlanId(replyFlightPlanId);
@@ -626,7 +628,7 @@ public class GcsServiceImpl implements IGcsService {
         return oacFlyApplyRequest;
     }
 
-    FlyApplyResponse buildFlyApplyResponse(com.htfp.service.oac.client.response.FlyApplyResponse oacFlyApplyResponse) {
+    FlyApplyResponse buildFlyApplyResponse(com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse) {
         FlyApplyResponse flyApplyResponse = new FlyApplyResponse();
         flyApplyResponse.setSuccess(oacFlyApplyResponse.getSuccess());
         flyApplyResponse.setCode(oacFlyApplyResponse.getCode());
@@ -655,8 +657,8 @@ public class GcsServiceImpl implements IGcsService {
                 flyQueryResultParam.setStatus(queryApplyFlyLog.getStatus());
                 flyQueryResponse.setFlyQueryResultParam(flyQueryResultParam);
             } else {
-                com.htfp.service.oac.client.request.FlyQueryRequest oacFlyQueryRequest = buildOacFlyQueryRequest(queryApplyFlyLog.getReplyFlyId());
-                com.htfp.service.oac.client.response.FlyQueryResponse oacFlyQueryResponse = flyingService.flyQuery(oacFlyQueryRequest);
+                com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest oacFlyQueryRequest = buildOacFlyQueryRequest(queryApplyFlyLog.getReplyFlyId());
+                com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse oacFlyQueryResponse = flyingService.flyQuery(oacFlyQueryRequest);
                 // TODO: 2022/12/22 校验oacFlyResponse
                 flyQueryResponse = buildOacFlyQueryResponse(oacFlyQueryResponse);
                 // 如果成功更新flyLog表的状态
@@ -676,13 +678,13 @@ public class GcsServiceImpl implements IGcsService {
         return flyQueryResponse;
     }
 
-    com.htfp.service.oac.client.request.FlyQueryRequest buildOacFlyQueryRequest(String replyFlyId) {
-        com.htfp.service.oac.client.request.FlyQueryRequest oacFlyQueryRequest = new com.htfp.service.oac.client.request.FlyQueryRequest();
+    com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest buildOacFlyQueryRequest(String replyFlyId) {
+        com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest oacFlyQueryRequest = new com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest();
         oacFlyQueryRequest.setReplyFlyId(replyFlyId);
         return oacFlyQueryRequest;
     }
 
-    FlyQueryResponse buildOacFlyQueryResponse(com.htfp.service.oac.client.response.FlyQueryResponse oacFlyQueryResponse) {
+    FlyQueryResponse buildOacFlyQueryResponse(com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse oacFlyQueryResponse) {
         FlyQueryResponse flyQueryResponse = new FlyQueryResponse();
         if (oacFlyQueryResponse.getSuccess() && oacFlyQueryResponse.getFlyQueryResultParam() != null) {
             FlyQueryResultParam flyQueryResultParam = new FlyQueryResultParam();
@@ -865,8 +867,8 @@ public class GcsServiceImpl implements IGcsService {
                 ApplyStatusEnum flightPlanStatus = ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus());
                 ApplyStatusEnum flyStatus = ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus());
                 if (ApplyStatusEnum.APPROVED.equals(flightPlanStatus) && !ApplyStatusEnum.PENDING.equals(flyStatus)) {
-                    com.htfp.service.oac.client.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = buildOacFinishFlightPlanRequest(finishFlightPlanRequest, queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
-                    com.htfp.service.oac.client.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingService.finishFlightPlan(oacFinishFlightPlanRequest);
+                    com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = buildOacFinishFlightPlanRequest(finishFlightPlanRequest, queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                    com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingService.finishFlightPlan(oacFinishFlightPlanRequest);
                     finishFlightPlanResponse = buildFinishFlightPlanResponse(oacFinishFlightPlanResponse);
                     if (finishFlightPlanResponse.getSuccess()) {
                         // 更新reportCode和连接状态
@@ -893,8 +895,8 @@ public class GcsServiceImpl implements IGcsService {
         return finishFlightPlanResponse;
     }
 
-    com.htfp.service.oac.client.request.FinishFlightPlanRequest buildOacFinishFlightPlanRequest(FinishFlightPlanRequest finishFlightPlanRequest, String replyFlightPlanId, String cpn) {
-        com.htfp.service.oac.client.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = new com.htfp.service.oac.client.request.FinishFlightPlanRequest();
+    com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest buildOacFinishFlightPlanRequest(FinishFlightPlanRequest finishFlightPlanRequest, String replyFlightPlanId, String cpn) {
+        com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = new com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest();
         oacFinishFlightPlanRequest.setCpn(cpn);
         oacFinishFlightPlanRequest.setReplyFlightPlanId(replyFlightPlanId);
         oacFinishFlightPlanRequest.setTotalRoutePoint(finishFlightPlanRequest.getTotalRoutePoint());
@@ -904,7 +906,7 @@ public class GcsServiceImpl implements IGcsService {
         return oacFinishFlightPlanRequest;
     }
 
-    FinishFlightPlanResponse buildFinishFlightPlanResponse(com.htfp.service.oac.client.response.FinishFlightPlanResponse oacFinishFlightPlanResponse) {
+    FinishFlightPlanResponse buildFinishFlightPlanResponse(com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse oacFinishFlightPlanResponse) {
         FinishFlightPlanResponse finishFlightPlanResponse = new FinishFlightPlanResponse();
         finishFlightPlanResponse.setSuccess(oacFinishFlightPlanResponse.getSuccess());
         finishFlightPlanResponse.setCode(oacFinishFlightPlanResponse.getCode());

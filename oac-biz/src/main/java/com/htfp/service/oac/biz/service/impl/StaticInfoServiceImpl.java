@@ -1,41 +1,40 @@
 package com.htfp.service.oac.biz.service.impl;
 
 import com.htfp.service.oac.biz.service.IStaticInfoService;
-import com.htfp.service.oac.client.enums.StaticInfoStatusEnum;
-import com.htfp.service.oac.client.enums.UavProductSizeTypeEnum;
-import com.htfp.service.oac.client.enums.UavProductTypeEnum;
-import com.htfp.service.oac.client.request.CancelOperatorInfoRequest;
-import com.htfp.service.oac.client.request.CancelPilotInfoRequest;
-import com.htfp.service.oac.client.request.CancelUavInfoRequest;
-import com.htfp.service.oac.client.request.DeleteOperatorInfoRequest;
-import com.htfp.service.oac.client.request.DeletePilotInfoRequest;
-import com.htfp.service.oac.client.request.DeleteUavInfoRequest;
-import com.htfp.service.oac.client.request.RegisterOperatorInfoRequest;
-import com.htfp.service.oac.client.request.RegisterPilotInfoRequest;
-import com.htfp.service.oac.client.request.RegisterUavInfoRequest;
-import com.htfp.service.oac.client.request.UpdateOperatorInfoRequest;
-import com.htfp.service.oac.client.request.UpdatePilotInfoRequest;
-import com.htfp.service.oac.client.request.UpdateUavInfoRequest;
-import com.htfp.service.oac.client.response.CancelOperatorInfoResponse;
-import com.htfp.service.oac.client.response.CancelPilotInfoResponse;
-import com.htfp.service.oac.client.response.CancelUavInfoResponse;
-import com.htfp.service.oac.client.response.DeleteOperatorInfoResponse;
-import com.htfp.service.oac.client.response.DeletePilotInfoResponse;
-import com.htfp.service.oac.client.response.DeleteUavInfoResponse;
-import com.htfp.service.oac.client.response.RegisterOperatorInfoResponse;
-import com.htfp.service.oac.client.response.RegisterPilotInfoResponse;
-import com.htfp.service.oac.client.response.RegisterUavInfoResponse;
-import com.htfp.service.oac.client.response.UpdateOperatorInfoResponse;
-import com.htfp.service.oac.client.response.UpdatePilotInfoResponse;
-import com.htfp.service.oac.client.response.UpdateUavInfoResponse;
+import com.htfp.service.oac.common.enums.StaticInfoStatusEnum;
+import com.htfp.service.oac.common.enums.UavProductSizeTypeEnum;
+import com.htfp.service.oac.common.enums.UavProductTypeEnum;
+import com.htfp.service.oac.biz.model.inner.request.CancelOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.CancelPilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.CancelUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeleteOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeletePilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeleteUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterPilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdateOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdatePilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdateUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.response.CancelOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.CancelPilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.CancelUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeleteOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeletePilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeleteUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterPilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdateOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdatePilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdateUavInfoResponse;
 import com.htfp.service.oac.dao.model.OperatorInfoDO;
 import com.htfp.service.oac.dao.model.PilotInfoDO;
 import com.htfp.service.oac.dao.model.UavInfoDO;
-import com.htfp.service.oac.dao.service.OperatorDalService;
-import com.htfp.service.oac.dao.service.PilotDalService;
-import com.htfp.service.oac.dao.service.UavDalService;
+import com.htfp.service.oac.dao.service.OacOperatorDalService;
+import com.htfp.service.oac.dao.service.OacPilotDalService;
+import com.htfp.service.oac.dao.service.OacUavDalService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -54,13 +53,13 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     public final static Integer ONE_MILLION = 1000000;
 
     @Resource
-    PilotDalService pilotDalService;
+    OacPilotDalService oacPilotDalService;
 
     @Resource
-    OperatorDalService operatorDalService;
+    OacOperatorDalService oacOperatorDalService;
 
     @Resource
-    UavDalService uavDalService;
+    OacUavDalService oacUavDalService;
 
     /**
      * 修改驾驶员信息
@@ -72,14 +71,14 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     public UpdatePilotInfoResponse updatePilotInfo(UpdatePilotInfoRequest updatePilotInfoRequest) {
         UpdatePilotInfoResponse updatePilotInfoResponse = new UpdatePilotInfoResponse();
         updatePilotInfoResponse.fail();
-        PilotInfoDO queryPilotInfo = pilotDalService.queryPilotInfoByPilotUniId(updatePilotInfoRequest.getPilotUniId());
+        PilotInfoDO queryPilotInfo = oacPilotDalService.queryPilotInfoByPilotUniId(updatePilotInfoRequest.getPilotUniId());
         if (queryPilotInfo != null) {
             if (StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryPilotInfo.getStatus()))) {
                 String pilotUniId = generateSubjectUniqueId(updatePilotInfoRequest.getIdCardType(), updatePilotInfoRequest.getIdCardNumber());
                 if (queryPilotInfo.getPilotUniId().equals(pilotUniId)) {
-                    PilotInfoDO pilotInfo = pilotDalService.buildPilotInfoDO(updatePilotInfoRequest.getPilotSourceId(), updatePilotInfoRequest.getPilotUniId(), updatePilotInfoRequest.getPilotName(), updatePilotInfoRequest.getPilotType(), updatePilotInfoRequest.getLicenseType(), updatePilotInfoRequest.getLicenseId(), updatePilotInfoRequest.getLicensePictureAddress(), updatePilotInfoRequest.getIdCardType(), updatePilotInfoRequest.getIdCardNumber(), updatePilotInfoRequest.getIdCardPictureAddress(), updatePilotInfoRequest.getGender(), updatePilotInfoRequest.getNationality(), updatePilotInfoRequest.getPhoneNumber(), updatePilotInfoRequest.getEmailAddress(), null);
+                    PilotInfoDO pilotInfo = oacPilotDalService.buildPilotInfoDO(updatePilotInfoRequest.getPilotSourceId(), updatePilotInfoRequest.getPilotUniId(), updatePilotInfoRequest.getPilotName(), updatePilotInfoRequest.getPilotType(), updatePilotInfoRequest.getLicenseType(), updatePilotInfoRequest.getLicenseId(), updatePilotInfoRequest.getLicensePictureAddress(), updatePilotInfoRequest.getIdCardType(), updatePilotInfoRequest.getIdCardNumber(), updatePilotInfoRequest.getIdCardPictureAddress(), updatePilotInfoRequest.getGender(), updatePilotInfoRequest.getNationality(), updatePilotInfoRequest.getPhoneNumber(), updatePilotInfoRequest.getEmailAddress(), null);
                     pilotInfo.setId(queryPilotInfo.getId());
-                    int id = pilotDalService.updatePilotInfo(pilotInfo);
+                    int id = oacPilotDalService.updatePilotInfo(pilotInfo);
                     if (id > 0) {
                         updatePilotInfoResponse.success();
                     } else {
@@ -107,14 +106,14 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     public UpdateOperatorInfoResponse updateOperatorInfo(UpdateOperatorInfoRequest updateOperatorInfoRequest) {
         UpdateOperatorInfoResponse updateOperatorInfoResponse = new UpdateOperatorInfoResponse();
         updateOperatorInfoResponse.fail();
-        OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfoByOperatorUniId(updateOperatorInfoRequest.getOperatorUniId());
+        OperatorInfoDO queryOperatorInfo = oacOperatorDalService.queryOperatorInfoByOperatorUniId(updateOperatorInfoRequest.getOperatorUniId());
         if (queryOperatorInfo != null) {
             if (StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryOperatorInfo.getStatus()))) {
                 String operatorUniId = generateSubjectUniqueId(updateOperatorInfoRequest.getIdCardType(), updateOperatorInfoRequest.getIdCardNumber());
                 if (queryOperatorInfo.getOperatorUniId().equals(operatorUniId)) {
-                    OperatorInfoDO operatorInfo = operatorDalService.buildOperatorInfoDO(updateOperatorInfoRequest.getOperatorSourceId(), updateOperatorInfoRequest.getOperatorUniId(), updateOperatorInfoRequest.getOperatorName(), updateOperatorInfoRequest.getOperatorType(), updateOperatorInfoRequest.getIdCardType(), updateOperatorInfoRequest.getIdCardNumber(), updateOperatorInfoRequest.getIdCardPictureAddress(), updateOperatorInfoRequest.getCompanyName(), updateOperatorInfoRequest.getSocialCreditCode(), updateOperatorInfoRequest.getGender(), updateOperatorInfoRequest.getNationality(), updateOperatorInfoRequest.getCity(), updateOperatorInfoRequest.getAddress(), updateOperatorInfoRequest.getPhoneNumber(), updateOperatorInfoRequest.getEmailAddress(), null);
+                    OperatorInfoDO operatorInfo = oacOperatorDalService.buildOperatorInfoDO(updateOperatorInfoRequest.getOperatorSourceId(), updateOperatorInfoRequest.getOperatorUniId(), updateOperatorInfoRequest.getOperatorName(), updateOperatorInfoRequest.getOperatorType(), updateOperatorInfoRequest.getIdCardType(), updateOperatorInfoRequest.getIdCardNumber(), updateOperatorInfoRequest.getIdCardPictureAddress(), updateOperatorInfoRequest.getCompanyName(), updateOperatorInfoRequest.getSocialCreditCode(), updateOperatorInfoRequest.getGender(), updateOperatorInfoRequest.getNationality(), updateOperatorInfoRequest.getCity(), updateOperatorInfoRequest.getAddress(), updateOperatorInfoRequest.getPhoneNumber(), updateOperatorInfoRequest.getEmailAddress(), null);
                     operatorInfo.setId(queryOperatorInfo.getId());
-                    int id = operatorDalService.updateOperatorInfo(operatorInfo);
+                    int id = oacOperatorDalService.updateOperatorInfo(operatorInfo);
                     if (id > 0) {
                         updateOperatorInfoResponse.success();
                     } else {
@@ -142,7 +141,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     public UpdateUavInfoResponse updateUavInfo(UpdateUavInfoRequest updateUavInfoRequest) {
         UpdateUavInfoResponse updateUavInfoResponse = new UpdateUavInfoResponse();
         updateUavInfoResponse.fail();
-        UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(updateUavInfoRequest.getCpn());
+        UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByCpn(updateUavInfoRequest.getCpn());
         if (queryUavInfo != null) {
             if (StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus()))) {
                 // 是否需要生成新的CPN
@@ -153,9 +152,9 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
                     updateUavInfoRequest.setCpn(newCpn);
                     updateUavInfoResponse.setCpn(newCpn);
                 }
-                UavInfoDO uavInfo = uavDalService.buildUavInfoDO(updateUavInfoRequest.getUavSourceId(), updateUavInfoRequest.getUavReg(), updateUavInfoRequest.getUavName(), updateUavInfoRequest.getCpn(), updateUavInfoRequest.getVin(), updateUavInfoRequest.getPvin(), updateUavInfoRequest.getSn(), updateUavInfoRequest.getFlightControlSn(), updateUavInfoRequest.getImei(), updateUavInfoRequest.getImsi(), updateUavInfoRequest.getManufacturerName(), updateUavInfoRequest.getProductName(), updateUavInfoRequest.getProductType(), updateUavInfoRequest.getProductSizeType(), updateUavInfoRequest.getMaxFlyTime(), updateUavInfoRequest.getOperationScenarioType(), updateUavInfoRequest.getOperatorUniId(), null);
+                UavInfoDO uavInfo = oacUavDalService.buildUavInfoDO(updateUavInfoRequest.getUavSourceId(), updateUavInfoRequest.getUavReg(), updateUavInfoRequest.getUavName(), updateUavInfoRequest.getCpn(), updateUavInfoRequest.getVin(), updateUavInfoRequest.getPvin(), updateUavInfoRequest.getSn(), updateUavInfoRequest.getFlightControlSn(), updateUavInfoRequest.getImei(), updateUavInfoRequest.getImsi(), updateUavInfoRequest.getManufacturerName(), updateUavInfoRequest.getProductName(), updateUavInfoRequest.getProductType(), updateUavInfoRequest.getProductSizeType(), updateUavInfoRequest.getMaxFlyTime(), updateUavInfoRequest.getOperationScenarioType(), updateUavInfoRequest.getOperatorUniId(), null);
                 uavInfo.setId(queryUavInfo.getId());
-                int id = uavDalService.updateUavInfo(uavInfo);
+                int id = oacUavDalService.updateUavInfo(uavInfo);
                 if (id > 0) {
                     updateUavInfoResponse.success();
                 } else {
@@ -172,7 +171,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
 
     // TODO: 2022/12/20 待优化
     String generateNewCpn(String oldCpn, String operatorUniId, Integer productSizeType, Integer productType) {
-        OperatorInfoDO operatorInfoDO = operatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
+        OperatorInfoDO operatorInfoDO = oacOperatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
         String operatorNum = String.format("%03d", operatorInfoDO.getId().intValue() % ONE_THOUSAND);
         String uavNum = oldCpn.substring(oldCpn.length() - 7);
         return operatorNum + UavProductSizeTypeEnum.getFromCode(productSizeType).getType().toString() + UavProductTypeEnum.getFromCode(productType).getType() + "#" + uavNum;
@@ -180,9 +179,9 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
 
     // TODO: 2022/12/20 待优化
     String generateCpn(String operatorUniId, Integer productSizeType, Integer productType) {
-        OperatorInfoDO operatorInfoDO = operatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
+        OperatorInfoDO operatorInfoDO = oacOperatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
         String operatorNum = String.format("%03d", operatorInfoDO.getId().intValue() % ONE_THOUSAND);
-        Long uavCount = uavDalService.queryUavCountByOperatorUniIdIncludeDel(operatorUniId);
+        Long uavCount = oacUavDalService.queryUavCountByOperatorUniIdIncludeDel(operatorUniId);
         String uavNum = String.format("%07d", (uavCount.intValue() + 1) % ONE_MILLION);
         return operatorNum + UavProductSizeTypeEnum.getFromCode(productSizeType).getType().toString() + UavProductTypeEnum.getFromCode(productType).getType() + "#" + uavNum;
     }
@@ -203,9 +202,9 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         DeletePilotInfoResponse deletePilotInfoResponse = new DeletePilotInfoResponse();
         deletePilotInfoResponse.fail();
         try {
-            PilotInfoDO queryPilotInfo = pilotDalService.queryPilotInfoByPilotUniId(deletePilotInfoRequest.getPilotUniId());
+            PilotInfoDO queryPilotInfo = oacPilotDalService.queryPilotInfoByPilotUniId(deletePilotInfoRequest.getPilotUniId());
             if (queryPilotInfo != null) {
-                int id = pilotDalService.deletePilotInfoById(queryPilotInfo.getId());
+                int id = oacPilotDalService.deletePilotInfoById(queryPilotInfo.getId());
                 if (id > 0) {
                     deletePilotInfoResponse.success();
                 } else {
@@ -232,11 +231,11 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         DeleteOperatorInfoResponse deleteOperatorInfoResponse = new DeleteOperatorInfoResponse();
         deleteOperatorInfoResponse.fail();
         try {
-            List<UavInfoDO> queryUavInfoList = uavDalService.queryUavInfoByOperatorUniId(deleteOperatorInfoRequest.getOperatorUniId());
+            List<UavInfoDO> queryUavInfoList = oacUavDalService.queryUavInfoByOperatorUniId(deleteOperatorInfoRequest.getOperatorUniId());
             if (queryUavInfoList == null) {
-                OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfoByOperatorUniId(deleteOperatorInfoRequest.getOperatorUniId());
+                OperatorInfoDO queryOperatorInfo = oacOperatorDalService.queryOperatorInfoByOperatorUniId(deleteOperatorInfoRequest.getOperatorUniId());
                 if (queryOperatorInfo != null) {
-                    int id = operatorDalService.deleteOperatorInfo(queryOperatorInfo.getId());
+                    int id = oacOperatorDalService.deleteOperatorInfo(queryOperatorInfo.getId());
                     if (id > 0) {
                         deleteOperatorInfoResponse.success();
                     } else {
@@ -266,9 +265,9 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         DeleteUavInfoResponse deleteUavInfoResponse = new DeleteUavInfoResponse();
         deleteUavInfoResponse.fail();
         try {
-            UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(deleteUavInfoRequest.getCpn());
+            UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByCpn(deleteUavInfoRequest.getCpn());
             if (queryUavInfo != null) {
-                int id = uavDalService.deleteUavInfoById(queryUavInfo.getId());
+                int id = oacUavDalService.deleteUavInfoById(queryUavInfo.getId());
                 if (id > 0) {
                     deleteUavInfoResponse.success();
                 } else {
@@ -296,11 +295,11 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         registerPilotInfoResponse.fail();
         try {
             String pilotUniId = generateSubjectUniqueId(registerPilotInfoRequest.getIdCardType(), registerPilotInfoRequest.getIdCardNumber());
-            PilotInfoDO queryPilotInfo = pilotDalService.queryPilotInfoByPilotUniId(pilotUniId);
+            PilotInfoDO queryPilotInfo = oacPilotDalService.queryPilotInfoByPilotUniId(pilotUniId);
             if (queryPilotInfo == null) {
                 // 默认注册成功，外部接口确定后，增加请求外部接口流程
-                PilotInfoDO pilotInfo = pilotDalService.buildPilotInfoDO(registerPilotInfoRequest.getPilotSourceId(), pilotUniId, registerPilotInfoRequest.getPilotName(), registerPilotInfoRequest.getPilotType(), registerPilotInfoRequest.getLicenseType(), registerPilotInfoRequest.getLicenseId(), registerPilotInfoRequest.getLicensePictureAddress(), registerPilotInfoRequest.getIdCardType(), registerPilotInfoRequest.getIdCardNumber(), registerPilotInfoRequest.getIdCardPictureAddress(), registerPilotInfoRequest.getGender(), registerPilotInfoRequest.getNationality(), registerPilotInfoRequest.getPhoneNumber(), registerPilotInfoRequest.getEmailAddress(), StaticInfoStatusEnum.REGISTERED.getCode());
-                int id = pilotDalService.insertPilotInfo(pilotInfo);
+                PilotInfoDO pilotInfo = oacPilotDalService.buildPilotInfoDO(registerPilotInfoRequest.getPilotSourceId(), pilotUniId, registerPilotInfoRequest.getPilotName(), registerPilotInfoRequest.getPilotType(), registerPilotInfoRequest.getLicenseType(), registerPilotInfoRequest.getLicenseId(), registerPilotInfoRequest.getLicensePictureAddress(), registerPilotInfoRequest.getIdCardType(), registerPilotInfoRequest.getIdCardNumber(), registerPilotInfoRequest.getIdCardPictureAddress(), registerPilotInfoRequest.getGender(), registerPilotInfoRequest.getNationality(), registerPilotInfoRequest.getPhoneNumber(), registerPilotInfoRequest.getEmailAddress(), StaticInfoStatusEnum.REGISTERED.getCode());
+                int id = oacPilotDalService.insertPilotInfo(pilotInfo);
                 if (id > 0) {
                     registerPilotInfoResponse.setPilotUniId(pilotUniId);
                     registerPilotInfoResponse.success();
@@ -310,7 +309,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
             } else {
                 // 已注销的可以重新注册
                 if (StaticInfoStatusEnum.CANCELED.equals(StaticInfoStatusEnum.getFromCode(queryPilotInfo.getStatus()))) {
-                    int id = pilotDalService.updatePilotInfoStatus(queryPilotInfo, StaticInfoStatusEnum.REGISTERED.getCode());
+                    int id = oacPilotDalService.updatePilotInfoStatus(queryPilotInfo, StaticInfoStatusEnum.REGISTERED.getCode());
                     if (id > 0) {
                         registerPilotInfoResponse.setPilotUniId(pilotUniId);
                         registerPilotInfoResponse.success();
@@ -340,11 +339,11 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         registerOperatorInfoResponse.fail();
         try {
             String operatorUniId = generateSubjectUniqueId(registerOperatorInfoRequest.getIdCardType(), registerOperatorInfoRequest.getIdCardNumber());
-            OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
+            OperatorInfoDO queryOperatorInfo = oacOperatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
             if (queryOperatorInfo == null) {
                 // 默认注册成功，外部接口确定后，增加请求外部接口流程
-                OperatorInfoDO operatorInfo = operatorDalService.buildOperatorInfoDO(registerOperatorInfoRequest.getOperatorSourceId(), operatorUniId, registerOperatorInfoRequest.getOperatorName(), registerOperatorInfoRequest.getOperatorType(), registerOperatorInfoRequest.getIdCardType(), registerOperatorInfoRequest.getIdCardNumber(), registerOperatorInfoRequest.getIdCardPictureAddress(), registerOperatorInfoRequest.getCompanyName(), registerOperatorInfoRequest.getSocialCreditCode(), registerOperatorInfoRequest.getGender(), registerOperatorInfoRequest.getNationality(), registerOperatorInfoRequest.getCity(), registerOperatorInfoRequest.getAddress(), registerOperatorInfoRequest.getPhoneNumber(), registerOperatorInfoRequest.getEmailAddress(), StaticInfoStatusEnum.REGISTERED.getCode());
-                int id = operatorDalService.insertOperatorInfo(operatorInfo);
+                OperatorInfoDO operatorInfo = oacOperatorDalService.buildOperatorInfoDO(registerOperatorInfoRequest.getOperatorSourceId(), operatorUniId, registerOperatorInfoRequest.getOperatorName(), registerOperatorInfoRequest.getOperatorType(), registerOperatorInfoRequest.getIdCardType(), registerOperatorInfoRequest.getIdCardNumber(), registerOperatorInfoRequest.getIdCardPictureAddress(), registerOperatorInfoRequest.getCompanyName(), registerOperatorInfoRequest.getSocialCreditCode(), registerOperatorInfoRequest.getGender(), registerOperatorInfoRequest.getNationality(), registerOperatorInfoRequest.getCity(), registerOperatorInfoRequest.getAddress(), registerOperatorInfoRequest.getPhoneNumber(), registerOperatorInfoRequest.getEmailAddress(), StaticInfoStatusEnum.REGISTERED.getCode());
+                int id = oacOperatorDalService.insertOperatorInfo(operatorInfo);
                 if (id > 0) {
                     registerOperatorInfoResponse.setOperatorUniId(operatorUniId);
                     registerOperatorInfoResponse.success();
@@ -354,7 +353,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
             } else {
                 // 已注销的可以重新注册
                 if (StaticInfoStatusEnum.CANCELED.equals(StaticInfoStatusEnum.getFromCode(queryOperatorInfo.getStatus()))) {
-                    int id = operatorDalService.updateOperatorInfoStatus(queryOperatorInfo, StaticInfoStatusEnum.REGISTERED.getCode());
+                    int id = oacOperatorDalService.updateOperatorInfoStatus(queryOperatorInfo, StaticInfoStatusEnum.REGISTERED.getCode());
                     if (id > 0) {
                         registerOperatorInfoResponse.setOperatorUniId(operatorUniId);
                         registerOperatorInfoResponse.success();
@@ -383,14 +382,14 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         RegisterUavInfoResponse registerUavInfoResponse = new RegisterUavInfoResponse();
         registerUavInfoResponse.fail();
         try {
-            OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfoByOperatorUniId(registerUavInfoRequest.getOperatorUniId());
+            OperatorInfoDO queryOperatorInfo = oacOperatorDalService.queryOperatorInfoByOperatorUniId(registerUavInfoRequest.getOperatorUniId());
             if (queryOperatorInfo != null && StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryOperatorInfo.getStatus()))) {
-                UavInfoDO queryUavInfo = uavDalService.queryUavInfoByUavReg(registerUavInfoRequest.getUavReg());
+                UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByUavReg(registerUavInfoRequest.getUavReg());
                 if (queryUavInfo == null) {
                     String cpn = generateCpn(registerUavInfoRequest.getOperatorUniId(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getProductType());
                     // 默认注册成功，外部接口确定后，增加请求外部接口流程
-                    UavInfoDO uavInfo = uavDalService.buildUavInfoDO(registerUavInfoRequest.getUavSourceId(), registerUavInfoRequest.getUavReg(), registerUavInfoRequest.getUavName(), cpn, registerUavInfoRequest.getVin(), registerUavInfoRequest.getPvin(), registerUavInfoRequest.getSn(), registerUavInfoRequest.getFlightControlSn(), registerUavInfoRequest.getImei(), registerUavInfoRequest.getImsi(), registerUavInfoRequest.getManufacturerName(), registerUavInfoRequest.getProductName(), registerUavInfoRequest.getProductType(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getMaxFlyTime(), registerUavInfoRequest.getOperationScenarioType(), registerUavInfoRequest.getOperatorUniId(), StaticInfoStatusEnum.REGISTERED.getCode());
-                    int id = uavDalService.insertUavInfo(uavInfo);
+                    UavInfoDO uavInfo = oacUavDalService.buildUavInfoDO(registerUavInfoRequest.getUavSourceId(), registerUavInfoRequest.getUavReg(), registerUavInfoRequest.getUavName(), cpn, registerUavInfoRequest.getVin(), registerUavInfoRequest.getPvin(), registerUavInfoRequest.getSn(), registerUavInfoRequest.getFlightControlSn(), registerUavInfoRequest.getImei(), registerUavInfoRequest.getImsi(), registerUavInfoRequest.getManufacturerName(), registerUavInfoRequest.getProductName(), registerUavInfoRequest.getProductType(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getMaxFlyTime(), registerUavInfoRequest.getOperationScenarioType(), registerUavInfoRequest.getOperatorUniId(), StaticInfoStatusEnum.REGISTERED.getCode());
+                    int id = oacUavDalService.insertUavInfo(uavInfo);
                     if (id > 0) {
                         registerUavInfoResponse.setCpn(cpn);
                         registerUavInfoResponse.success();
@@ -400,7 +399,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
                 } else {
                     // 已注销的可以重新注册
                     if (StaticInfoStatusEnum.CANCELED.equals(StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus()))) {
-                        int id = uavDalService.updateUavInfoStatus(queryUavInfo, StaticInfoStatusEnum.REGISTERED.getCode());
+                        int id = oacUavDalService.updateUavInfoStatus(queryUavInfo, StaticInfoStatusEnum.REGISTERED.getCode());
                         if (id > 0) {
                             registerUavInfoResponse.setCpn(queryUavInfo.getCpn());
                             registerUavInfoResponse.success();
@@ -432,12 +431,12 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         CancelPilotInfoResponse cancelPilotInfoResponse = new CancelPilotInfoResponse();
         cancelPilotInfoResponse.fail();
         try {
-            PilotInfoDO queryPilotInfo = pilotDalService.queryPilotInfoByPilotUniId(cancelPilotInfoRequest.getPilotUniId());
+            PilotInfoDO queryPilotInfo = oacPilotDalService.queryPilotInfoByPilotUniId(cancelPilotInfoRequest.getPilotUniId());
             if (queryPilotInfo != null) {
                 StaticInfoStatusEnum pilotStatus = StaticInfoStatusEnum.getFromCode(queryPilotInfo.getStatus());
                 if (StaticInfoStatusEnum.REGISTERED.equals(pilotStatus)) {
                     // 默认注销成功，外部接口确定后，增加请求外部接口流程
-                    int id = pilotDalService.updatePilotInfoStatus(queryPilotInfo, StaticInfoStatusEnum.CANCELED.getCode());
+                    int id = oacPilotDalService.updatePilotInfoStatus(queryPilotInfo, StaticInfoStatusEnum.CANCELED.getCode());
                     if (id > 0) {
                         cancelPilotInfoResponse.success();
                     }
@@ -465,9 +464,9 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         CancelOperatorInfoResponse cancelOperatorInfoResponse = new CancelOperatorInfoResponse();
         cancelOperatorInfoResponse.fail();
         try {
-            OperatorInfoDO queryOperatorInfo = operatorDalService.queryOperatorInfoByOperatorUniId(cancelOperatorInfoRequest.getOperatorUniId());
+            OperatorInfoDO queryOperatorInfo = oacOperatorDalService.queryOperatorInfoByOperatorUniId(cancelOperatorInfoRequest.getOperatorUniId());
             if (queryOperatorInfo != null) {
-                List<UavInfoDO> queryUavInfoList = uavDalService.queryUavInfoByOperatorUniId(cancelOperatorInfoRequest.getOperatorUniId());
+                List<UavInfoDO> queryUavInfoList = oacUavDalService.queryUavInfoByOperatorUniId(cancelOperatorInfoRequest.getOperatorUniId());
                 if (queryUavInfoList != null) {
                     for (UavInfoDO uavInfoDO : queryUavInfoList) {
                         if (StaticInfoStatusEnum.REGISTERING.equals(StaticInfoStatusEnum.getFromCode(uavInfoDO.getStatus())) ||
@@ -481,7 +480,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
                 StaticInfoStatusEnum operatorStatus = StaticInfoStatusEnum.getFromCode(queryOperatorInfo.getStatus());
                 if (StaticInfoStatusEnum.REGISTERED.equals(operatorStatus)) {
                     // 默认注销成功，外部接口确定后，增加请求外部接口流程
-                    int id = operatorDalService.updateOperatorInfoStatus(queryOperatorInfo, StaticInfoStatusEnum.CANCELED.getCode());
+                    int id = oacOperatorDalService.updateOperatorInfoStatus(queryOperatorInfo, StaticInfoStatusEnum.CANCELED.getCode());
                     if (id > 0) {
                         cancelOperatorInfoResponse.success();
                     }
@@ -509,12 +508,12 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
         CancelUavInfoResponse cancelUavInfoResponse = new CancelUavInfoResponse();
         cancelUavInfoResponse.fail();
         try {
-            UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(cancelUavInfoRequest.getCpn());
+            UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByCpn(cancelUavInfoRequest.getCpn());
             if (queryUavInfo != null) {
                 StaticInfoStatusEnum uavStatus = StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus());
                 if (StaticInfoStatusEnum.REGISTERED.equals(uavStatus)) {
                     // 默认注销成功，外部接口确定后，增加请求外部接口流程
-                    int id = uavDalService.updateUavInfoStatus(queryUavInfo, StaticInfoStatusEnum.CANCELED.getCode());
+                    int id = oacUavDalService.updateUavInfoStatus(queryUavInfo, StaticInfoStatusEnum.CANCELED.getCode());
                     if (id > 0) {
                         cancelUavInfoResponse.success();
                     }

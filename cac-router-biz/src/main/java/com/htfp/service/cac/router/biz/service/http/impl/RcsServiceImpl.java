@@ -6,7 +6,7 @@ import com.htfp.service.cac.command.biz.model.resquest.SaveUavControlLogRequest;
 import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
 import com.htfp.service.cac.common.constant.HttpUriConstant;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;

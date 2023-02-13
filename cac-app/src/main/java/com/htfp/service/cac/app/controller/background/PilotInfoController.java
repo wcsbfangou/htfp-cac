@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.CancelPilotInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.PilotInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.RegisterPilotInfoRequest;
@@ -11,7 +11,7 @@ import com.htfp.service.cac.router.biz.model.background.response.InsertPilotInfo
 import com.htfp.service.cac.router.biz.model.background.response.QueryPilotInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.RegisterPilotInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.UpdatePilotInfoResponse;
-import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
+import com.htfp.service.cac.router.biz.service.http.IStaticInformationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -32,8 +32,8 @@ import javax.annotation.Resource;
 @RequestMapping("/background/pilot")
 public class PilotInfoController {
 
-    @Resource(name = "staticInfoServiceImpl")
-    private IStaticInfoService staticInfoService;
+    @Resource(name = "staticInformationServiceImpl")
+    private IStaticInformationService staticInformationService;
 
     @Resource
     private HttpValidator httpValidator;
@@ -54,7 +54,7 @@ public class PilotInfoController {
             if (StringUtils.isBlank(pilotId)) {
                 queryPilotInfoResponse.fail(ErrorCodeEnum.LACK_OF_PILOT_ID);
             } else {
-                queryPilotInfoResponse = staticInfoService.queryPilotInfo(Long.valueOf(pilotId));
+                queryPilotInfoResponse = staticInformationService.queryPilotInfo(Long.valueOf(pilotId));
             }
         } catch (Exception e) {
             log.error("查询pilot信息异常, pilotId={}", pilotId, e);
@@ -82,7 +82,7 @@ public class PilotInfoController {
             if (StringUtils.isBlank(idCardNumber)) {
                 queryPilotInfoResponse.fail(ErrorCodeEnum.LACK_OF_ID_CARD_NUMBER);
             }
-            queryPilotInfoResponse = staticInfoService.queryPilotInfoByIdCardInfo(idCardType, idCardNumber);
+            queryPilotInfoResponse = staticInformationService.queryPilotInfoByIdCardInfo(idCardType, idCardNumber);
         } catch (Exception e) {
             log.error("查询pilot信息异常, pilotIdCardType={}, pilotIdCardNumber={}", idCardType, idCardNumber, e);
             queryPilotInfoResponse.fail("查询pilot信息异常");
@@ -104,7 +104,7 @@ public class PilotInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(pilotInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                updatePilotInfoResponse = staticInfoService.updatePilotInfo(pilotInfoRequest);
+                updatePilotInfoResponse = staticInformationService.updatePilotInfo(pilotInfoRequest);
             } else {
                 updatePilotInfoResponse.fail(errorCodeEnum);
             }
@@ -129,7 +129,7 @@ public class PilotInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(pilotInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                insertPilotInfoResponse = staticInfoService.typeInPilotInfo(pilotInfoRequest);
+                insertPilotInfoResponse = staticInformationService.typeInPilotInfo(pilotInfoRequest);
             } else {
                 insertPilotInfoResponse.fail(errorCodeEnum);
             }
@@ -153,7 +153,7 @@ public class PilotInfoController {
         deletePilotInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(pilotId)) {
-                deletePilotInfoResponse = staticInfoService.deletePilotInfo(Long.valueOf(pilotId));
+                deletePilotInfoResponse = staticInformationService.deletePilotInfo(Long.valueOf(pilotId));
             } else {
                 deletePilotInfoResponse.fail(ErrorCodeEnum.WRONG_PILOT_ID);
             }
@@ -178,7 +178,7 @@ public class PilotInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(registerPilotInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                registerPilotInfoResponse = staticInfoService.registerPilotInfo(registerPilotInfoRequest);
+                registerPilotInfoResponse = staticInformationService.registerPilotInfo(registerPilotInfoRequest);
             } else {
                 registerPilotInfoResponse.fail(errorCodeEnum);
             }
@@ -203,7 +203,7 @@ public class PilotInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(cancelPilotInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                cancelPilotInfoResponse = staticInfoService.cancelPilotInfo(cancelPilotInfoRequest);
+                cancelPilotInfoResponse = staticInformationService.cancelPilotInfo(cancelPilotInfoRequest);
             } else {
                 cancelPilotInfoResponse.fail(errorCodeEnum);
             }

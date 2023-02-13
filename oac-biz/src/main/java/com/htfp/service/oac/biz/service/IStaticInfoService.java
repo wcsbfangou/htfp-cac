@@ -1,29 +1,29 @@
 package com.htfp.service.oac.biz.service;
 
-import com.htfp.service.oac.client.request.CancelOperatorInfoRequest;
-import com.htfp.service.oac.client.request.CancelPilotInfoRequest;
-import com.htfp.service.oac.client.request.CancelUavInfoRequest;
-import com.htfp.service.oac.client.request.DeleteOperatorInfoRequest;
-import com.htfp.service.oac.client.request.DeletePilotInfoRequest;
-import com.htfp.service.oac.client.request.DeleteUavInfoRequest;
-import com.htfp.service.oac.client.request.RegisterOperatorInfoRequest;
-import com.htfp.service.oac.client.request.RegisterPilotInfoRequest;
-import com.htfp.service.oac.client.request.RegisterUavInfoRequest;
-import com.htfp.service.oac.client.request.UpdateOperatorInfoRequest;
-import com.htfp.service.oac.client.request.UpdatePilotInfoRequest;
-import com.htfp.service.oac.client.request.UpdateUavInfoRequest;
-import com.htfp.service.oac.client.response.CancelOperatorInfoResponse;
-import com.htfp.service.oac.client.response.CancelPilotInfoResponse;
-import com.htfp.service.oac.client.response.CancelUavInfoResponse;
-import com.htfp.service.oac.client.response.DeleteOperatorInfoResponse;
-import com.htfp.service.oac.client.response.DeletePilotInfoResponse;
-import com.htfp.service.oac.client.response.DeleteUavInfoResponse;
-import com.htfp.service.oac.client.response.RegisterOperatorInfoResponse;
-import com.htfp.service.oac.client.response.RegisterPilotInfoResponse;
-import com.htfp.service.oac.client.response.RegisterUavInfoResponse;
-import com.htfp.service.oac.client.response.UpdateOperatorInfoResponse;
-import com.htfp.service.oac.client.response.UpdatePilotInfoResponse;
-import com.htfp.service.oac.client.response.UpdateUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.request.CancelOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.CancelPilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.CancelUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeleteOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeletePilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.DeleteUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterPilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.RegisterUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdateOperatorInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdatePilotInfoRequest;
+import com.htfp.service.oac.biz.model.inner.request.UpdateUavInfoRequest;
+import com.htfp.service.oac.biz.model.inner.response.CancelOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.CancelPilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.CancelUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeleteOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeletePilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.DeleteUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterPilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.RegisterUavInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdateOperatorInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdatePilotInfoResponse;
+import com.htfp.service.oac.biz.model.inner.response.UpdateUavInfoResponse;
 
 /**
  * @Author sunjipeng

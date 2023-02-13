@@ -1,7 +1,7 @@
 package com.htfp.service.cac.router.biz.model.http.request;
 
 import com.htfp.service.cac.common.enums.ApplicantTypeEnum;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.FlightMissionTypeEnum;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
 import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationParam;

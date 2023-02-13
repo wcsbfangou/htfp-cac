@@ -1,13 +1,13 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.GcsInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.response.DeleteGcsInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.InsertGcsInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.QueryGcsInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.UpdateGcsInfoResponse;
-import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
+import com.htfp.service.cac.router.biz.service.http.IStaticInformationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -31,8 +31,8 @@ public class GcsInfoController {
     @Resource
     private HttpValidator httpValidator;
 
-    @Resource(name = "staticInfoServiceImpl")
-    private IStaticInfoService staticInfoService;
+    @Resource(name = "staticInformationServiceImpl")
+    private IStaticInformationService staticInformationService;
 
     /**
      * 根据gcsId查询gcs信息
@@ -47,7 +47,7 @@ public class GcsInfoController {
         queryGcsInfoResponse.fail();
         try {
             if (StringUtils.isBlank(gcsId)) {
-                queryGcsInfoResponse = staticInfoService.queryGcsInfo(Long.valueOf(gcsId));
+                queryGcsInfoResponse = staticInformationService.queryGcsInfo(Long.valueOf(gcsId));
             } else {
                 queryGcsInfoResponse.fail(ErrorCodeEnum.LACK_OF_GCS_ID);
             }
@@ -71,7 +71,7 @@ public class GcsInfoController {
         queryGcsInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(gcsReg)) {
-                staticInfoService.queryGcsInfoByGcsReg(gcsReg);
+                staticInformationService.queryGcsInfoByGcsReg(gcsReg);
             } else{
                 queryGcsInfoResponse.fail(ErrorCodeEnum.LACK_OF_GCS_REG);
             }
@@ -95,7 +95,7 @@ public class GcsInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(gcsInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                updateGcsInfoResponse = staticInfoService.updateGcsInfo(gcsInfoRequest);
+                updateGcsInfoResponse = staticInformationService.updateGcsInfo(gcsInfoRequest);
             } else {
                 updateGcsInfoResponse.fail(errorCodeEnum);
             }
@@ -120,7 +120,7 @@ public class GcsInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(gcsInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                insertGcsInfoResponse = staticInfoService.typeInGcsInfo(gcsInfoRequest);
+                insertGcsInfoResponse = staticInformationService.typeInGcsInfo(gcsInfoRequest);
             } else {
                 insertGcsInfoResponse.fail(errorCodeEnum);
             }
@@ -144,7 +144,7 @@ public class GcsInfoController {
         deleteGcsInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(gcsId)) {
-                staticInfoService.deleteGcsInfo(Long.valueOf(gcsId));
+                staticInformationService.deleteGcsInfo(Long.valueOf(gcsId));
             } else {
                 deleteGcsInfoResponse.fail(ErrorCodeEnum.WRONG_GCS_ID);
             }

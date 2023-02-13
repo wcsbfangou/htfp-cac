@@ -1,7 +1,7 @@
 package com.htfp.service.cac.app.controller.background;
 
 import com.htfp.service.cac.app.validator.HttpValidator;
-import com.htfp.service.cac.client.enums.ErrorCodeEnum;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.background.request.CancelOperatorInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.OperatorInfoRequest;
 import com.htfp.service.cac.router.biz.model.background.request.RegisterOperatorInfoRequest;
@@ -11,7 +11,7 @@ import com.htfp.service.cac.router.biz.model.background.response.InsertOperatorI
 import com.htfp.service.cac.router.biz.model.background.response.QueryOperatorInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.RegisterOperatorInfoResponse;
 import com.htfp.service.cac.router.biz.model.background.response.UpdateOperatorInfoResponse;
-import com.htfp.service.cac.router.biz.service.http.IStaticInfoService;
+import com.htfp.service.cac.router.biz.service.http.IStaticInformationService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -34,8 +34,8 @@ import javax.annotation.Resource;
 public class OperatorInfoController {
 
 
-    @Resource(name = "staticInfoServiceImpl")
-    private IStaticInfoService staticInfoService;
+    @Resource(name = "staticInformationServiceImpl")
+    private IStaticInformationService staticInformationService;
 
     @Resource
     private HttpValidator httpValidator;
@@ -54,7 +54,7 @@ public class OperatorInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(operatorInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                insertOperatorInfoResponse = staticInfoService.typeInOperatorInfo(operatorInfoRequest);
+                insertOperatorInfoResponse = staticInformationService.typeInOperatorInfo(operatorInfoRequest);
             } else {
                 insertOperatorInfoResponse.fail(errorCodeEnum);
             }
@@ -79,7 +79,7 @@ public class OperatorInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(operatorInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                updateOperatorInfoResponse = staticInfoService.updateOperatorInfo(operatorInfoRequest);
+                updateOperatorInfoResponse = staticInformationService.updateOperatorInfo(operatorInfoRequest);
             } else {
                 updateOperatorInfoResponse.fail(errorCodeEnum);
             }
@@ -105,7 +105,7 @@ public class OperatorInfoController {
             if (StringUtils.isBlank(operatorId)) {
                 queryOperatorInfoResponse.fail(ErrorCodeEnum.LACK_OF_OPERATOR_ID);
             } else {
-                queryOperatorInfoResponse = staticInfoService.queryOperatorInfo(Long.valueOf(operatorId));
+                queryOperatorInfoResponse = staticInformationService.queryOperatorInfo(Long.valueOf(operatorId));
             }
         } catch (Exception e) {
             log.error("查询operator信息异常, operatorId={}", operatorId, e);
@@ -132,7 +132,7 @@ public class OperatorInfoController {
             if (StringUtils.isBlank(idCardNumber)) {
                 queryOperatorInfoResponse.fail(ErrorCodeEnum.LACK_OF_ID_CARD_NUMBER);
             }
-            queryOperatorInfoResponse = staticInfoService.queryOperatorInfoByIdCardInfo(idCardType, idCardNumber);
+            queryOperatorInfoResponse = staticInformationService.queryOperatorInfoByIdCardInfo(idCardType, idCardNumber);
         } catch (Exception e) {
             log.error("查询operator信息异常, operatorIdCardType={}, operatorIdCardNumber={}", idCardType, idCardNumber, e);
             queryOperatorInfoResponse.fail("查询operator信息异常");
@@ -153,7 +153,7 @@ public class OperatorInfoController {
         operatorInfoResponse.fail();
         try {
             if (!StringUtils.isBlank(operatorId)) {
-                operatorInfoResponse = staticInfoService.deleteOperatorInfo(Long.valueOf(operatorId));
+                operatorInfoResponse = staticInformationService.deleteOperatorInfo(Long.valueOf(operatorId));
             } else {
                 operatorInfoResponse.fail(ErrorCodeEnum.WRONG_OPERATOR_ID);
             }
@@ -178,7 +178,7 @@ public class OperatorInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(registerOperatorInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                registerOperatorInfoResponse = staticInfoService.registerOperatorInfo(registerOperatorInfoRequest);
+                registerOperatorInfoResponse = staticInformationService.registerOperatorInfo(registerOperatorInfoRequest);
             } else {
                 registerOperatorInfoResponse.fail(errorCodeEnum);
             }
@@ -203,7 +203,7 @@ public class OperatorInfoController {
         try {
             ErrorCodeEnum errorCodeEnum = httpValidator.httpRequestValidate(cancelOperatorInfoRequest);
             if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
-                cancelOperatorInfoResponse = staticInfoService.cancelOperatorInfo(cancelOperatorInfoRequest);
+                cancelOperatorInfoResponse = staticInformationService.cancelOperatorInfo(cancelOperatorInfoRequest);
             } else {
                 cancelOperatorInfoResponse.fail(errorCodeEnum);
             }

@@ -1,21 +1,17 @@
 package com.htfp.service.oac.biz.service;
 
-import com.htfp.service.oac.biz.model.request.FlightPlanIssuedRequest;
-import com.htfp.service.oac.biz.model.request.FlyIssuedRequest;
-import com.htfp.service.oac.biz.model.response.FlightPlanIssuedResponse;
-import com.htfp.service.oac.biz.model.response.FlyIssuedResponse;
-import com.htfp.service.oac.client.request.FinishFlightPlanRequest;
-import com.htfp.service.oac.client.request.FlightPlanApplyRequest;
-import com.htfp.service.oac.client.request.FlightPlanQueryRequest;
-import com.htfp.service.oac.client.request.FlyApplyRequest;
-import com.htfp.service.oac.client.request.FlyQueryRequest;
-import com.htfp.service.oac.client.request.UavVerifyApplyRequest;
-import com.htfp.service.oac.client.response.FinishFlightPlanResponse;
-import com.htfp.service.oac.client.response.FlightPlanApplyResponse;
-import com.htfp.service.oac.client.response.FlightPlanQueryResponse;
-import com.htfp.service.oac.client.response.FlyApplyResponse;
-import com.htfp.service.oac.client.response.FlyQueryResponse;
-import com.htfp.service.oac.client.response.UavVerifyApplyResponse;
+import com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest;
+import com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest;
+import com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest;
+import com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest;
+import com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest;
+import com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest;
+import com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse;
+import com.htfp.service.oac.biz.model.inner.response.FlightPlanApplyResponse;
+import com.htfp.service.oac.biz.model.inner.response.FlightPlanQueryResponse;
+import com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse;
+import com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse;
+import com.htfp.service.oac.biz.model.inner.response.UavVerifyApplyResponse;
 
 /**
  * @Author sunjipeng
@@ -40,13 +36,6 @@ public interface IFlightManagementService {
     FlightPlanQueryResponse flightPlanQuery(FlightPlanQueryRequest flightPlanQueryRequest);
 
     /**
-     * 飞行计划下发
-     * @param flightPlanQueryRequest
-     * @return
-     */
-    FlightPlanIssuedResponse flightPlanIssued(FlightPlanIssuedRequest flightPlanQueryRequest);
-
-    /**
      * 无人机系统接入校验
      * @param uavVerifyApplyRequest
      * @return
@@ -66,13 +55,6 @@ public interface IFlightManagementService {
      * @return
      */
     FlyQueryResponse flyQuery(FlyQueryRequest flyQueryRequest);
-
-    /**
-     * 放飞结果下发
-     * @param flyIssuedRequest
-     * @return
-     */
-    FlyIssuedResponse flyIssued(FlyIssuedRequest flyIssuedRequest);
 
     /**
      * 结束飞行计划
