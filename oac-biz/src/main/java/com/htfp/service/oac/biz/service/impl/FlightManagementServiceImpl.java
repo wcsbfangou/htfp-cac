@@ -236,16 +236,22 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
         uavDataTransferResponse.fail();
         try {
             log.info("[oac]无人机遥测数据透传start，uavDataTransferRequest={}", uavDataTransferRequest);
-            DynamicUavInfoDO queryDynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlyId(Long.valueOf(uavDataTransferRequest.getReportCode()));
-            if (queryDynamicUavInfo != null && queryDynamicUavInfo.getCpn().equals(uavDataTransferRequest.getCpn())) {
-                Boolean updateDynamicUavInfoResult = updateDynamicUavInfo(uavDataTransferRequest, queryDynamicUavInfo);
-                if (updateDynamicUavInfoResult) {
-                    uavDataTransferResponse.setCpn(uavDataTransferRequest.getCpn());
-                    uavDataTransferResponse.setReportCode(uavDataTransferRequest.getReportCode());
-                    uavDataTransferResponse.success();
+            if (!uavDataTransferRequest.getCpn().equals(uavDataTransferRequest.getReportCode())) {
+                DynamicUavInfoDO queryDynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlyId(Long.valueOf(uavDataTransferRequest.getReportCode()));
+                if (queryDynamicUavInfo != null && queryDynamicUavInfo.getCpn().equals(uavDataTransferRequest.getCpn())) {
+                    Boolean updateDynamicUavInfoResult = updateDynamicUavInfo(uavDataTransferRequest, queryDynamicUavInfo);
+                    if (updateDynamicUavInfoResult) {
+                        uavDataTransferResponse.setCpn(uavDataTransferRequest.getCpn());
+                        uavDataTransferResponse.setReportCode(uavDataTransferRequest.getReportCode());
+                        uavDataTransferResponse.success();
+                    }
+                } else {
+                    uavDataTransferResponse.fail("无此飞行计划信息或cpn不一致");
                 }
             } else {
-                uavDataTransferResponse.fail("无此飞行计划信息或cpn不一致");
+                uavDataTransferResponse.setCpn(uavDataTransferRequest.getCpn());
+                uavDataTransferResponse.setReportCode(uavDataTransferRequest.getReportCode());
+                uavDataTransferResponse.success();
             }
             log.info("[oac]无人机遥测数据透传end，uavDataTransferRequest={}, uavDataTransferResponse={}", uavDataTransferRequest, JsonUtils.object2Json(uavDataTransferResponse));
         } catch (Exception e) {

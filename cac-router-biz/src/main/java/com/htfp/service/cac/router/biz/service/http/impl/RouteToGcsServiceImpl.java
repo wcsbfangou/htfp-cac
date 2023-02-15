@@ -177,7 +177,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                         queryUavInfo.getId().equals(queryApplyFlyLog.getUavId())) {
                     // 修改状态和上报编码
                     int id = applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
-                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), queryApplyFlyLog.getReplyFlightPlanId(), flyReplyRequest.getPass());
+                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), queryApplyFlyLog.getReplyFlyId(), flyReplyRequest.getPass());
                     if (id > 0 && updateReportCodeResult) {
                         // 查询无人机信息
                         GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());
