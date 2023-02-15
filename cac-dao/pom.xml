@@ -52,6 +52,11 @@
             <artifactId>cac-common</artifactId>
             <version>0.0.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.htfp.service</groupId>
+            <artifactId>oac-common</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 

@@ -26,7 +26,6 @@
         <module>oac-front-app</module>
         <module>oac-front-biz</module>
         <module>oac-common</module>
-        <module>oac-dao</module>
     </modules>
 
     <properties>

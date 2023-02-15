@@ -26,8 +26,8 @@
     <dependencies>
         <dependency>
             <groupId>com.htfp.service</groupId>
-            <artifactId>oac-dao</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <artifactId>cac-dao</artifactId>
+            <version>0.0.1</version>
         </dependency>
         <dependency>
             <groupId>com.htfp.service</groupId>

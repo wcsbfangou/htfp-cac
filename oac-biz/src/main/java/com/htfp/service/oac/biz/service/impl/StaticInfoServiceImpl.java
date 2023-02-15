@@ -28,12 +28,12 @@ import com.htfp.service.oac.biz.model.inner.response.RegisterUavInfoResponse;
 import com.htfp.service.oac.biz.model.inner.response.UpdateOperatorInfoResponse;
 import com.htfp.service.oac.biz.model.inner.response.UpdatePilotInfoResponse;
 import com.htfp.service.oac.biz.model.inner.response.UpdateUavInfoResponse;
-import com.htfp.service.oac.dao.model.OperatorInfoDO;
-import com.htfp.service.oac.dao.model.PilotInfoDO;
-import com.htfp.service.oac.dao.model.UavInfoDO;
-import com.htfp.service.oac.dao.service.OacOperatorDalService;
-import com.htfp.service.oac.dao.service.OacPilotDalService;
-import com.htfp.service.oac.dao.service.OacUavDalService;
+import com.htfp.service.cac.dao.model.oac.OperatorInfoDO;
+import com.htfp.service.cac.dao.model.oac.PilotInfoDO;
+import com.htfp.service.cac.dao.model.oac.UavInfoDO;
+import com.htfp.service.cac.dao.service.oac.OacOperatorDalService;
+import com.htfp.service.cac.dao.service.oac.OacPilotDalService;
+import com.htfp.service.cac.dao.service.oac.OacUavDalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
