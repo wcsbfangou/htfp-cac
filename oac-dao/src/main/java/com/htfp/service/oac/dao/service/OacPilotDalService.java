@@ -21,7 +21,7 @@ import java.util.List;
 public class OacPilotDalService {
 
     @Resource
-    OacPilotInfoMapper oacPilotInfoMapper;
+    private OacPilotInfoMapper oacPilotInfoMapper;
 
     public PilotInfoDO queryPilotInfo(Long id){
         return oacPilotInfoMapper.selectById(id);

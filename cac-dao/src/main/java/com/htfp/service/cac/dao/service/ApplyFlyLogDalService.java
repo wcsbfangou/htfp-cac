@@ -20,7 +20,7 @@ import java.util.List;
 public class ApplyFlyLogDalService {
 
     @Resource
-    ApplyFlyLogMapper applyFlyMapper;
+    private ApplyFlyLogMapper applyFlyMapper;
 
     public ApplyFlyLogDO queryApplyFlyLog(Long id){
         return applyFlyMapper.selectById(id);

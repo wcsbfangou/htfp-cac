@@ -21,7 +21,7 @@ import java.util.List;
 public class PilotDalService {
 
     @Resource
-    PilotInfoMapper pilotInfoMapper;
+    private PilotInfoMapper pilotInfoMapper;
 
     public PilotInfoDO queryPilotInfo(Long pilotId){
         return pilotInfoMapper.selectById(pilotId);

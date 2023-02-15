@@ -20,7 +20,7 @@ import java.util.List;
 public class OacDynamicUavInfoDalService {
 
     @Resource
-    OacDynamicUavInfoMapper oacDynamicUavInfoMapper;
+    private OacDynamicUavInfoMapper oacDynamicUavInfoMapper;
 
     public DynamicUavInfoDO queryDynamicUavInfo(Long id){
         return oacDynamicUavInfoMapper.selectById(id);

@@ -40,10 +40,10 @@ public class GcsPingJob extends QuartzJobBean {
     public static final String GCS_ECHO_TOKEN = "hello,gcs:";
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
 
     @Override
@@ -67,8 +67,8 @@ public class GcsPingJob extends QuartzJobBean {
                 gcsDalService.updateGcsIpMappingLinkStatus(queryGcsIpMapping, LinkStatusEnum.ONLINE);
                 List<UavGcsMappingDO> validUavGcsMappingList = uavDalService.queryUavGcsMapping(queryGcsIpMapping.getGcsId(), MappingStatusEnum.VALID);
                 for (UavGcsMappingDO validUavGcsMapping : validUavGcsMappingList) {
-                    UavOacMappingDO onlineUavOacMapping = uavDalService.queryUavOacMapping(validUavGcsMapping.getUavId(), MappingStatusEnum.VALID, LinkStatusEnum.DISCONNECT);
-                    uavDalService.updateUavOacMappingLinkStatus(onlineUavOacMapping, LinkStatusEnum.ONLINE);
+                    UavOacMappingDO disconnectUavOacMapping = uavDalService.queryUavOacMapping(validUavGcsMapping.getUavId(), MappingStatusEnum.VALID, LinkStatusEnum.DISCONNECT);
+                    uavDalService.updateUavOacMappingLinkStatus(disconnectUavOacMapping, LinkStatusEnum.ONLINE);
                 }
             }
         } else {

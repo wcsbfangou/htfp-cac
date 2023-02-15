@@ -20,7 +20,7 @@ import java.util.List;
 public class OacUavDalService {
 
     @Resource
-    OacUavInfoMapper oacUavInfoMapper;
+    private OacUavInfoMapper oacUavInfoMapper;
 
     public UavInfoDO queryUavInfo(Long id) {
         return oacUavInfoMapper.selectById(id);

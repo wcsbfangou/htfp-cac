@@ -53,13 +53,13 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     public final static Integer ONE_MILLION = 1000000;
 
     @Resource
-    OacPilotDalService oacPilotDalService;
+    private OacPilotDalService oacPilotDalService;
 
     @Resource
-    OacOperatorDalService oacOperatorDalService;
+    private OacOperatorDalService oacOperatorDalService;
 
     @Resource
-    OacUavDalService oacUavDalService;
+    private OacUavDalService oacUavDalService;
 
     /**
      * 修改驾驶员信息

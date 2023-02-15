@@ -10,6 +10,7 @@ public enum DataFrameTypeEnum {
     DATA_TRANSFER_SUBSCRIBE(1, "DATA_TRANSFER_SUBSCRIBE", "订阅"),
     DATA_TRANSFER_CANCEL_SUBSCRIBE(2, "DATA_TRANSFER_CANCEL_SUBSCRIBE", "取消订阅"),
     DATA_TRANSFER_GCS_TO_RCS(3, "DATA_TRANSFER_GCS_TO_RCS", "GCS到RCS数据透传"),
+    DATA_TRANSFER_GCS_TO_OAC(4, "DATA_TRANSFER_GCS_TO_OAC", "地面站数据透传至运行管控"),
     ;
 
     public final Integer type;

@@ -51,6 +51,7 @@ public enum ErrorCodeEnum {
     LACK_OF_TRUE_COURSE(3029, "真航向缺失"),
     LACK_OF_PITCH_ANGLE(3030, "俯仰角缺失"),
     LACK_OF_ROLL_ANGLE(3031, "横滚角缺失"),
+    LACK_OF_UAV_REPORT_CODE(3032, "无人机上报数据编码缺失"),
 
 
     WRONG_UAV_ID(3101, "无人机编号错误"),

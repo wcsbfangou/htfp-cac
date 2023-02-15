@@ -87,34 +87,34 @@ import java.util.List;
 public class GcsServiceImpl implements IGcsService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Resource
-    PilotDalService pilotDalService;
+    private PilotDalService pilotDalService;
 
     @Resource(name = "preFlightServiceImpl")
-    IPreFlightService preFlightService;
+    private IPreFlightService preFlightService;
 
     @Resource(name = "flyingServiceImpl")
-    IFlyingService flyingService;
+    private IFlyingService flyingService;
 
     @Resource
-    ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
+    private ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
 
     @Resource
-    ApplyUavVerifyLogDalService applyUavVerifyLogDalService;
+    private ApplyUavVerifyLogDalService applyUavVerifyLogDalService;
 
     @Resource
-    ApplyFlyLogDalService applyFlyLogDalService;
+    private ApplyFlyLogDalService applyFlyLogDalService;
 
     @Resource(name = "uavServiceImpl")
-    IUavService uavService;
+    private IUavService uavService;
 
     @Resource(name = "commandServiceImpl")
-    ICommandService commandService;
+    private ICommandService commandService;
 
     /**
      * 地面站上线
@@ -666,7 +666,7 @@ public class GcsServiceImpl implements IGcsService {
                     applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyQueryResponse.getFlyQueryResultParam().getStatus());
                     // 如果放飞申请通过,更新reportCode
                     if (ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(flyQueryResponse.getFlyQueryResultParam().getStatus()))) {
-                        updateUavOacMappingReportCode(queryApplyFlyLog.getUavId(), queryApplyFlyLog.getReplyFlyId());
+                        updateUavOacMappingReportCode(queryApplyFlyLog.getUavId(), queryApplyFlyLog.getReplyFlightPlanId());
                     }
                 }
             }

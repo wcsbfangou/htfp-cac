@@ -41,16 +41,16 @@ import java.util.Map;
 public class RouteToGcsServiceImpl implements IRouteToGcsService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Resource
-    ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
+    private ApplyFlightPlanLogDalService applyFlightPlanLogDalService;
 
     @Resource
-    ApplyFlyLogDalService applyFlyLogDalService;
+    private ApplyFlyLogDalService applyFlyLogDalService;
 
     /**
      * 飞行计划回复
@@ -177,7 +177,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                         queryUavInfo.getId().equals(queryApplyFlyLog.getUavId())) {
                     // 修改状态和上报编码
                     int id = applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
-                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), flyReplyRequest.getReplyFlyId(), flyReplyRequest.getPass());
+                    boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), queryApplyFlyLog.getReplyFlightPlanId(), flyReplyRequest.getPass());
                     if (id > 0 && updateReportCodeResult) {
                         // 查询无人机信息
                         GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());

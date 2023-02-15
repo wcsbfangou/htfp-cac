@@ -21,7 +21,7 @@ import java.util.List;
 public class NavigationDalService {
 
     @Resource
-    NavigationLogMapper navigationLogMapper;
+    private NavigationLogMapper navigationLogMapper;
 
     public List<NavigationLogDO> queryNavigationLog(Long navigationId) {
         return navigationLogMapper.selectByNavigationId(navigationId);

@@ -35,7 +35,7 @@ import java.util.TimeZone;
 public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRequest> {
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     /**
      * 校验HTTP请求体

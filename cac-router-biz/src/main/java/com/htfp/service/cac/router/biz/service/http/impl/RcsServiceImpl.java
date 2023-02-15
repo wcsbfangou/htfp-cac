@@ -55,16 +55,16 @@ import java.util.Map;
 public class RcsServiceImpl implements IRcsService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Resource
-    PilotDalService pilotDalService;
+    private PilotDalService pilotDalService;
 
     @Resource(name = "uavServiceImpl")
-    IUavService uavService;
+    private IUavService uavService;
 
     /**
      * 远程地面站注册

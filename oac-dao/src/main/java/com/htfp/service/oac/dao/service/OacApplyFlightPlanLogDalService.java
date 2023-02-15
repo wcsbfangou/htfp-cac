@@ -20,7 +20,7 @@ import java.util.List;
 public class OacApplyFlightPlanLogDalService {
 
     @Resource
-    OacApplyFlightPlanLogMapper oacApplyFlightPlanLogMapper;
+    private OacApplyFlightPlanLogMapper oacApplyFlightPlanLogMapper;
 
     public ApplyFlightPlanLogDO queryApplyFlightPlanLog(Long id){
         return oacApplyFlightPlanLogMapper.selectById(id);

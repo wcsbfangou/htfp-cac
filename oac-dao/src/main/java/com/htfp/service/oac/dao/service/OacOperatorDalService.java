@@ -20,7 +20,7 @@ import java.util.List;
 public class OacOperatorDalService {
 
     @Resource
-    OacOperatorInfoMapper oacOperatorInfoMapper;
+    private OacOperatorInfoMapper oacOperatorInfoMapper;
 
     public OperatorInfoDO queryOperatorInfo(Long id){
         return oacOperatorInfoMapper.selectById(id);

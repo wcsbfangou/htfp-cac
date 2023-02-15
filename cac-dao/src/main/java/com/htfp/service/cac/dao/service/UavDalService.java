@@ -38,22 +38,22 @@ import java.util.concurrent.TimeUnit;
 public class UavDalService {
 
     @Resource
-    UavGcsMappingMapper uavGcsMappingMapper;
+    private UavGcsMappingMapper uavGcsMappingMapper;
 
     @Resource
-    UavNavigationMappingMapper uavNavigationMappingMapper;
+    private UavNavigationMappingMapper uavNavigationMappingMapper;
 
     @Resource
-    UavInfoMapper uavInfoMapper;
+    private UavInfoMapper uavInfoMapper;
 
     @Resource
-    UavStatusLogMapper uavStatusLogMapper;
+    private UavStatusLogMapper uavStatusLogMapper;
 
     @Resource
-    CommandAndControlLogMapper commandAndControlLogMapper;
+    private CommandAndControlLogMapper commandAndControlLogMapper;
 
     @Resource
-    UavOacMappingMapper uavOacMappingMapper;
+    private UavOacMappingMapper uavOacMappingMapper;
 
     private Cache<Long, String> uavReportCache = CacheBuilder.newBuilder()
             .maximumSize(100)

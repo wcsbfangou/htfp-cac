@@ -36,7 +36,7 @@ public class RcsPingJob extends QuartzJobBean {
     public static final String RCS_ECHO_TOKEN = "hello,rcs:";
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {

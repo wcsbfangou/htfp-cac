@@ -42,7 +42,7 @@ import javax.annotation.Resource;
 public class BasicInfoServiceImpl implements IBasicInfoService {
 
     @Resource(name="staticInfoServiceImpl")
-    IStaticInfoService staticInfoService;
+    private IStaticInfoService staticInfoService;
 
     /**
      * 修改驾驶员信息

@@ -20,7 +20,7 @@ import java.util.List;
 public class OacApplyUavVerifyLogDalService {
 
     @Resource
-    OacApplyUavVerifyLogMapper oacApplyUavVerifyLogMapper;
+    private OacApplyUavVerifyLogMapper oacApplyUavVerifyLogMapper;
 
     public ApplyUavVerifyLogDO queryApplyUavVerifyLog(Long id){
         return oacApplyUavVerifyLogMapper.selectById(id);

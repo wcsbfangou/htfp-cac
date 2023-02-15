@@ -1,4 +1,4 @@
-package com.htfp.service.oac.biz.model.inner.param;
+package com.htfp.service.oac.biz.model.inner.response.param;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.htfp.service.oac.biz.model.inner.response;
 
-import com.htfp.service.oac.biz.model.inner.param.FlyQueryResultParam;
+import com.htfp.service.oac.biz.model.inner.response.param.FlyQueryResultParam;
 import lombok.Data;
 
 /**

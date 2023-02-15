@@ -4,10 +4,12 @@ package com.htfp.service.oac.app.service;
 import com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest;
 import com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest;
 import com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest;
+import com.htfp.service.oac.biz.model.inner.request.UavDataTransferRequest;
 import com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest;
 import com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse;
 import com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse;
 import com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse;
+import com.htfp.service.oac.biz.model.inner.response.UavDataTransferResponse;
 import com.htfp.service.oac.biz.model.inner.response.UavVerifyApplyResponse;
 
 /**
@@ -23,6 +25,14 @@ public interface IFlyingService {
      * @return
      */
     UavVerifyApplyResponse uavVerifyApply(UavVerifyApplyRequest uavVerifyApplyRequest);
+
+    /**
+     * 无人机遥测数据透传
+     *
+     * @param uavDataTransferRequest
+     * @return
+     */
+    UavDataTransferResponse uavDataTransfer(UavDataTransferRequest uavDataTransferRequest);
 
     /**
      * 放飞申请

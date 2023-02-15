@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 public class OacServiceImpl implements IOacService {
 
     @Resource(name="routeToGcsServiceImpl")
-    IRouteToGcsService routeToGcsService;
+    private IRouteToGcsService routeToGcsService;
 
     /**
      * 飞行计划回复

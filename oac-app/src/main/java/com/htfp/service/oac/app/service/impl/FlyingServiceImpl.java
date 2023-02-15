@@ -1,6 +1,8 @@
 package com.htfp.service.oac.app.service.impl;
 
 import com.htfp.service.oac.app.service.IFlyingService;
+import com.htfp.service.oac.biz.model.inner.request.UavDataTransferRequest;
+import com.htfp.service.oac.biz.model.inner.response.UavDataTransferResponse;
 import com.htfp.service.oac.biz.service.IFlightManagementService;
 import com.htfp.service.oac.common.enums.ErrorCodeEnum;
 import com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest;
@@ -26,7 +28,7 @@ import javax.annotation.Resource;
 public class FlyingServiceImpl implements IFlyingService {
 
     @Resource(name="flightManagementServiceImpl")
-    IFlightManagementService flightManagementService;
+    private IFlightManagementService flightManagementService;
 
     /**
      * 无人机系统接入校验
@@ -50,6 +52,30 @@ public class FlyingServiceImpl implements IFlyingService {
             uavVerifyApplyResponse.fail("无人机系统接入校验异常");
         }
         return uavVerifyApplyResponse;
+    }
+
+    /**
+     * 无人机遥测数据透传
+     *
+     * @param uavDataTransferRequest
+     * @return
+     */
+    @Override
+    public UavDataTransferResponse uavDataTransfer(UavDataTransferRequest uavDataTransferRequest) {
+        UavDataTransferResponse uavDataTransferResponse = new UavDataTransferResponse();
+        uavDataTransferResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = uavDataTransferRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                uavDataTransferResponse = flightManagementService.uavDataTransfer(uavDataTransferRequest);
+            } else {
+                uavDataTransferResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("无人机遥测数据校验异常, uavDataTransferRequest={}", uavDataTransferRequest, e);
+            uavDataTransferResponse.fail("无人机遥测数据校验异常");
+        }
+        return uavDataTransferResponse;
     }
 
     /**

@@ -29,9 +29,9 @@ import java.util.concurrent.TimeUnit;
 public class GcsDalService {
 
     @Resource
-    GcsInfoMapper gcsInfoMapper;
+    private GcsInfoMapper gcsInfoMapper;
     @Resource
-    GcsIpMappingMapper gcsIpMappingMapper;
+    private GcsIpMappingMapper gcsIpMappingMapper;
 
     private Cache<Long,Integer> gcsLinkStatusCache = CacheBuilder.newBuilder()
             .maximumSize(100)

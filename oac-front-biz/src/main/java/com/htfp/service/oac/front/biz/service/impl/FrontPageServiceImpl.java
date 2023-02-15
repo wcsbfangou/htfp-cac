@@ -44,28 +44,28 @@ import java.util.Date;
 public class FrontPageServiceImpl implements IFrontPageService {
 
     @Resource
-    OacApplyFlyLogDalService oacApplyFlyLogDalService;
+    private OacApplyFlyLogDalService oacApplyFlyLogDalService;
 
     @Resource
-    OacUavDalService oacUavDalService;
+    private OacUavDalService oacUavDalService;
 
     @Resource
-    OacOperatorDalService oacOperatorDalService;
+    private OacOperatorDalService oacOperatorDalService;
 
     @Resource
-    OacAirportInfoDalService oacAirportInfoDalService;
+    private OacAirportInfoDalService oacAirportInfoDalService;
 
     @Resource
-    OacApplyFlightPlanLogDalService oacApplyFlightPlanLogDalService;
+    private OacApplyFlightPlanLogDalService oacApplyFlightPlanLogDalService;
 
     @Resource
-    OacDynamicUavInfoDalService oacDynamicUavInfoDalService;
+    private OacDynamicUavInfoDalService oacDynamicUavInfoDalService;
 
     @Resource
-    OacDynamicRouteInfoDalService oacDynamicRouteInfoDalService;
+    private OacDynamicRouteInfoDalService oacDynamicRouteInfoDalService;
 
-    @Resource
-    IOacService oacService;
+    @Resource(name="oacServiceImpl")
+    private IOacService oacService;
 
     /**
      * 飞行计划下发
@@ -140,7 +140,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                         null, null, null, null, null, null, null, null, currentTime, queryApplyFlightPlanLog.getStartTime(), queryApplyFlightPlanLog.getEndTime(),
                         null, queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId(), queryApplyFlightPlanLog.getTakeoffSite(), queryApplyFlightPlanLog.getLandingSite(),
                         queryAirportInfo.getIdentificationAreaRadius(), queryAirportInfo.getAlarmAreaRadius(), queryAirportInfo.getLng(), queryAirportInfo.getLat(), queryAirportInfo.getAlt(),
-                        null, null, null, null, flightPlanStatus, null);
+                        null, null, null, false, flightPlanStatus, null);
                 DynamicRouteInfoDO dynamicRouteInfoDO = oacDynamicRouteInfoDalService.buildDynamicUavInfoDO(queryApplyFlightPlanLog.getReplyFlightPlanId(), null, queryUavInfo.getUavName(), cpn,
                         queryApplyFlightPlanLog.getRoutePointCoordinates(), null, null, null, null, null, null,
                         queryApplyFlightPlanLog.getTakeoffSite(), queryAirportInfo.getLandingSites(), flightPlanStatus);

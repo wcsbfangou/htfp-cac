@@ -18,7 +18,7 @@ import java.util.Date;
 public class OacAirportInfoDalService {
 
     @Resource
-    OacAirportInfoMapper oacAirportInfoMapper;
+    private OacAirportInfoMapper oacAirportInfoMapper;
 
     public AirportInfoDO queryAirportInfo(Long id) {
         return oacAirportInfoMapper.selectById(id);

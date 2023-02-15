@@ -1,6 +1,6 @@
 package com.htfp.service.oac.biz.model.inner.response;
 
-import com.htfp.service.oac.biz.model.inner.param.UavVerifyResultParam;
+import com.htfp.service.oac.biz.model.inner.response.param.UavVerifyResultParam;
 import lombok.Data;
 
 /**

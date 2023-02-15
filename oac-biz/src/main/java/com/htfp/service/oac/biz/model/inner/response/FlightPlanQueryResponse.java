@@ -1,6 +1,6 @@
 package com.htfp.service.oac.biz.model.inner.response;
 
-import com.htfp.service.oac.biz.model.inner.param.FlightPlanQueryResultParam;
+import com.htfp.service.oac.biz.model.inner.response.param.FlightPlanQueryResultParam;
 import lombok.Data;
 
 /**

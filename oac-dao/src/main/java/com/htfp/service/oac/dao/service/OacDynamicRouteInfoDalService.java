@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public class OacDynamicRouteInfoDalService {
     @Resource
-    OacDynamicRouteInfoMapper oacDynamicRouteInfoMapper;
+    private OacDynamicRouteInfoMapper oacDynamicRouteInfoMapper;
 
     public DynamicRouteInfoDO queryDynamicRouteInfo(Long id){
         return oacDynamicRouteInfoMapper.selectById(id);
