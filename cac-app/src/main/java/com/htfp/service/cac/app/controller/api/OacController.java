@@ -1,11 +1,11 @@
-package com.htfp.service.oac.front.app.api;
+package com.htfp.service.cac.app.controller.api;
 
-import com.htfp.service.oac.front.app.model.BaseHttpResponse;
+import com.htfp.service.cac.app.model.BaseHttpResponse;
+import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
-import com.htfp.service.oac.common.enums.ErrorCodeEnum;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -43,7 +43,7 @@ public class OacController {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
-            ErrorCodeEnum errorCodeEnum = flightPlanIssuedRequest.validate();
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(flightPlanIssuedRequest.validate().getCode());
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }
@@ -74,7 +74,7 @@ public class OacController {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
-            ErrorCodeEnum errorCodeEnum = flyIssuedRequest.validate();
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(flyIssuedRequest.validate().getCode());
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }

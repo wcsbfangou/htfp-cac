@@ -50,11 +50,11 @@
             <artifactId>cac-router-biz</artifactId>
             <version>0.0.1</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>com.htfp.service</groupId>
             <artifactId>oac-front-biz</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
     </dependencies>
 
     <build>

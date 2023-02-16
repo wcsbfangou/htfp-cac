@@ -1,4 +1,4 @@
-package com.htfp.service.cac.app.service;
+package com.htfp.service.cac.inner.app.service;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
