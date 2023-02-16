@@ -7,7 +7,7 @@ package com.htfp.service.cac.common.enums.dataFrame;
  */
 public enum MagicCodeEnum {
 
-    DATA_TRANSFER((short) 0, "数据透传"),
+    DATA_TRANSFER((short) 0x504, "数据透传"),
     ;
 
     public final short code;

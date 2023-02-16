@@ -27,7 +27,7 @@ public class DynamicUavInfoDO implements Serializable {
     private Integer course;
     private Integer fuel;
     private Integer battery;
-    private Integer signal;
+    private Integer signalStrength;
     private String updateTime;
     private String flightPlanStartTime;
     private String flightPlanEndTime;

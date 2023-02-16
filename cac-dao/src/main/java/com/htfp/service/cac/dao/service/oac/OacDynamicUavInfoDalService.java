@@ -72,7 +72,7 @@ public class OacDynamicUavInfoDalService {
     }
 
     public DynamicUavInfoDO buildDynamicUavInfoDO(Long replyFlightPlanId, Long replyFlyId, String uavName, String cpn, String uavOperatorName, Integer lng, Integer lat, Integer alt,
-                                                      Integer speed, Integer course, Integer fuel, Integer battery, Integer signal, String updateTime, String flightPlanStartTime, String flightPlanEndTime,
+                                                      Integer speed, Integer course, Integer fuel, Integer battery, Integer signalStrength, String updateTime, String flightPlanStartTime, String flightPlanEndTime,
                                                       String startFlyTime, String takeoffAirportId, String landingAirportId, String takeoffSite, String landingSite, Integer landingAirportIdentificationRadius, Integer landingAirportAlarmRadius,
                                                       Integer landingLng, Integer landingLat, Integer landingAlt, Integer distanceToLandingPoint, Boolean inAlarm, String alarmIds, Boolean accessSystem, Integer planStatus, Integer uavStatus) {
         DynamicUavInfoDO dynamicUavInfoDO = new DynamicUavInfoDO();
@@ -88,7 +88,7 @@ public class OacDynamicUavInfoDalService {
         dynamicUavInfoDO.setCourse(course);
         dynamicUavInfoDO.setFuel(fuel);
         dynamicUavInfoDO.setBattery(battery);
-        dynamicUavInfoDO.setSignal(signal);
+        dynamicUavInfoDO.setSignalStrength(signalStrength);
         dynamicUavInfoDO.setUpdateTime(updateTime);
         dynamicUavInfoDO.setFlightPlanStartTime(flightPlanStartTime);
         dynamicUavInfoDO.setFlightPlanEndTime(flightPlanEndTime);

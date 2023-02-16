@@ -16,7 +16,7 @@ public class OperatorInfoDO implements Serializable {
 
     private Long id;
     /**
-     * pilotCode = idCardType+'#'+idCardNumber
+     * operatorCode = idCardType+'#'+idCardNumber
      */
     private String operatorCode;
     private String operatorUniId;
