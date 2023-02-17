@@ -47,6 +47,7 @@ public class OacDynamicUavInfoDalService {
     }
 
     public int updateDynamicUavInfo(DynamicUavInfoDO dynamicUavInfoDO){
+        dynamicUavInfoDO.setGmtModify(new Date());
         return oacDynamicUavInfoMapper.updateByDynamicUavInfo(dynamicUavInfoDO);
     }
 

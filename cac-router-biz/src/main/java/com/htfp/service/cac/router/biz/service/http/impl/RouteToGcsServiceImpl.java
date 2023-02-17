@@ -78,7 +78,9 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 queryGcsIpMapping.getGcsIp() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
                                 LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
-                            flightPlanReplyResponse = flightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLIGHT_PLAN_REPLY);
+                            // TODO: 2023/2/17 请求地面站，记得修改回来
+                            flightPlanReplyResponse.success();
+                            //flightPlanReplyResponse = flightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLIGHT_PLAN_REPLY);
                         } else {
                             flightPlanReplyResponse.fail("无人机系统未连接，飞行计划回复失败");
                         }
@@ -99,7 +101,8 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
     }
 
     public FlightPlanReplyResponse flightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId, Long gcsId, String url) {
-        FlightPlanReplyResponse flightPlanReplyResponse = null;
+        FlightPlanReplyResponse flightPlanReplyResponse = new FlightPlanReplyResponse();
+        flightPlanReplyResponse.fail();
         try {
             com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest gcsFlightPlanReplyRequest = buildGcsFlightPlanReplyRequest(flightPlanReplyRequest, uavId);
             HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()
@@ -168,7 +171,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         flyReplyResponse.fail();
         try {
             UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(flyReplyRequest.getCpn());
-            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlightPlanId(Long.valueOf(flyReplyRequest.getApplyFlyId()));
+            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(flyReplyRequest.getApplyFlyId()));
             if (queryApplyFlyLog != null &&
                     queryApplyFlyLog.getReplyFlyId() != null &&
                     queryApplyFlyLog.getReplyFlyId().equals(flyReplyRequest.getReplyFlyId())) {
@@ -185,7 +188,9 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 queryGcsIpMapping.getGcsIp() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
                                 LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
-                            flyReplyResponse = flyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLY_REPLY);
+                            // TODO: 2023/2/17 请求地面站记得修改回来
+                            flyReplyResponse.success();
+                            // flyReplyResponse = flyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLY_REPLY);
                         } else {
                             flyReplyResponse.fail("无人机系统未连接，放飞申请回复失败");
                         }
@@ -222,7 +227,8 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
     }
 
     public FlyReplyResponse flyReplyToGcs(FlyReplyRequest flyReplyRequest, Long uavId, Long gcsId, String url) {
-        FlyReplyResponse flyReplyResponse = null;
+        FlyReplyResponse flyReplyResponse = new FlyReplyResponse();
+        flyReplyResponse.fail();
         try {
             com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest gcsFlyReplyRequest = buildGcsFlyReplyRequest(flyReplyRequest, uavId);
             HttpContentWrapper httpContentWrapper = HttpContentWrapper.of()

@@ -24,12 +24,12 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     private String gcsId;
     private String uavId;
     private Integer applicantType;
-    private OrganizationParam applicantOrganizationParam;
-    private PersonParam applicantPersonParam;
+    private OrganizationParam applicantOrganization;
+    private PersonParam applicantPerson;
     private List<PersonParam> pilots;
     private List<String> airspaceNumbers;
     private List<PositionParam> routePointCoordinates;
-    private String takeOffAirportId;
+    private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;
     private String landingSite;
@@ -45,9 +45,9 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     public ErrorCodeEnum validate() {
         if (ApplicantTypeEnum.getFromCode(applicantType) == null) {
             return ErrorCodeEnum.LACK_OF_APPLICANT_TYPE;
-        } else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganizationParam == null) {
+        } else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganization == null) {
             return ErrorCodeEnum.LACK_OF_ORGANIZATION;
-        } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantPersonParam == null) {
+        } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantPerson == null) {
             return ErrorCodeEnum.LACK_OF_PERSON;
         } else if (CollectionUtils.isEmpty(pilots)) {
             return ErrorCodeEnum.LACK_OF_PILOT_INFO;
@@ -55,7 +55,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
         } else if (CollectionUtils.isEmpty(routePointCoordinates)) {
             return ErrorCodeEnum.LACK_OF_ROUTE_POINT;
-        } else if (StringUtils.isBlank(takeOffAirportId)) {
+        } else if (StringUtils.isBlank(takeoffAirportId)) {
             return ErrorCodeEnum.LACK_OF_TAKE_OFF_AIRPORT;
         } else if (StringUtils.isBlank(landingAirportId)) {
             return ErrorCodeEnum.LACK_OF_LANDING_AIRPORT;

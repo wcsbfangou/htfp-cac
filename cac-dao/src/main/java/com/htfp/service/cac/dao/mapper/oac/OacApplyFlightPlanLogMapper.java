@@ -106,7 +106,7 @@ public interface OacApplyFlightPlanLogMapper {
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"applyFlightPlanLog.applyFlightPlanId != null\"> apply_flight_plan_id = #{applyFlightPlanLog.applyFlightPlanId}, </if>"
-            + "<if test=\"applyFlightPlanLog.replyFlightPlanId != null\"> reply_plight_plan_id = #{applyFlightPlanLog.replyFlightPlanId}, </if>"
+            + "<if test=\"applyFlightPlanLog.replyFlightPlanId != null\"> reply_flight_plan_id = #{applyFlightPlanLog.replyFlightPlanId}, </if>"
             + "<if test=\"applyFlightPlanLog.cpn != null\"> cpn = #{applyFlightPlanLog.cpn}, </if>"
             + "<if test=\"applyFlightPlanLog.applicantType != null\"> applicant_type = #{applyFlightPlanLog.applicantType}, </if>"
             + "<if test=\"applyFlightPlanLog.applicantSubject != null\"> applicant_subject = #{applyFlightPlanLog.applicantSubject}, </if>"

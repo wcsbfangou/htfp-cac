@@ -248,12 +248,12 @@ public class GcsServiceImpl implements IGcsService {
                 Long applyFlightPlanId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
                 String applicantSubject;
                 if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType()))) {
-                    applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantOrganizationParam());
+                    applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantOrganization());
                 } else {
-                    applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantPersonParam());
+                    applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantPerson());
                 }
                 ApplyFlightPlanLogDO applyFlightPlanLog = applyFlightPlanLogDalService.buildApplyFlightPlanLogDO(applyFlightPlanId, null, Long.valueOf(flightPlanApplyRequest.getGcsId()), Long.valueOf(flightPlanApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), flightPlanApplyRequest.getApplicantType(), applicantSubject,
-                        JsonUtils.object2Json(flightPlanApplyRequest.getPilots()), JsonUtils.object2Json(flightPlanApplyRequest.getAirspaceNumbers()), JsonUtils.object2Json(flightPlanApplyRequest.getRoutePointCoordinates()), flightPlanApplyRequest.getTakeOffAirportId(), flightPlanApplyRequest.getLandingAirportId(),
+                        JsonUtils.object2Json(flightPlanApplyRequest.getPilots()), JsonUtils.object2Json(flightPlanApplyRequest.getAirspaceNumbers()), JsonUtils.object2Json(flightPlanApplyRequest.getRoutePointCoordinates()), flightPlanApplyRequest.getTakeoffAirportId(), flightPlanApplyRequest.getLandingAirportId(),
                         flightPlanApplyRequest.getTakeoffSite(), flightPlanApplyRequest.getLandingSite(), flightPlanApplyRequest.getMissionType(), flightPlanApplyRequest.getStartTime(), flightPlanApplyRequest.getEndTime(), flightPlanApplyRequest.getEmergencyProcedure(),
                         flightPlanApplyRequest.getOperationScenarioType(), flightPlanApplyRequest.getIsEmergency(), flightPlanApplyRequest.getIsVlos(), ApplyStatusEnum.PENDING.getCode());
                 int id = applyFlightPlanLogDalService.insertApplyFlightPlanLog(applyFlightPlanLog);
@@ -286,14 +286,14 @@ public class GcsServiceImpl implements IGcsService {
         oacFlightPlanApplyRequest.setApplyFlightPlanId(applyFlightPlanId.toString());
         oacFlightPlanApplyRequest.setApplicantType(flightPlanApplyRequest.getApplicantType());
         if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType()))) {
-            oacFlightPlanApplyRequest.setApplicantOrganizationParam(buildOacPersonParam(flightPlanApplyRequest.getApplicantOrganizationParam()));
+            oacFlightPlanApplyRequest.setApplicantOrganizationParam(buildOacPersonParam(flightPlanApplyRequest.getApplicantOrganization()));
         } else {
-            oacFlightPlanApplyRequest.setApplicantPersonParam(buildOacPersonParam(flightPlanApplyRequest.getApplicantPersonParam()));
+            oacFlightPlanApplyRequest.setApplicantPersonParam(buildOacPersonParam(flightPlanApplyRequest.getApplicantPerson()));
         }
         oacFlightPlanApplyRequest.setPilots(buildOacPilots(flightPlanApplyRequest.getPilots()));
         oacFlightPlanApplyRequest.setAirspaceNumbers(flightPlanApplyRequest.getAirspaceNumbers());
         oacFlightPlanApplyRequest.setRoutePointCoordinates(buildOacRoutePointCoordinates(flightPlanApplyRequest.getRoutePointCoordinates()));
-        oacFlightPlanApplyRequest.setTakeOffAirportId(flightPlanApplyRequest.getTakeOffAirportId());
+        oacFlightPlanApplyRequest.setTakeoffAirportId(flightPlanApplyRequest.getTakeoffAirportId());
         oacFlightPlanApplyRequest.setLandingAirportId(flightPlanApplyRequest.getLandingAirportId());
         oacFlightPlanApplyRequest.setTakeoffSite(flightPlanApplyRequest.getTakeoffSite());
         oacFlightPlanApplyRequest.setLandingSite(flightPlanApplyRequest.getLandingSite());

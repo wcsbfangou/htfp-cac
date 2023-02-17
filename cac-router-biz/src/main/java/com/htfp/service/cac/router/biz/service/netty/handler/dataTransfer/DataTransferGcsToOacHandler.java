@@ -72,8 +72,6 @@ public class DataTransferGcsToOacHandler implements IDataFrameHandler {
                             Long uavId = Long.valueOf(dataFrame.getUavId());
                             UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(uavId, MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
                             UavInfoDO queryUavInfo = uavDalService.queryUavInfo(uavId);
-                            // 测试用
-                            UavDataTransferRequest uavDataTransferRequest = decodeUavOriginData(dataFrame.getOriginDataBytes(), "lalalalla", queryUavInfo.getCpn());
                             if (queryUavOacMapping != null) {
                                 newData = dataDecodeAndTransferToOac(dataFrame.getOriginDataBytes(), queryUavOacMapping.getReportCode(), queryUavInfo.getCpn());
                             } else {

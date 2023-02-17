@@ -14,6 +14,7 @@ import java.util.Date;
 public class ApplyFlyLogDO implements Serializable {
 
     private Long id;
+
     private String applyFlyId;
     private Long replyFlyId;
     private String applyFlightPlanId;

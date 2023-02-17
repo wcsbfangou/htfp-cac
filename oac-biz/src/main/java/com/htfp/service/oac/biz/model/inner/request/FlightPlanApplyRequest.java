@@ -28,7 +28,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     private List<PersonParam> pilots;
     private List<String> airspaceNumbers;
     private List<PositionParam> routePointCoordinates;
-    private String takeOffAirportId;
+    private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;
     private String landingSite;
@@ -56,7 +56,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
         } else if (CollectionUtils.isEmpty(routePointCoordinates)) {
             return ErrorCodeEnum.LACK_OF_ROUTE_POINT;
-        } else if (StringUtils.isBlank(takeOffAirportId)) {
+        } else if (StringUtils.isBlank(takeoffAirportId)) {
             return ErrorCodeEnum.LACK_OF_TAKE_OFF_AIRPORT;
         } else if (StringUtils.isBlank(landingAirportId)) {
             return ErrorCodeEnum.LACK_OF_LANDING_AIRPORT;

@@ -24,7 +24,7 @@ public class OacAirportInfoDalService {
         return oacAirportInfoMapper.selectById(id);
     }
 
-    public AirportInfoDO queryAirportInfoByUavReg(String airportId) {
+    public AirportInfoDO queryAirportInfoByAirportId(String airportId) {
         return oacAirportInfoMapper.selectByAirportId(airportId);
     }
 

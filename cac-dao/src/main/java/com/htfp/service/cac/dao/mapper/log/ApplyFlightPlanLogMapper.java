@@ -134,7 +134,7 @@ public interface ApplyFlightPlanLogMapper {
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
             + "<if test=\"applyFlightPlanLog.applyFlightPlanId != null\"> apply_flight_plan_id = #{applyFlightPlanLog.applyFlightPlanId}, </if>"
-            + "<if test=\"applyFlightPlanLog.replyFlightPlanId != null\"> reply_plight_plan_id = #{applyFlightPlanLog.replyFlightPlanId}, </if>"
+            + "<if test=\"applyFlightPlanLog.replyFlightPlanId != null\"> reply_flight_plan_id = #{applyFlightPlanLog.replyFlightPlanId}, </if>"
             + "<if test=\"applyFlightPlanLog.gcsId != null\"> gcs_id = #{applyFlightPlanLog.gcsId}, </if>"
             + "<if test=\"applyFlightPlanLog.uavId != null\"> uav_id = #{applyFlightPlanLog.uavId}, </if>"
             + "<if test=\"applyFlightPlanLog.uavReg != null\"> uav_reg = #{applyFlightPlanLog.uavReg}, </if>"
