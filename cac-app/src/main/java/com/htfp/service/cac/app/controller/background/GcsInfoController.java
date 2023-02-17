@@ -46,7 +46,7 @@ public class GcsInfoController {
         QueryGcsInfoResponse queryGcsInfoResponse = new QueryGcsInfoResponse();
         queryGcsInfoResponse.fail();
         try {
-            if (StringUtils.isBlank(gcsId)) {
+            if (StringUtils.isNotBlank(gcsId)) {
                 queryGcsInfoResponse = staticInformationService.queryGcsInfo(Long.valueOf(gcsId));
             } else {
                 queryGcsInfoResponse.fail(ErrorCodeEnum.LACK_OF_GCS_ID);
@@ -70,8 +70,8 @@ public class GcsInfoController {
         QueryGcsInfoResponse queryGcsInfoResponse = new QueryGcsInfoResponse();
         queryGcsInfoResponse.fail();
         try {
-            if (!StringUtils.isBlank(gcsReg)) {
-                staticInformationService.queryGcsInfoByGcsReg(gcsReg);
+            if (StringUtils.isNotBlank(gcsReg)) {
+                queryGcsInfoResponse = staticInformationService.queryGcsInfoByGcsReg(gcsReg);
             } else{
                 queryGcsInfoResponse.fail(ErrorCodeEnum.LACK_OF_GCS_REG);
             }

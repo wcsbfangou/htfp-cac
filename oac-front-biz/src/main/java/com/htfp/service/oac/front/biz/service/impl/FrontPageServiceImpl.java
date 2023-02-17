@@ -25,8 +25,14 @@ import com.htfp.service.cac.dao.service.oac.OacOperatorDalService;
 import com.htfp.service.cac.dao.service.oac.OacUavDalService;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -66,6 +72,39 @@ public class FrontPageServiceImpl implements IFrontPageService {
 
     @Resource(name="oacServiceImpl")
     private IOacService oacService;
+
+    /**
+     * 查询无人机动态信息
+     *
+     * @param queryUavDynamicInfoRequest
+     * @return
+     */
+    @Override
+    public QueryUavDynamicInfoResponse queryUavDynamicInfo(QueryUavDynamicInfoRequest queryUavDynamicInfoRequest) {
+        return null;
+    }
+
+    /**
+     * 查询无人机航线信息
+     *
+     * @param queryUavRouteInfoRequest
+     * @return
+     */
+    @Override
+    public QueryUavRouteInfoResponse queryUavRouteInfo(QueryUavRouteInfoRequest queryUavRouteInfoRequest) {
+        return null;
+    }
+
+    /**
+     * 查询无人机机场信息
+     *
+     * @param queryAirportInfoRequest
+     * @return
+     */
+    @Override
+    public QueryAirportInfoResponse queryAirportInfoData(QueryAirportInfoRequest queryAirportInfoRequest) {
+        return null;
+    }
 
     /**
      * 飞行计划下发

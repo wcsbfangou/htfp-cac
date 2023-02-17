@@ -178,9 +178,8 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
     }
 
     // TODO: 2022/12/20 待优化
-    String generateCpn(String operatorUniId, Integer productSizeType, Integer productType) {
-        OperatorInfoDO operatorInfoDO = oacOperatorDalService.queryOperatorInfoByOperatorUniId(operatorUniId);
-        String operatorNum = String.format("%03d", operatorInfoDO.getId().intValue() % ONE_THOUSAND);
+    String generateCpn(String operatorUniId, Long operatorId, Integer productSizeType, Integer productType) {
+        String operatorNum = String.format("%03d", operatorId.intValue() % ONE_THOUSAND);
         Long uavCount = oacUavDalService.queryUavCountByOperatorUniIdIncludeDel(operatorUniId);
         String uavNum = String.format("%07d", (uavCount.intValue() + 1) % ONE_MILLION);
         return operatorNum + UavProductSizeTypeEnum.getFromCode(productSizeType).getType().toString() + UavProductTypeEnum.getFromCode(productType).getType() + "#" + uavNum;
@@ -386,7 +385,7 @@ public class StaticInfoServiceImpl implements IStaticInfoService {
             if (queryOperatorInfo != null && StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryOperatorInfo.getStatus()))) {
                 UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByUavReg(registerUavInfoRequest.getUavReg());
                 if (queryUavInfo == null) {
-                    String cpn = generateCpn(registerUavInfoRequest.getOperatorUniId(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getProductType());
+                    String cpn = generateCpn(queryOperatorInfo.getOperatorUniId(), queryOperatorInfo.getId(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getProductType());
                     // 默认注册成功，外部接口确定后，增加请求外部接口流程
                     UavInfoDO uavInfo = oacUavDalService.buildUavInfoDO(registerUavInfoRequest.getUavSourceId(), registerUavInfoRequest.getUavReg(), registerUavInfoRequest.getUavName(), cpn, registerUavInfoRequest.getVin(), registerUavInfoRequest.getPvin(), registerUavInfoRequest.getSn(), registerUavInfoRequest.getFlightControlSn(), registerUavInfoRequest.getImei(), registerUavInfoRequest.getImsi(), registerUavInfoRequest.getManufacturerName(), registerUavInfoRequest.getProductName(), registerUavInfoRequest.getProductType(), registerUavInfoRequest.getProductSizeType(), registerUavInfoRequest.getMaxFlyTime(), registerUavInfoRequest.getOperationScenarioType(), registerUavInfoRequest.getOperatorUniId(), StaticInfoStatusEnum.REGISTERED.getCode());
                     int id = oacUavDalService.insertUavInfo(uavInfo);

@@ -152,7 +152,7 @@ public class OperatorInfoController {
         DeleteOperatorInfoResponse operatorInfoResponse = new DeleteOperatorInfoResponse();
         operatorInfoResponse.fail();
         try {
-            if (!StringUtils.isBlank(operatorId)) {
+            if (StringUtils.isNotBlank(operatorId)) {
                 operatorInfoResponse = staticInformationService.deleteOperatorInfo(Long.valueOf(operatorId));
             } else {
                 operatorInfoResponse.fail(ErrorCodeEnum.WRONG_OPERATOR_ID);

@@ -10,6 +10,7 @@ public enum DataTransferTypeEnum {
     SUBSCRIBE(1, (byte) 1, "订阅"),
     CANCEL_SUBSCRIBE(2, (byte) 2, "取消订阅"),
     GCS_TO_RCS_DATA_TRANSFER(3, (byte) 3, "GCS到RCS数据透传"),
+    GCS_TO_OAC_DATA_TRANSFER(4, (byte) 4, "GCS到OAC数据透传"),
     ;
 
     public final Integer dataFrameType;
