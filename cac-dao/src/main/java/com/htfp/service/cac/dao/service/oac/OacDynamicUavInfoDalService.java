@@ -35,12 +35,11 @@ public class OacDynamicUavInfoDalService {
     }
 
     public List<DynamicUavInfoDO> queryDynamicUavInfoByCpn(String cpn){
-        List<DynamicUavInfoDO> dynamicUavInfoDOList = oacDynamicUavInfoMapper.selectByCpn(cpn);
-        if(CollectionUtils.isNotEmpty(dynamicUavInfoDOList)){
-            return dynamicUavInfoDOList;
-        } else {
-            return null;
-        }
+        return oacDynamicUavInfoMapper.selectByCpn(cpn);
+    }
+
+    public List<DynamicUavInfoDO> queryByPlanStatusInterval(Integer littlePlanStatus, Integer bigPlanStatus){
+        return oacDynamicUavInfoMapper.selectByPlanStatusInterval(littlePlanStatus, bigPlanStatus);
     }
 
     public int insertDynamicUavInfo(DynamicUavInfoDO dynamicUavInfoDO){

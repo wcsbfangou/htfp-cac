@@ -72,8 +72,10 @@ public class DataTransferGcsToOacHandler implements IDataFrameHandler {
                             Long uavId = Long.valueOf(dataFrame.getUavId());
                             UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(uavId, MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
                             UavInfoDO queryUavInfo = uavDalService.queryUavInfo(uavId);
+                            // 测试用
+                            UavDataTransferRequest uavDataTransferRequest = decodeUavOriginData(dataFrame.getOriginDataBytes(), "lalalalla", queryUavInfo.getCpn());
                             if (queryUavOacMapping != null) {
-                                newData = dataDecodeAndTransferToOac(dataFrame.getData(), queryUavOacMapping.getReportCode(), queryUavInfo.getCpn());
+                                newData = dataDecodeAndTransferToOac(dataFrame.getOriginDataBytes(), queryUavOacMapping.getReportCode(), queryUavInfo.getCpn());
                             } else {
                                 newData = UdpDataFrameConstant.RESP + dataFrame.getData();
                             }
@@ -108,25 +110,115 @@ public class DataTransferGcsToOacHandler implements IDataFrameHandler {
         return DataFrameTypeEnum.DATA_TRANSFER_GCS_TO_OAC.getName();
     }
 
-    String dataDecodeAndTransferToOac(String data, String reportCode, String cpn) {
+    String dataDecodeAndTransferToOac(byte[] originDataBytes, String reportCode, String cpn) {
         String newData = UdpDataFrameConstant.DATA_TRANSFER_FAIL;
         try {
-            UavDataTransferRequest uavDataTransferRequest = decodeUavOriginData(data, reportCode, cpn);
+            UavDataTransferRequest uavDataTransferRequest = decodeUavOriginData(originDataBytes, reportCode, cpn);
             if (uavDataTransferRequest != null) {
                 UavDataTransferResponse uavDataTransferResponse = flyingService.uavDataTransfer(uavDataTransferRequest);
                 if (uavDataTransferResponse.getSuccess() && reportCode.equals(uavDataTransferResponse.getReportCode())) {
                     newData = UdpDataFrameConstant.DATA_TRANSFER_SUCCESS;
                 }
+            } else {
+                newData = UdpDataFrameConstant.DATA_DECODE_ERROR;
             }
         } catch (Exception e) {
-            log.error("解码和传输数据发生异常, data= {}", data, e);
+            log.error("解码和传输数据发生异常, originDataBytes= {}", originDataBytes, e);
             newData = UdpDataFrameConstant.DATA_TRANSFER_EXCEPTION;
         }
         return newData;
     }
 
-    UavDataTransferRequest decodeUavOriginData(String data, String reportCode, String cpn){
-        UavDataTransferRequest uavDataTransferRequest = new UavDataTransferRequest();
-        return uavDataTransferRequest;
+    UavDataTransferRequest decodeUavOriginData(byte[] originDataBytes, String reportCode, String cpn) {
+        if (originDataBytes[0] == UdpDataFrameConstant.AHEAD_1 && originDataBytes[1] == UdpDataFrameConstant.AHEAD_2) {
+            UavDataTransferRequest uavDataTransferRequest = new UavDataTransferRequest();
+            uavDataTransferRequest.setCpn(cpn);
+            uavDataTransferRequest.setReportCode(reportCode);
+            if (originDataBytes[2] == UdpDataFrameConstant.IDENTIFY_A1) {
+                int pitchAngle = byteToShortLittle(originDataBytes, 5, 6);
+                int rollAngle = byteToShortLittle(originDataBytes, 7, 8);
+                uavDataTransferRequest.setPitchAngle(pitchAngle);
+                uavDataTransferRequest.setRollAngle(rollAngle);
+                return uavDataTransferRequest;
+            } else if (originDataBytes[2] == UdpDataFrameConstant.IDENTIFY_A2) {
+                int lng = bytes2IntLittle(originDataBytes, 5, 6, 7, 8);
+                int lat = bytes2IntLittle(originDataBytes, 9, 10, 11, 12);
+                int alt = 10 * (byteToShortLittle(originDataBytes, 13, 14) - UdpDataFrameConstant.FIVE_THOUSAND);
+                int relativeHeight = 10 * (byteToShortLittle(originDataBytes, 17, 18) - UdpDataFrameConstant.FIVE_THOUSAND);
+                int groundSpeed = byteToShortLittle(originDataBytes, 19, 20);
+                uavDataTransferRequest.setLng(lng);
+                uavDataTransferRequest.setLat(lat);
+                uavDataTransferRequest.setAlt(alt);
+                uavDataTransferRequest.setRelativeHeight(relativeHeight);
+                uavDataTransferRequest.setGroundSpeed(groundSpeed);
+                return uavDataTransferRequest;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * 读取小端byte数组为short
+     *
+     * @param bytes
+     * @param little
+     * @param big
+     * @return
+     */
+    public static short byteToShortLittle(byte[] bytes, int little, int big) {
+        return (short) (((bytes[big] << 8) | bytes[little] & 0xff));
+    }
+
+    /**
+     * 读取大端byte数组为short
+     *
+     * @param bytes
+     * @param little
+     * @param big
+     * @return
+     */
+    public static short byteToShortBig(byte[] bytes, int little, int big) {
+        return (short) (((bytes[little] << 8) | bytes[big] & 0xff));
+    }
+
+    /**
+     * byte数组到int的转换(小端)
+     *
+     * @param bytes
+     * @param one
+     * @param two
+     * @param three
+     * @param four
+     * @return
+     */
+    public static int bytes2IntLittle(byte[] bytes, int one, int two, int three, int four) {
+        int int1 = bytes[one] & 0xff;
+        int int2 = (bytes[two] & 0xff) << 8;
+        int int3 = (bytes[three] & 0xff) << 16;
+        int int4 = (bytes[four] & 0xff) << 24;
+
+        return int1 | int2 | int3 | int4;
+    }
+
+    /**
+     * byte数组到int的转换(大端)
+     *
+     * @param bytes
+     * @param one
+     * @param two
+     * @param three
+     * @param four
+     * @return
+     */
+    public static int bytes2IntBig(byte[] bytes, int one, int two, int three, int four) {
+        int int1 = bytes[four] & 0xff;
+        int int2 = (bytes[three] & 0xff) << 8;
+        int int3 = (bytes[two] & 0xff) << 16;
+        int int4 = (bytes[one] & 0xff) << 24;
+
+        return int1 | int2 | int3 | int4;
     }
 }

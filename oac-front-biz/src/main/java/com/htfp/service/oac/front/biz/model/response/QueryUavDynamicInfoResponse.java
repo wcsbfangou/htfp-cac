@@ -3,6 +3,8 @@ package com.htfp.service.oac.front.biz.model.response;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
 import lombok.Data;
 
+import java.util.List;
+
 
 /**
  * @Author sunjipeng
@@ -13,5 +15,5 @@ import lombok.Data;
 @Data
 public class QueryUavDynamicInfoResponse extends BaseResponse {
 
-    private QueryUavDynamicInfoResultParam queryUavDynamicInfoResultParam;
+    private List<QueryUavDynamicInfoResultParam> queryUavDynamicInfoResultParamList;
 }

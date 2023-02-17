@@ -23,5 +23,5 @@ public class GcsUdpDataTransferDataFrame implements BaseDataFrame {
     private short sequenceId;
     private int length;
     private String data;
-
+    private byte[] originDataBytes;
 }

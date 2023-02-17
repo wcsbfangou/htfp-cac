@@ -1,5 +1,6 @@
 package com.htfp.service.oac.front.biz.model.request;
 
+import com.htfp.service.cac.common.enums.UavDynamicInfoQueryStatusEnum;
 import com.htfp.service.oac.common.enums.ErrorCodeEnum;
 import com.htfp.service.oac.front.biz.model.BaseValidate;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class QueryUavDynamicInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if (uavPlanStatus == null) {
+        if (UavDynamicInfoQueryStatusEnum.getFromCode(uavPlanStatus) == null) {
             return ErrorCodeEnum.LACK_OF_PLAN_STATUS;
         } else {
             return ErrorCodeEnum.SUCCESS;

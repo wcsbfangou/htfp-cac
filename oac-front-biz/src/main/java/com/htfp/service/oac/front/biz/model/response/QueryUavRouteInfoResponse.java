@@ -14,5 +14,5 @@ import java.util.List;
 @Data
 public class QueryUavRouteInfoResponse extends BaseResponse {
 
-    private QueryUavRouteInfoResultParam queryUavRouteInfoResultParam;
+    private List<QueryUavRouteInfoResultParam> queryUavRouteInfoResultParamList;
 }

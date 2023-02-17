@@ -54,12 +54,12 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }
-            // 飞行计划下发
+            // 查询无人机动态信息
             QueryUavDynamicInfoResponse queryUavDynamicInfoResponse = frontPageService.queryUavDynamicInfo(queryUavDynamicInfoRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryUavDynamicInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryUavDynamicInfoResponse.getCode(), queryUavDynamicInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryUavDynamicInfoResponse.getQueryUavDynamicInfoResultParam()));
+                httpResponse.setData(JsonUtils.object2Json(queryUavDynamicInfoResponse.getQueryUavDynamicInfoResultParamList()));
             }
         } catch (Exception e) {
             log.error("查询无人机动态失败, queryUavDynamicInfoRequest={}", queryUavDynamicInfoRequest, e);
@@ -90,7 +90,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryUavRouteInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryUavRouteInfoResponse.getCode(), queryUavRouteInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryUavRouteInfoResponse.getQueryUavRouteInfoResultParam()));
+                httpResponse.setData(JsonUtils.object2Json(queryUavRouteInfoResponse.getQueryUavRouteInfoResultParamList()));
             }
         } catch (Exception e) {
             log.error("查询无人机航线信息失败, queryUavRouteInfoRequest={}", queryUavRouteInfoRequest, e);
@@ -121,7 +121,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAirportInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryAirportInfoResponse.getCode(), queryAirportInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryAirportInfoResponse.getQueryAirportInfoResultParam()));
+                httpResponse.setData(JsonUtils.object2Json(queryAirportInfoResponse.getQueryAirportInfoResultParamList()));
             }
         } catch (Exception e) {
             log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAirportInfoRequest, e);

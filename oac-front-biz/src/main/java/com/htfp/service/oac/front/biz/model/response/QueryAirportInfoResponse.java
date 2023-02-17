@@ -13,5 +13,5 @@ import java.util.List;
 @Data
 public class QueryAirportInfoResponse extends BaseResponse {
 
-    private QueryAirportInfoResultParam queryAirportInfoResultParam;
+    private List<QueryAirportInfoResultParam> queryAirportInfoResultParamList;
 }

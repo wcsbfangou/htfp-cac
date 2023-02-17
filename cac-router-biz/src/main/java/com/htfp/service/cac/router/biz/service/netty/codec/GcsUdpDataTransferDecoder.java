@@ -93,6 +93,7 @@ public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramP
             in.readBytes(dataByteArray);
             gcsUdpDataTransferDataFrame.setLength(dataLength);
             gcsUdpDataTransferDataFrame.setData(new String(dataByteArray));
+            gcsUdpDataTransferDataFrame.setOriginDataBytes(dataByteArray);
 
             // 获得 type 对应的 DataFrameHandler 处理器
             DataFrameTypeEnum dataFrameTypeEnum = getDataFrameType(gcsUdpDataTransferDataFrame);
@@ -101,7 +102,7 @@ public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramP
             nettyBaseContext.setOriginSender(packet.sender());
             out.add(nettyBaseContext);
             // TODO: 2022/6/13 测试之后记得删除此log
-            log.info("[GcsUdpDataTransferDecoder][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsUdpDataTransferDataFrame.toString());
+            // log.info("[GcsUdpDataTransferDecoder][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsUdpDataTransferDataFrame.toString());
         } catch (Exception e){
             log.error("GcsUdpDataTransferDecoder 发生异常, packet={}",packet, e);
         }

@@ -7,6 +7,7 @@ import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyRespo
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 import com.htfp.service.oac.common.enums.ApplyStatusEnum;
 import com.htfp.service.oac.common.enums.FlightPlanStatusTypeEnum;
+import com.htfp.service.oac.common.enums.UavDynamicInfoQueryStatusEnum;
 import com.htfp.service.oac.common.utils.DateUtils;
 import com.htfp.service.oac.common.utils.JsonUtils;
 import com.htfp.service.cac.dao.model.oac.AirportInfoDO;
@@ -39,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -70,7 +72,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
     @Resource
     private OacDynamicRouteInfoDalService oacDynamicRouteInfoDalService;
 
-    @Resource(name="oacServiceImpl")
+    @Resource(name = "oacServiceImpl")
     private IOacService oacService;
 
     /**
@@ -81,6 +83,22 @@ public class FrontPageServiceImpl implements IFrontPageService {
      */
     @Override
     public QueryUavDynamicInfoResponse queryUavDynamicInfo(QueryUavDynamicInfoRequest queryUavDynamicInfoRequest) {
+        UavDynamicInfoQueryStatusEnum frontQueryPlanStatusEnum = UavDynamicInfoQueryStatusEnum.getFromCode(queryUavDynamicInfoRequest.getUavPlanStatus());
+        if (queryUavDynamicInfoRequest.getCpn() != null) {
+            List<DynamicUavInfoDO> dynamicUavInfoDOList = oacDynamicUavInfoDalService.queryDynamicUavInfoByCpn(queryUavDynamicInfoRequest.getCpn());
+            for (DynamicUavInfoDO dynamicUavInfo : dynamicUavInfoDOList) {
+            }
+        }
+        if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(frontQueryPlanStatusEnum)) {
+            List<DynamicUavInfoDO> dynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLIGHT_PLAN_IMPLEMENT.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
+
+        } else if (UavDynamicInfoQueryStatusEnum.ARRIVAL.equals(frontQueryPlanStatusEnum)) {
+            List<DynamicUavInfoDO> dynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLY_APPLY_SUBMITTED.getCode(), FlightPlanStatusTypeEnum.FLY_APPLY_APPROVED.getCode());
+
+        } else {
+            List<DynamicUavInfoDO> dynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.ENTER_IDENTIFICATION_AREA.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
+
+        }
         return null;
     }
 

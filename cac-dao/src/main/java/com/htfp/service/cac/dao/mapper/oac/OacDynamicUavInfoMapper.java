@@ -58,6 +58,15 @@ public interface OacDynamicUavInfoMapper {
     @Select("SELECT * FROM " + TABLE + " WHERE cpn = #{cpn} AND is_del = 0")
     List<DynamicUavInfoDO> selectByCpn(@Param(value = "cpn") String cpn);
 
+    /**
+     * 根据planStatus闭区间查询
+     * @param littlePlanStatus
+     * @param bigPlanStatus
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE plan_status <= #{bigPlanStatus} AND plan_status >= #{littlePlanStatus} AND is_del = 0")
+    List<DynamicUavInfoDO> selectByPlanStatusInterval(@Param(value = "littlePlanStatus") Integer littlePlanStatus, @Param(value = "bigPlanStatus") Integer bigPlanStatus);
+
 
     /**
      * 查询总数量
