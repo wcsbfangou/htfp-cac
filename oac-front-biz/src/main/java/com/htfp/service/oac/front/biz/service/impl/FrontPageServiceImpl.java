@@ -35,7 +35,10 @@ import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.param.CoordinateParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryAirportInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryUavRouteInfoResultParam;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -108,7 +111,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             } else {
                 if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(frontQueryPlanStatusEnum)) {
                     List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLIGHT_PLAN_IMPLEMENT.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
-                    if (CollectionUtils.isNotEmpty(queryDynamicUavInfoDOList) && queryUavDynamicInfoRequest.getInAlarm()!=null &&queryUavDynamicInfoRequest.getInAlarm()) {
+                    if (CollectionUtils.isNotEmpty(queryDynamicUavInfoDOList) && queryUavDynamicInfoRequest.getInAlarm() != null && queryUavDynamicInfoRequest.getInAlarm()) {
                         for (DynamicUavInfoDO dynamicUavInfo : queryDynamicUavInfoDOList) {
                             if (dynamicUavInfo.getInAlarm()) {
                                 dynamicUavInfoDOList.add(dynamicUavInfo);
@@ -156,7 +159,9 @@ public class FrontPageServiceImpl implements IFrontPageService {
         List<QueryUavDynamicInfoResultParam> queryUavDynamicInfoResultParamList = new ArrayList<>();
         for (DynamicUavInfoDO dynamicUavInfo : dynamicUavInfoDOList) {
             QueryUavDynamicInfoResultParam queryUavDynamicInfoResultParam = new QueryUavDynamicInfoResultParam();
-            queryUavDynamicInfoResultParam.setCpn(dynamicUavInfo.getCpn().substring(dynamicUavInfo.getCpn().length() - 6));
+            queryUavDynamicInfoResultParam.setShortCpn(dynamicUavInfo.getCpn().substring(dynamicUavInfo.getCpn().length() - 4));
+            queryUavDynamicInfoResultParam.setShortFlightPlanId(dynamicUavInfo.getReplyFlightPlanId().toString().substring(dynamicUavInfo.getReplyFlightPlanId().toString().length()-4));
+            queryUavDynamicInfoResultParam.setCpn(dynamicUavInfo.getCpn());
             queryUavDynamicInfoResultParam.setFlightPlanId(dynamicUavInfo.getReplyFlightPlanId().toString());
             queryUavDynamicInfoResultParam.setFlyId(dynamicUavInfo.getReplyFlyId().toString());
             queryUavDynamicInfoResultParam.setUavName(dynamicUavInfo.getUavName());
@@ -194,7 +199,45 @@ public class FrontPageServiceImpl implements IFrontPageService {
      */
     @Override
     public QueryUavRouteInfoResponse queryUavRouteInfo(QueryUavRouteInfoRequest queryUavRouteInfoRequest) {
-        return null;
+        QueryUavRouteInfoResponse queryUavRouteInfoResponse = new QueryUavRouteInfoResponse();
+        queryUavRouteInfoResponse.fail();
+        try {
+            log.info("[oac]查询无人机航线信息start，queryUavRouteInfoRequest={}", queryUavRouteInfoRequest);
+            List<QueryUavRouteInfoResultParam> queryUavRouteInfoResultParamList = new ArrayList<>();
+            DynamicRouteInfoDO dynamicRouteInfo = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(queryUavRouteInfoRequest.getFlightPlanId()));
+            if (dynamicRouteInfo != null) {
+                queryUavRouteInfoResultParamList.add(buildQueryUavRouteInfoResultParam(dynamicRouteInfo));
+            }
+            queryUavRouteInfoResponse.setQueryUavRouteInfoResultParamList(queryUavRouteInfoResultParamList);
+            queryUavRouteInfoResponse.success();
+            log.info("[oac]查询无人机航线信息end，queryUavRouteInfoRequest={},queryUavRouteInfoResponse={}", queryUavRouteInfoRequest, JsonUtils.object2Json(queryUavRouteInfoResponse));
+        } catch (Exception e) {
+            log.error("[oac]查询无人机航线信息异常，queryUavRouteInfoRequest={}", queryUavRouteInfoRequest, e);
+            queryUavRouteInfoResponse.fail(e.getMessage());
+        }
+        return queryUavRouteInfoResponse;
+    }
+
+    QueryUavRouteInfoResultParam buildQueryUavRouteInfoResultParam(DynamicRouteInfoDO dynamicRouteInfo) {
+        CoordinateParam currentLegStartPoint = new CoordinateParam();
+        CoordinateParam currentLegEndPoint = new CoordinateParam();
+        currentLegStartPoint.setLng(dynamicRouteInfo.getCurrentLegStartLng());
+        currentLegStartPoint.setLat(dynamicRouteInfo.getCurrentLegStartLat());
+        currentLegStartPoint.setAlt(dynamicRouteInfo.getCurrentLegStartAlt());
+        currentLegEndPoint.setLng(dynamicRouteInfo.getCurrentLegEndLng());
+        currentLegEndPoint.setLat(dynamicRouteInfo.getCurrentLegEndLat());
+        currentLegEndPoint.setAlt(dynamicRouteInfo.getCurrentLegEndAlt());
+        QueryUavRouteInfoResultParam queryUavRouteInfoResultParam = new QueryUavRouteInfoResultParam();
+        queryUavRouteInfoResultParam.setFlightPlanId(dynamicRouteInfo.getReplyFlightPlanId());
+        queryUavRouteInfoResultParam.setFlyId(dynamicRouteInfo.getReplyFlyId());
+        queryUavRouteInfoResultParam.setUavName(dynamicRouteInfo.getUavName());
+        queryUavRouteInfoResultParam.setCpn(dynamicRouteInfo.getCpn());
+        queryUavRouteInfoResultParam.setRoutePointCoordinates(JsonUtils.json2List(dynamicRouteInfo.getRoutePointCoordinates(), CoordinateParam.class));
+        queryUavRouteInfoResultParam.setCurrentLegStartPoint(currentLegStartPoint);
+        queryUavRouteInfoResultParam.setCurrentLegEndPoint(currentLegEndPoint);
+        queryUavRouteInfoResultParam.setTakeoffSite(dynamicRouteInfo.getTakeoffSite());
+        queryUavRouteInfoResultParam.setLandingSite(dynamicRouteInfo.getLandingSite());
+        return queryUavRouteInfoResultParam;
     }
 
     /**
@@ -205,7 +248,36 @@ public class FrontPageServiceImpl implements IFrontPageService {
      */
     @Override
     public QueryAirportInfoResponse queryAirportInfoData(QueryAirportInfoRequest queryAirportInfoRequest) {
-        return null;
+        QueryAirportInfoResponse queryAirportInfoResponse = new QueryAirportInfoResponse();
+        queryAirportInfoResponse.fail();
+        try {
+            log.info("[oac]查询机场信息start，queryAirportInfoRequest={}", queryAirportInfoRequest);
+            List<QueryAirportInfoResultParam> queryQueryAirportInfoResultParamList = new ArrayList<>();
+            AirportInfoDO airportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(queryAirportInfoRequest.getAirportId());
+            if (airportInfo != null) {
+                queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+            }
+            queryAirportInfoResponse.setQueryAirportInfoResultParamList(queryQueryAirportInfoResultParamList);
+            queryAirportInfoResponse.success();
+            log.info("[oac]查询机场信息end，queryAirportInfoRequest={},queryAirportInfoResponse={}", queryAirportInfoRequest, JsonUtils.object2Json(queryAirportInfoResponse));
+        } catch (Exception e) {
+            log.error("[oac]查询机场信息异常，queryAirportInfoRequest={}", queryAirportInfoRequest, e);
+            queryAirportInfoResponse.fail(e.getMessage());
+        }
+        return queryAirportInfoResponse;
+    }
+
+    QueryAirportInfoResultParam buildQueryAirportInfoResultParam(AirportInfoDO airportInfo) {
+        QueryAirportInfoResultParam queryAirportInfoResultParam = new QueryAirportInfoResultParam();
+        queryAirportInfoResultParam.setAirportId(airportInfo.getAirportId());
+        queryAirportInfoResultParam.setCity(airportInfo.getCity());
+        queryAirportInfoResultParam.setLng(airportInfo.getLng());
+        queryAirportInfoResultParam.setLat(airportInfo.getLat());
+        queryAirportInfoResultParam.setAlt(airportInfo.getAlt());
+        queryAirportInfoResultParam.setIdentificationAreaRadius(airportInfo.getIdentificationAreaRadius());
+        queryAirportInfoResultParam.setAlarmAreaRadius(airportInfo.getAlarmAreaRadius());
+        queryAirportInfoResultParam.setLandingSites(JsonUtils.json2List(airportInfo.getLandingSites(), String.class));
+        return queryAirportInfoResultParam;
     }
 
     /**

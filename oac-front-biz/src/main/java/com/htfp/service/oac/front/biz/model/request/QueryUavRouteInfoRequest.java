@@ -12,15 +12,13 @@ import lombok.Data;
 @Data
 public class QueryUavRouteInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
-    private String cpn;
     private String flightPlanId;
-    private String flyId;
 
 
     @Override
     public ErrorCodeEnum validate() {
-        if (cpn == null) {
-            return ErrorCodeEnum.LACK_OF_UAV_CPN;
+        if (flightPlanId == null) {
+            return ErrorCodeEnum.LACK_OF_REPLY_FLIGHT_PLAN_ID;
         } else {
             return ErrorCodeEnum.SUCCESS;
         }

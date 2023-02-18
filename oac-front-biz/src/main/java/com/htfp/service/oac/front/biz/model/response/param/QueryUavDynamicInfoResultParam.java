@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class QueryUavDynamicInfoResultParam {
 
+    private String shortCpn;
+    private String shortFlightPlanId;
     private String cpn;
     private String flightPlanId;
     private String flyId;
