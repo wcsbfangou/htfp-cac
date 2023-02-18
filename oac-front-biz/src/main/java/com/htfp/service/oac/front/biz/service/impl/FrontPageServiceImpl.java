@@ -25,16 +25,8 @@ import com.htfp.service.cac.dao.service.oac.OacDynamicRouteInfoDalService;
 import com.htfp.service.cac.dao.service.oac.OacDynamicUavInfoDalService;
 import com.htfp.service.cac.dao.service.oac.OacOperatorDalService;
 import com.htfp.service.cac.dao.service.oac.OacUavDalService;
-import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
-import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.request.*;
+import com.htfp.service.oac.front.biz.model.response.*;
 import com.htfp.service.oac.front.biz.model.response.param.CoordinateParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAirportInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
@@ -253,9 +245,11 @@ public class FrontPageServiceImpl implements IFrontPageService {
         try {
             log.info("[oac]查询机场信息start，queryAirportInfoRequest={}", queryAirportInfoRequest);
             List<QueryAirportInfoResultParam> queryQueryAirportInfoResultParamList = new ArrayList<>();
-            AirportInfoDO airportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(queryAirportInfoRequest.getAirportId());
-            if (airportInfo != null) {
-                queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+            List<AirportInfoDO> airportInfoList = oacAirportInfoDalService.queryAllAirportInfo();
+            if (CollectionUtils.isNotEmpty(airportInfoList)) {
+                for (AirportInfoDO airportInfo : airportInfoList) {
+                    queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+                }
             }
             queryAirportInfoResponse.setQueryAirportInfoResultParamList(queryQueryAirportInfoResultParamList);
             queryAirportInfoResponse.success();
@@ -278,6 +272,17 @@ public class FrontPageServiceImpl implements IFrontPageService {
         queryAirportInfoResultParam.setAlarmAreaRadius(airportInfo.getAlarmAreaRadius());
         queryAirportInfoResultParam.setLandingSites(JsonUtils.json2List(airportInfo.getLandingSites(), String.class));
         return queryAirportInfoResultParam;
+    }
+
+    /**
+     * 查询告警信息
+     *
+     * @param queryAlarmMessageInfoRequest
+     * @return
+     */
+    @Override
+    public QueryAlarmMessageInfoResponse queryAlarmMessageInfoData(QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest) {
+        return null;
     }
 
     /**

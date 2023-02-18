@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @Author sunjipeng
  * @Date 2022/12/23
@@ -37,6 +39,14 @@ public interface OacAirportInfoMapper {
      */
     @Select("SELECT * FROM " + TABLE + " WHERE airport_id = #{airportId} AND is_del = 0")
     AirportInfoDO selectByAirportId(@Param(value = "airportId") String airportId);
+
+    /**
+     * 查询所有机场信息
+     *
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE is_del = 0")
+    List<AirportInfoDO> selectAllAirports();
 
     /**
      * 查询总数量

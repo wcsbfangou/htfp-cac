@@ -1,15 +1,7 @@
 package com.htfp.service.oac.front.biz.service;
 
-import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
-import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.request.*;
+import com.htfp.service.oac.front.biz.model.response.*;
 
 /**
  * @Author sunjipeng
@@ -37,6 +29,13 @@ public interface IFrontPageService {
      * @return
      */
     QueryAirportInfoResponse queryAirportInfoData(QueryAirportInfoRequest queryAirportInfoRequest);
+
+    /**
+     * 查询告警信息
+     * @param queryAlarmMessageInfoRequest
+     * @return
+     */
+    QueryAlarmMessageInfoResponse queryAlarmMessageInfoData(QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest);
 
     /**
      * 飞行计划下发

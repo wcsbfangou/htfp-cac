@@ -16,10 +16,6 @@ public class QueryAirportInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if (airportId == null) {
-            return ErrorCodeEnum.LACK_OF_UAV_CPN;
-        } else {
-            return ErrorCodeEnum.SUCCESS;
-        }
+        return ErrorCodeEnum.SUCCESS;
     }
 }

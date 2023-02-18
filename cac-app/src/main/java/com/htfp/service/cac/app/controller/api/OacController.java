@@ -3,16 +3,8 @@ package com.htfp.service.cac.app.controller.api;
 import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
-import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
-import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
-import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
-import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.request.*;
+import com.htfp.service.oac.front.biz.model.response.*;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -125,6 +117,37 @@ public class OacController {
             }
         } catch (Exception e) {
             log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAirportInfoRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 查询告警信息
+     *
+     * @param queryAlarmMessageInfoRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/QueryAlarmDetail", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse QueryAlarmMessageInfo(@RequestBody QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(queryAlarmMessageInfoRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 查询无人机动态信息
+            QueryAlarmMessageInfoResponse queryAlarmMessageInfoResponse = frontPageService.queryAlarmMessageInfoData(queryAlarmMessageInfoRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAlarmMessageInfoResponse.getCode())) {
+                return BaseHttpResponse.fail(queryAlarmMessageInfoResponse.getCode(), queryAlarmMessageInfoResponse.getMessage());
+            }else {
+                httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoParam()));
+            }
+        } catch (Exception e) {
+            log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAlarmMessageInfoRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

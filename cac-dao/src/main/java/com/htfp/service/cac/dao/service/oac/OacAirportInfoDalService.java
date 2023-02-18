@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -26,6 +27,10 @@ public class OacAirportInfoDalService {
 
     public AirportInfoDO queryAirportInfoByAirportId(String airportId) {
         return oacAirportInfoMapper.selectByAirportId(airportId);
+    }
+
+    public List<AirportInfoDO> queryAllAirportInfo() {
+        return oacAirportInfoMapper.selectAllAirports();
     }
 
     public int insertAirportInfo(AirportInfoDO airportInfoDO) {
