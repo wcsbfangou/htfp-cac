@@ -34,11 +34,11 @@ public class OacAirportInfoDalService {
     }
 
     public int insertAirportInfo(AirportInfoDO airportInfoDO) {
-        return oacAirportInfoMapper.insertAirportInfoLog(airportInfoDO);
+        return oacAirportInfoMapper.insertAirportInfo(airportInfoDO);
     }
 
     public int updateAirportInfo(AirportInfoDO airportInfoDO) {
-        return oacAirportInfoMapper.updateByApplyFlightPlanLog(airportInfoDO);
+        return oacAirportInfoMapper.updateByAirportInfo(airportInfoDO);
     }
 
     public int updateAirportInfoStatus(AirportInfoDO airportInfo, Integer status) {

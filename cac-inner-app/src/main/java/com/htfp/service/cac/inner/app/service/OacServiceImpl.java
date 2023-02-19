@@ -1,8 +1,12 @@
 package com.htfp.service.cac.inner.app.service;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
+import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
+import com.htfp.service.cac.router.biz.model.inner.response.AlarmSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 import com.htfp.service.cac.router.biz.service.http.IRouteToGcsService;
@@ -69,6 +73,54 @@ public class OacServiceImpl implements IOacService {
             flyReplyResponse.fail("放飞计划回复异常");
         }
         return flyReplyResponse;
+    }
+
+    /**
+     * 管制信息发送
+     *
+     * @param atcSendRequest
+     * @return
+     */
+    @Override
+    public ATCSendResponse atcSend(ATCSendRequest atcSendRequest) {
+        ATCSendResponse atcSendResponse = new ATCSendResponse();
+        atcSendResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = atcSendRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                atcSendResponse = routeToGcsService.atcSend(atcSendRequest);
+            } else {
+                atcSendResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("管制信息下发异常, atcSendRequest={}", atcSendRequest, e);
+            atcSendResponse.fail("管制信息下发异常");
+        }
+        return atcSendResponse;
+    }
+
+    /**
+     * 告警信息发送
+     *
+     * @param alarmSendRequest
+     * @return
+     */
+    @Override
+    public AlarmSendResponse alarmSend(AlarmSendRequest alarmSendRequest) {
+        AlarmSendResponse alarmSendResponse = new AlarmSendResponse();
+        alarmSendResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = alarmSendRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                alarmSendResponse = routeToGcsService.alarmSend(alarmSendRequest);
+            } else {
+                alarmSendResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("告警信息下发异常, alarmSendRequest={}", alarmSendRequest, e);
+            alarmSendResponse.fail("告警信息下发异常");
+        }
+        return alarmSendResponse;
     }
 
 }

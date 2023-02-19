@@ -1,12 +1,20 @@
 package com.htfp.service.cac.router.biz.service.http.impl;
 
 import com.google.common.collect.Maps;
+import com.htfp.service.cac.common.enums.DeliverTypeEnum;
+import com.htfp.service.cac.common.utils.DateUtils;
+import com.htfp.service.cac.dao.model.log.ATCIssuedLogDO;
+import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
+import com.htfp.service.cac.dao.service.ATCIssuedLogDalService;
+import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
+import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
+import com.htfp.service.cac.router.biz.model.inner.response.AlarmSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
-import com.htfp.service.cac.common.constant.HttpUriConstant;
 import com.htfp.service.cac.common.enums.ApplyStatusEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
@@ -29,6 +37,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -51,6 +60,9 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
 
     @Resource
     private ApplyFlyLogDalService applyFlyLogDalService;
+
+    @Resource
+    private ATCIssuedLogDalService atcIssuedLogDalService;
 
     /**
      * 飞行计划回复
@@ -272,6 +284,72 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         flyReplyResponse.setCode(gcsFlyReplyResponse.getCode());
         flyReplyResponse.setMessage(gcsFlyReplyResponse.getMessage());
         return flyReplyResponse;
+    }
+
+    /**
+     * 管制信息下发
+     *
+     * @param atcSendRequest
+     * @return
+     */
+    @Override
+    public ATCSendResponse atcSend(ATCSendRequest atcSendRequest) {
+        ATCSendResponse atcSendResponse = new ATCSendResponse();
+        atcSendResponse.fail();
+        try {
+            String currentTime = DateUtils.getDateFormatString(new Date(), DateUtils.DATETIME_MSEC_PATTERN);
+            Long applyFlightPlanId = Long.valueOf(atcSendRequest.getApplyFlightPlanId());
+            Long applyFlyId = Long.valueOf(atcSendRequest.getApplyFlyId());
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(atcSendRequest.getCpn());
+            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(atcSendRequest.getApplyFlyId()));
+            if (queryApplyFlyLog != null &&
+                    queryApplyFlyLog.getReplyFlyId() != null &&
+                    queryApplyFlyLog.getReplyFlyId().equals(atcSendRequest.getReplyFlyId())&&
+                    ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus()))) {
+                if (queryUavInfo != null &&
+                        queryApplyFlyLog.getUavId() != null &&
+                        queryUavInfo.getId().equals(queryApplyFlyLog.getUavId())) {
+                    UavNavigationMappingDO queryUavNavigationMapping = uavDalService.queryUavNavigationMapping(queryUavInfo.getId());
+                    ATCIssuedLogDO atcIssuedLog = atcIssuedLogDalService.buildATCIssuedLog(applyFlightPlanId, applyFlyId, queryApplyFlyLog.getReplyFlightPlanId(), queryApplyFlyLog.getReplyFlyId(), queryUavNavigationMapping.getNavigationId(), queryUavInfo.getId(), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), atcSendRequest.getAtcType(), null,
+                            currentTime, null, "oacSystem", DeliverTypeEnum.DELIVERING.getCode());
+                    int id = atcIssuedLogDalService.insertATCIssuedLog(atcIssuedLog);
+                    if (id > 0) {
+                        // 查询无人机信息
+                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());
+                        if (queryGcsIpMapping != null &&
+                                queryGcsIpMapping.getGcsIp() != null &&
+                                MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
+                                LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
+                            // TODO: 2023/2/17 请求地面站
+                            atcSendResponse.success();
+                       } else {
+                            atcSendResponse.fail("无人机系统未连接，管制信息下发失败");
+                        }
+                    } else {
+                        atcSendResponse.fail("写入放飞申请状态和上报编码异常，管制信息下发失败");
+                    }
+                } else {
+                    atcSendResponse.fail("无人机信息异常，管制信息下发失败");
+                }
+            } else {
+                atcSendResponse.fail("放飞申请信息异常，管制信息下发失败");
+            }
+        } catch (Exception e) {
+            log.error("管制信息下发异常, atcSendRequest={}", atcSendRequest, e);
+            atcSendResponse.fail("管制信息下发异常");
+        }
+        return atcSendResponse;
+    }
+
+    /**
+     * 告警信息下发
+     *
+     * @param alarmSendRequest
+     * @return
+     */
+    @Override
+    public AlarmSendResponse alarmSend(AlarmSendRequest alarmSendRequest) {
+        return null;
     }
 
 }

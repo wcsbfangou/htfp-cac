@@ -1,4 +1,4 @@
-package com.htfp.service.cac.common.enums;
+package com.htfp.service.oac.common.enums;
 
 /**
  * @Author sunjipeng
@@ -18,6 +18,7 @@ public enum AtcTypeEnum {
     NOT_ALLOW_TAKE_OFF(9, "禁止起飞"),
     ALLOW_TAKE_OFF(10,"允许起飞"),
     DECELERATE(11,"减速"),
+    ALLOW_LANDING(12,"允许降落"),
     ;
 
     public final Integer code;

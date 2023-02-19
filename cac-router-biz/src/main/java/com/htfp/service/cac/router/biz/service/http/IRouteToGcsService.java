@@ -1,8 +1,12 @@
 package com.htfp.service.cac.router.biz.service.http;
 
 
+import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
+import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
+import com.htfp.service.cac.router.biz.model.inner.response.AlarmSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 
@@ -26,4 +30,18 @@ public interface IRouteToGcsService {
      * @return
      */
     FlyReplyResponse flyReply(FlyReplyRequest flyReplyRequest);
+
+    /**
+     * 飞行计划下发
+     * @param atcSendRequest
+     * @return
+     */
+    ATCSendResponse atcSend(ATCSendRequest atcSendRequest);
+
+    /**
+     * 告警信息下发
+     * @param alarmSendRequest
+     * @return
+     */
+    AlarmSendResponse alarmSend(AlarmSendRequest alarmSendRequest);
 }

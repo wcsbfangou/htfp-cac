@@ -112,6 +112,9 @@ public enum ErrorCodeEnum {
     LACK_OF_PLAN_STATUS(3513, "飞行计划状态缺失"),
     LACK_OF_AIRPORT_ID(3514, "机场ID缺失"),
     LACK_OF_ALARM_ID(3515, "告警ID缺失"),
+    LACK_OF_ATC_TYPE(3516, "管制类型缺失"),
+    LACK_OF_ALARM_TYPE(3517, "告警类型缺失"),
+    LACK_OF_ALARM_CONTENT(3518, "告警内容缺失"),
 
     SYSTEM_UNAVAILABLE(4001, "系统暂时不可用"),
     SYSTEM_ERROR(4002, "系统错误"),

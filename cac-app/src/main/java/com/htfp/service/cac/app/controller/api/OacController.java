@@ -214,4 +214,67 @@ public class OacController {
         }
         return httpResponse;
     }
+
+    /**
+     * 管制信息下发
+     *
+     * @param atcIssuedRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/SendATCMessage", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse atcIssued(@RequestBody ATCIssuedRequest atcIssuedRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(atcIssuedRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 管制信息下发
+            ATCIssuedResponse atcIssuedResponse = frontPageService.atcIssued(atcIssuedRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(atcIssuedResponse.getCode())) {
+                return BaseHttpResponse.fail(atcIssuedResponse.getCode(), atcIssuedResponse.getMessage());
+            }else {
+                httpResponse.setData(atcIssuedResponse.getCpn());
+            }
+        } catch (Exception e) {
+            log.error("管制信息下发失败, atcIssuedRequest={}", atcIssuedRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 告警信息下发
+     *
+     * @param alarmIssuedRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/SendAlarmSuggestion", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse alarmIssued(@RequestBody AlarmIssuedRequest alarmIssuedRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(alarmIssuedRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 管制信息下发
+            AlarmIssuedResponse alarmIssuedResponse = frontPageService.alarmIssued(alarmIssuedRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(alarmIssuedResponse.getCode())) {
+                return BaseHttpResponse.fail(alarmIssuedResponse.getCode(), alarmIssuedResponse.getMessage());
+            }else {
+                httpResponse.setData(alarmIssuedResponse.getCpn());
+            }
+        } catch (Exception e) {
+            log.error("告警信息下发失败, alarmIssuedRequest={}", alarmIssuedRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
 }

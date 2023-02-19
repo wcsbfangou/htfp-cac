@@ -662,6 +662,7 @@ public class GcsServiceImpl implements IGcsService {
                 // TODO: 2022/12/22 校验oacFlyResponse
                 flyQueryResponse = buildOacFlyQueryResponse(oacFlyQueryResponse);
                 // 如果成功更新flyLog表的状态
+                // TODO: 2023/2/19 status不通用
                 if (flyQueryResponse.getSuccess() && !queryApplyFlyLog.getStatus().equals(flyQueryResponse.getFlyQueryResultParam().getStatus())) {
                     applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyQueryResponse.getFlyQueryResultParam().getStatus());
                     // 如果放飞申请通过,更新reportCode

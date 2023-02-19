@@ -67,7 +67,7 @@ public interface OacAirportInfoMapper {
             + "VALUES (#{airportInfo.airportId}, #{airportInfo.airportName}, #{airportInfo.airportOperatorSubject}, #{airportInfo.phoneNumber}, #{airportInfo.emailAddress}, #{airportInfo.city}, #{airportInfo.address}, #{airportInfo.lng}, #{airportInfo.lat}, #{airportInfo.alt}, #{airportInfo.identificationAreaRadius}, #{airportInfo.alarmAreaRadius}, #{airportInfo.landingSites}, #{airportInfo.status}, #{airportInfo.gmtCreate}, #{airportInfo.gmtModify})"
             + " ON DUPLICATE KEY UPDATE airport_id=#{airportInfo.airportId}, airport_name=#{airportInfo.airportName}, airport_operator_subject=#{airportInfo.airportOperatorSubject}, phone_number=#{airportInfo.phoneNumber}, email_address=#{airportInfo.emailAddress}, city=#{airportInfo.city}, address=#{airportInfo.address}, lng=#{airportInfo.lng}, lat=#{airportInfo.lat}, alt=#{airportInfo.alt}, identification_area_radius=#{airportInfo.identificationAreaRadius}, alarm_area_radius=#{airportInfo.alarmAreaRadius}, landing_sites=#{airportInfo.landingSites}, status=#{airportInfo.status}, gmt_modify=#{airportInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "airportInfo.id")
-    int insertAirportInfoLog(@Param(value = "airportInfo") AirportInfoDO airportInfo);
+    int insertAirportInfo(@Param(value = "airportInfo") AirportInfoDO airportInfo);
 
     /**
      * 根据airportId逻辑删除一条地面站记录
@@ -113,6 +113,6 @@ public interface OacAirportInfoMapper {
             + "<if test=\"airportInfo.gmtModify != null\"> gmt_modify = #{airportInfo.gmtModify} </if>"
             + "</set>"
             + "WHERE id = #{airportInfo.id} </script>")
-    int updateByApplyFlightPlanLog(@Param(value = "airportInfo") AirportInfoDO airportInfo);
+    int updateByAirportInfo(@Param(value = "airportInfo") AirportInfoDO airportInfo);
 
 }
