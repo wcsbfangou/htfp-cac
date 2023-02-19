@@ -267,7 +267,21 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
         if (uavDataTransferRequest.getLng() != null && uavDataTransferRequest.getLat() != null) {
             dynamicUavInfo.setLng(uavDataTransferRequest.getLng());
             dynamicUavInfo.setLat(uavDataTransferRequest.getLat());
-            dynamicUavInfo.setDistanceToLandingPoint(GpsDistanceUtils.getDistance(uavDataTransferRequest.getLng(), uavDataTransferRequest.getLat(), dynamicUavInfo.getLandingLng(), dynamicUavInfo.getLandingLat()));
+            Integer distanceToLandingPoint = GpsDistanceUtils.getDistance(uavDataTransferRequest.getLng(), uavDataTransferRequest.getLat(), dynamicUavInfo.getLandingLng(), dynamicUavInfo.getLandingLat());
+            dynamicUavInfo.setDistanceToLandingPoint(distanceToLandingPoint);
+            if(distanceToLandingPoint <= dynamicUavInfo.getLandingAirportIdentificationRadius()){
+                dynamicUavInfo.setPlanStatus(FlightPlanStatusTypeEnum.ENTER_IDENTIFICATION_AREA.getCode());
+            } else if(distanceToLandingPoint <= dynamicUavInfo.getLandingAirportAlarmRadius()){
+                if(FlightPlanStatusTypeEnum.LANDING_APPLY_APPROVED.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicUavInfo.getPlanStatus()))){
+                    dynamicUavInfo.setPlanStatus(FlightPlanStatusTypeEnum.PREPARE_LANDING.getCode());
+                } else {
+                    // TODO: 2023/2/20 告警
+                    String alarmId = "null";
+                    List<String> alarmIdList = JsonUtils.json2List(dynamicUavInfo.getAlarmIds(), String.class);
+                    alarmIdList.add(alarmId);
+                    dynamicUavInfo.setAlarmIds(JsonUtils.object2Json(alarmIdList));
+                }
+            }
         }
         if (uavDataTransferRequest.getAlt() != null) {
             dynamicUavInfo.setAlt(uavDataTransferRequest.getAlt());

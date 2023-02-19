@@ -90,7 +90,7 @@ public interface OacATCIssuedLogMapper {
 
 
     /**
-     * 根据id更新applyFlightPlanLog
+     * 根据id更新atcIssuedLog
      *
      * @param atcIssuedLog
      * @return
