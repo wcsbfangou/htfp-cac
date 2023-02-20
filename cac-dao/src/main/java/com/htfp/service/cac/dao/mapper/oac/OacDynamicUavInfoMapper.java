@@ -67,6 +67,14 @@ public interface OacDynamicUavInfoMapper {
     @Select("SELECT * FROM " + TABLE + " WHERE plan_status <= #{bigPlanStatus} AND plan_status >= #{littlePlanStatus} AND is_del = 0")
     List<DynamicUavInfoDO> selectByPlanStatusInterval(@Param(value = "littlePlanStatus") Integer littlePlanStatus, @Param(value = "bigPlanStatus") Integer bigPlanStatus);
 
+    /**
+     * 查询所有动态信息
+     *
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE is_del = 0")
+    List<DynamicUavInfoDO> selectAllDynamicUavInfo();
+
 
     /**
      * 查询总数量

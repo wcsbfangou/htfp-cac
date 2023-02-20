@@ -19,11 +19,11 @@ public class ATCIssuedLogDO implements Serializable {
     private Long replyFlyId;
     private String cpn;
     private Integer atcType;
-    private String specificPosition;
-    private String commandEffectTime;
-    private Integer commandLimitPeriod;
-    private String commandOperator;
-    private Integer commandDelivered;
+    private String atcSpecificPosition;
+    private String atcEffectTime;
+    private Integer atcLimitPeriod;
+    private String atcOperator;
+    private Integer atcDelivered;
     private Integer isDel;
     private Date gmtCreate;
     private Date gmtModify;

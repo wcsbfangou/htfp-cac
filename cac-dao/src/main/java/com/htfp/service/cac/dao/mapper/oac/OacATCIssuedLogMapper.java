@@ -69,13 +69,12 @@ public interface OacATCIssuedLogMapper {
 
     /**
      * 插入atcIssuedLog数据
-     *
      * @param atcIssuedLog
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (reply_flight_plan_id, reply_fly_id, cpn, atc_type, specific_position, command_effect_time, command_limit_period, command_operator, command_delivered, gmt_create, gmt_modify) "
-            + "VALUES (#{atcIssuedLog.replyFlightPlanId}, #{atcIssuedLog.replyFlyId}, #{atcIssuedLog.cpn}, #{atcIssuedLog.atcType}, #{atcIssuedLog.specificPosition}, #{atcIssuedLog.commandEffectTime}, #{atcIssuedLog.commandLimitPeriod}, #{atcIssuedLog.commandOperator}, #{atcIssuedLog.commandDelivered}, #{atcIssuedLog.gmtCreate}, #{atcIssuedLog.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE reply_flight_plan_id=#{atcIssuedLog.replyFlightPlanId}, reply_fly_id=#{atcIssuedLog.replyFlyId}, cpn=#{atcIssuedLog.cpn}, atc_type=#{atcIssuedLog.atcType}, specific_position=#{atcIssuedLog.specificPosition}, command_effect_time=#{atcIssuedLog.commandEffectTime}, command_limit_period=#{atcIssuedLog.commandLimitPeriod}, command_operator=#{atcIssuedLog.commandOperator},  command_delivered=#{atcIssuedLog.commandDelivered}, gmt_modify=#{atcIssuedLog.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (reply_flight_plan_id, reply_fly_id, cpn, atc_type, atc_specific_position, atc_effect_time, atc_limit_period, atc_operator, atc_delivered, gmt_create, gmt_modify) "
+            + "VALUES (#{atcIssuedLog.replyFlightPlanId}, #{atcIssuedLog.replyFlyId}, #{atcIssuedLog.cpn}, #{atcIssuedLog.atcType}, #{atcIssuedLog.atc_specificPosition}, #{atcIssuedLog.atcEffectTime}, #{atcIssuedLog.atcLimitPeriod}, #{atcIssuedLog.atcOperator}, #{atcIssuedLog.atcDelivered}, #{atcIssuedLog.gmtCreate}, #{atcIssuedLog.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE reply_flight_plan_id=#{atcIssuedLog.replyFlightPlanId}, reply_fly_id=#{atcIssuedLog.replyFlyId}, cpn=#{atcIssuedLog.cpn}, atc_type=#{atcIssuedLog.atcType}, atc_specific_position=#{atcIssuedLog.atcSpecificPosition}, atc_effect_time=#{atcIssuedLog.atcEffectTime}, atc_limit_period=#{atcIssuedLog.atcLimitPeriod}, atc_operator=#{atcIssuedLog.atcOperator},  atc_delivered=#{atcIssuedLog.atcDelivered}, gmt_modify=#{atcIssuedLog.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "atcIssuedLog.id")
     int insertAtcIssuedLog(@Param(value = "atcIssuedLog") ATCIssuedLogDO atcIssuedLog);
 
@@ -100,11 +99,11 @@ public interface OacATCIssuedLogMapper {
             + "<if test=\"atcIssuedLog.replyFlyId != null\"> reply_fly_id = #{atcIssuedLog.replyFlyId}, </if>"
             + "<if test=\"atcIssuedLog.cpn != null\"> cpn = #{atcIssuedLog.cpn}, </if>"
             + "<if test=\"atcIssuedLog.atcType != null\"> atc_type = #{atcIssuedLog.atcType}, </if>"
-            + "<if test=\"atcIssuedLog.specificPosition != null\"> specific_position = #{atcIssuedLog.specificPosition}, </if>"
-            + "<if test=\"atcIssuedLog.commandEffectTime != null\"> command_effect_time = #{atcIssuedLog.commandEffectTime}, </if>"
-            + "<if test=\"atcIssuedLog.commandLimitPeriod != null\"> command_limit_period = #{atcIssuedLog.commandLimitPeriod}, </if>"
-            + "<if test=\"atcIssuedLog.commandOperator != null\"> command_operator = #{atcIssuedLog.commandOperator}, </if>"
-            + "<if test=\"atcIssuedLog.commandDelivered != null\"> command_delivered = #{atcIssuedLog.commandDelivered}, </if>"
+            + "<if test=\"atcIssuedLog.atcSpecificPosition != null\"> atc_specific_position = #{atcIssuedLog.atc_specificPosition}, </if>"
+            + "<if test=\"atcIssuedLog.atcEffectTime != null\"> atc_effect_time = #{atcIssuedLog.atcEffectTime}, </if>"
+            + "<if test=\"atcIssuedLog.atcLimitPeriod != null\"> atc_limit_period = #{atcIssuedLog.atcLimitPeriod}, </if>"
+            + "<if test=\"atcIssuedLog.atcOperator != null\"> atc_operator = #{atcIssuedLog.atcOperator}, </if>"
+            + "<if test=\"atcIssuedLog.atcDelivered != null\"> atc_delivered = #{atcIssuedLog.atcDelivered}, </if>"
             + "<if test=\"atcIssuedLog.isDel != null\"> is_del = #{atcIssuedLog.isDel}, </if>"
             + "<if test=\"atcIssuedLog.gmtModify != null\"> gmt_modify = #{atcIssuedLog.gmtModify} </if>"
             + "</set>"

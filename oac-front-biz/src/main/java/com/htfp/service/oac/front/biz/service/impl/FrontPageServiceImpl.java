@@ -124,7 +124,11 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     }
                 }
             } else {
-                if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(frontQueryPlanStatusEnum)) {
+                if (UavDynamicInfoQueryStatusEnum.ALL.equals(frontQueryPlanStatusEnum)) {
+                    // TODO: 2023/2/20 待优化
+                    List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryAllDynamicUavInfo();
+                    dynamicUavInfoDOList.addAll(queryDynamicUavInfoDOList);
+                } else if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(frontQueryPlanStatusEnum)) {
                     List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLIGHT_PLAN_IMPLEMENT.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
                     if (CollectionUtils.isNotEmpty(queryDynamicUavInfoDOList) && queryUavDynamicInfoRequest.getInAlarm() != null && queryUavDynamicInfoRequest.getInAlarm()) {
                         for (DynamicUavInfoDO dynamicUavInfo : queryDynamicUavInfoDOList) {
@@ -268,10 +272,15 @@ public class FrontPageServiceImpl implements IFrontPageService {
         try {
             log.info("[oac]查询机场信息start，queryAirportInfoRequest={}", queryAirportInfoRequest);
             List<QueryAirportInfoResultParam> queryQueryAirportInfoResultParamList = new ArrayList<>();
-            List<AirportInfoDO> airportInfoList = oacAirportInfoDalService.queryAllAirportInfo();
-            if (CollectionUtils.isNotEmpty(airportInfoList)) {
-                for (AirportInfoDO airportInfo : airportInfoList) {
-                    queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+            if (StringUtils.isNotBlank(queryAirportInfoRequest.getAirportId())) {
+                AirportInfoDO airportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(queryAirportInfoRequest.getAirportId());
+                queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+            } else {
+                List<AirportInfoDO> airportInfoList = oacAirportInfoDalService.queryAllAirportInfo();
+                if (CollectionUtils.isNotEmpty(airportInfoList)) {
+                    for (AirportInfoDO airportInfo : airportInfoList) {
+                        queryQueryAirportInfoResultParamList.add(buildQueryAirportInfoResultParam(airportInfo));
+                    }
                 }
             }
             queryAirportInfoResponse.setQueryAirportInfoResultParamList(queryQueryAirportInfoResultParamList);

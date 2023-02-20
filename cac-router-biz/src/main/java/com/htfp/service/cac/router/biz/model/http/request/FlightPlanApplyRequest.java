@@ -7,6 +7,7 @@ import com.htfp.service.cac.router.biz.model.BaseValidate;
 import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PersonParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
+import com.htfp.service.cac.router.biz.model.http.request.param.PositionStringParam;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,8 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     private PersonParam applicantPerson;
     private List<PersonParam> pilots;
     private List<String> airspaceNumbers;
-    private List<PositionParam> routePointCoordinates;
+    // TODO: 2023/2/20 地面站转换麻烦,暂时用positionString替代一下,需要改回
+    private List<PositionStringParam> routePointCoordinates;
     private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;

@@ -12,7 +12,13 @@ import java.util.List;
 @Data
 public class QueryAlarmMessageInfoParam {
 
-    private Integer alarmCount;
-    private List<AlarmDetail> alarmDetailList;
+    private String alarmId;
+    private String flyId;
+    private String cpn;
+    private Integer alarmLevel;
+    private String alarmContent;
+    private String alarmEffectTime;
+    private String alarmOperator;
+    private Boolean alarmDeliver;
 
 }

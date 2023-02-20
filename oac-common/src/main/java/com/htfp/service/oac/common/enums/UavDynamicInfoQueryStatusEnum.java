@@ -7,9 +7,10 @@ package com.htfp.service.oac.common.enums;
  */
 public enum UavDynamicInfoQueryStatusEnum {
 
-    FLIGHT_PLAN_PASS_AND_NOT_OVER(0, "飞行计划已通过且未结束"),
-    ARRIVAL(1, "处于进港状态"),
-    DEPARTURE(2, "处于离港状态"),
+    ALL(0, "查询所有"),
+    FLIGHT_PLAN_PASS_AND_NOT_OVER(1, "飞行计划已通过且未结束"),
+    ARRIVAL(2, "处于进港状态"),
+    DEPARTURE(3, "处于离港状态"),
     ;
 
 

@@ -13,5 +13,5 @@ import java.util.List;
 @Data
 public class QueryAlarmMessageInfoResponse extends BaseResponse {
 
-    QueryAlarmMessageInfoParam queryAlarmMessageInfoParam;
+    List<QueryAlarmMessageInfoParam> queryAlarmMessageInfoParamList;
 }

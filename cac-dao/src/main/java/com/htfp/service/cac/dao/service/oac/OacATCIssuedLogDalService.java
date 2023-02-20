@@ -45,8 +45,8 @@ public class OacATCIssuedLogDalService {
         return oacAtcIssuedLogMapper.updateByATCIssuedLog(atcIssuedLogDO);
     }
 
-    public int updateATCIssuedLogDelivered(ATCIssuedLogDO atcIssuedLogDO, Integer delivered) {
-        atcIssuedLogDO.setCommandDelivered(delivered);
+    public int updateATCIssuedLogDelivered(ATCIssuedLogDO atcIssuedLogDO, Integer atcDelivered) {
+        atcIssuedLogDO.setAtcDelivered(atcDelivered);
         atcIssuedLogDO.setGmtModify(new Date());
         return updateATCIssuedLog(atcIssuedLogDO);
     }
@@ -56,17 +56,17 @@ public class OacATCIssuedLogDalService {
         return oacAtcIssuedLogMapper.deleteById(id);
     }
 
-    public ATCIssuedLogDO buildATCIssuedLog(Long replyFlightPlanId, Long replyFlyId, String cpn, Integer atcType, String specificPosition, String commandEffectTime, Integer commandLimitPeriod, String commandOperator, Integer commandDelivered) {
+    public ATCIssuedLogDO buildATCIssuedLog(Long replyFlightPlanId, Long replyFlyId, String cpn, Integer atcType, String atcSpecificPosition, String atcEffectTime, Integer atcLimitPeriod, String atcOperator, Integer atcDelivered) {
         ATCIssuedLogDO atcIssuedLog = new ATCIssuedLogDO();
         atcIssuedLog.setReplyFlightPlanId(replyFlightPlanId);
         atcIssuedLog.setReplyFlyId(replyFlyId);
         atcIssuedLog.setCpn(cpn);
         atcIssuedLog.setAtcType(atcType);
-        atcIssuedLog.setSpecificPosition(specificPosition);
-        atcIssuedLog.setCommandEffectTime(commandEffectTime);
-        atcIssuedLog.setCommandLimitPeriod(commandLimitPeriod);
-        atcIssuedLog.setCommandOperator(commandOperator);
-        atcIssuedLog.setCommandDelivered(commandDelivered);
+        atcIssuedLog.setAtcSpecificPosition(atcSpecificPosition);
+        atcIssuedLog.setAtcEffectTime(atcEffectTime);
+        atcIssuedLog.setAtcLimitPeriod(atcLimitPeriod);
+        atcIssuedLog.setAtcOperator(atcOperator);
+        atcIssuedLog.setAtcDelivered(atcDelivered);
         atcIssuedLog.setGmtCreate(new Date());
         atcIssuedLog.setGmtModify(new Date());
         return atcIssuedLog;

@@ -49,6 +49,7 @@ import com.htfp.service.cac.router.biz.model.BaseResponse;
 import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PersonParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
+import com.htfp.service.cac.router.biz.model.http.request.param.PositionStringParam;
 import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
@@ -343,17 +344,17 @@ public class GcsServiceImpl implements IGcsService {
     }
 
 
-    com.htfp.service.oac.biz.model.inner.request.param.PositionParam buildOacPositionParam(PositionParam positionParam) {
+    com.htfp.service.oac.biz.model.inner.request.param.PositionParam buildOacPositionParam(PositionStringParam positionStringParam) {
         com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacPositionParam = new com.htfp.service.oac.biz.model.inner.request.param.PositionParam();
-        oacPositionParam.setAlt(positionParam.getAlt());
-        oacPositionParam.setLat(positionParam.getLat());
-        oacPositionParam.setLng(positionParam.getLng());
+        oacPositionParam.setAlt(Integer.valueOf(positionStringParam.getAlt()));
+        oacPositionParam.setLat(Integer.valueOf(positionStringParam.getLat()));
+        oacPositionParam.setLng(Integer.valueOf(positionStringParam.getLng()));
         return oacPositionParam;
     }
 
-    List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionParam> routePointCoordinates) {
+    List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionStringParam> routePointCoordinates) {
         List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
-        for (PositionParam routePointCoordinate : routePointCoordinates) {
+        for (PositionStringParam routePointCoordinate : routePointCoordinates) {
             com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
             oacRoutePointCoordinates.add(oacRoutePointCoordinate);
         }

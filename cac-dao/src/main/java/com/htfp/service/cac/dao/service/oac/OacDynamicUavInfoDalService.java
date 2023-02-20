@@ -1,6 +1,7 @@
 package com.htfp.service.cac.dao.service.oac;
 
 import com.htfp.service.cac.dao.mapper.oac.OacDynamicUavInfoMapper;
+import com.htfp.service.cac.dao.model.oac.AirportInfoDO;
 import com.htfp.service.cac.dao.model.oac.DynamicUavInfoDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -40,6 +41,10 @@ public class OacDynamicUavInfoDalService {
 
     public List<DynamicUavInfoDO> queryByPlanStatusInterval(Integer littlePlanStatus, Integer bigPlanStatus){
         return oacDynamicUavInfoMapper.selectByPlanStatusInterval(littlePlanStatus, bigPlanStatus);
+    }
+
+    public List<DynamicUavInfoDO> queryAllDynamicUavInfo() {
+        return oacDynamicUavInfoMapper.selectAllDynamicUavInfo();
     }
 
     public int insertDynamicUavInfo(DynamicUavInfoDO dynamicUavInfoDO){

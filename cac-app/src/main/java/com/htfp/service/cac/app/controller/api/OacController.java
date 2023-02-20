@@ -144,7 +144,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAlarmMessageInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryAlarmMessageInfoResponse.getCode(), queryAlarmMessageInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoParam()));
+                httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoParamList()));
             }
         } catch (Exception e) {
             log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAlarmMessageInfoRequest, e);
