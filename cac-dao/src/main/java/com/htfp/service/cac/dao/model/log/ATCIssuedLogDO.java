@@ -24,7 +24,7 @@ public class ATCIssuedLogDO implements Serializable {
     private String uavReg;
     private String cpn;
     private Integer atcType;
-    private String specificPosition;
+    private String atcSpecificPosition;
     private String atcEffectTime;
     private Integer atcLimitPeriod;
     private String atcOperator;

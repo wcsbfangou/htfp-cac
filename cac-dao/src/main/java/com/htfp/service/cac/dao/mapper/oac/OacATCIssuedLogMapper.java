@@ -73,8 +73,8 @@ public interface OacATCIssuedLogMapper {
      * @return
      */
     @Insert("INSERT INTO " + TABLE + " (reply_flight_plan_id, reply_fly_id, cpn, atc_type, atc_specific_position, atc_effect_time, atc_limit_period, atc_operator, atc_delivered, gmt_create, gmt_modify) "
-            + "VALUES (#{atcIssuedLog.replyFlightPlanId}, #{atcIssuedLog.replyFlyId}, #{atcIssuedLog.cpn}, #{atcIssuedLog.atcType}, #{atcIssuedLog.atc_specificPosition}, #{atcIssuedLog.atcEffectTime}, #{atcIssuedLog.atcLimitPeriod}, #{atcIssuedLog.atcOperator}, #{atcIssuedLog.atcDelivered}, #{atcIssuedLog.gmtCreate}, #{atcIssuedLog.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE reply_flight_plan_id=#{atcIssuedLog.replyFlightPlanId}, reply_fly_id=#{atcIssuedLog.replyFlyId}, cpn=#{atcIssuedLog.cpn}, atc_type=#{atcIssuedLog.atcType}, atc_specific_position=#{atcIssuedLog.atcSpecificPosition}, atc_effect_time=#{atcIssuedLog.atcEffectTime}, atc_limit_period=#{atcIssuedLog.atcLimitPeriod}, atc_operator=#{atcIssuedLog.atcOperator},  atc_delivered=#{atcIssuedLog.atcDelivered}, gmt_modify=#{atcIssuedLog.gmtModify}, is_del = 0")
+            + "VALUES (#{atcIssuedLog.replyFlightPlanId}, #{atcIssuedLog.replyFlyId}, #{atcIssuedLog.cpn}, #{atcIssuedLog.atcType}, #{atcIssuedLog.atcSpecificPosition}, #{atcIssuedLog.atcEffectTime}, #{atcIssuedLog.atcLimitPeriod}, #{atcIssuedLog.atcOperator}, #{atcIssuedLog.atcDelivered}, #{atcIssuedLog.gmtCreate}, #{atcIssuedLog.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE reply_flight_plan_id=#{atcIssuedLog.replyFlightPlanId}, reply_fly_id=#{atcIssuedLog.replyFlyId}, cpn=#{atcIssuedLog.cpn}, atc_type=#{atcIssuedLog.atcType}, atc_specific_position=#{atcIssuedLog.atcSpecificPosition}, atc_effect_time=#{atcIssuedLog.atcEffectTime}, atc_limit_period=#{atcIssuedLog.atcLimitPeriod}, atc_operator=#{atcIssuedLog.atcOperator}, atc_delivered=#{atcIssuedLog.atcDelivered}, gmt_modify=#{atcIssuedLog.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "atcIssuedLog.id")
     int insertAtcIssuedLog(@Param(value = "atcIssuedLog") ATCIssuedLogDO atcIssuedLog);
 
@@ -99,7 +99,7 @@ public interface OacATCIssuedLogMapper {
             + "<if test=\"atcIssuedLog.replyFlyId != null\"> reply_fly_id = #{atcIssuedLog.replyFlyId}, </if>"
             + "<if test=\"atcIssuedLog.cpn != null\"> cpn = #{atcIssuedLog.cpn}, </if>"
             + "<if test=\"atcIssuedLog.atcType != null\"> atc_type = #{atcIssuedLog.atcType}, </if>"
-            + "<if test=\"atcIssuedLog.atcSpecificPosition != null\"> atc_specific_position = #{atcIssuedLog.atc_specificPosition}, </if>"
+            + "<if test=\"atcIssuedLog.atcSpecificPosition != null\"> atc_specific_position = #{atcIssuedLog.atcSpecificPosition}, </if>"
             + "<if test=\"atcIssuedLog.atcEffectTime != null\"> atc_effect_time = #{atcIssuedLog.atcEffectTime}, </if>"
             + "<if test=\"atcIssuedLog.atcLimitPeriod != null\"> atc_limit_period = #{atcIssuedLog.atcLimitPeriod}, </if>"
             + "<if test=\"atcIssuedLog.atcOperator != null\"> atc_operator = #{atcIssuedLog.atcOperator}, </if>"

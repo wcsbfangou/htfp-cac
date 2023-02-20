@@ -75,7 +75,7 @@ public class ATCIssuedLogDalService {
         atcIssuedLog.setUavReg(uavReg);
         atcIssuedLog.setCpn(cpn);
         atcIssuedLog.setAtcType(atcType);
-        atcIssuedLog.setSpecificPosition(atcSpecificPosition);
+        atcIssuedLog.setAtcSpecificPosition(atcSpecificPosition);
         atcIssuedLog.setAtcEffectTime(atcEffectTime);
         atcIssuedLog.setAtcLimitPeriod(atcLimitPeriod);
         atcIssuedLog.setAtcOperator(atcOperator);

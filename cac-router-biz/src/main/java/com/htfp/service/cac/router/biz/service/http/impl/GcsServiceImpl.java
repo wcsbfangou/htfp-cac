@@ -21,6 +21,8 @@ import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
+import com.htfp.service.cac.dao.model.log.ATCIssuedLogDO;
+import com.htfp.service.cac.dao.model.log.AlarmIssuedLogDO;
 import com.htfp.service.cac.dao.model.log.ApplyFlightPlanLogDO;
 import com.htfp.service.cac.dao.model.log.ApplyFlyLogDO;
 import com.htfp.service.cac.dao.model.log.ApplyUavVerifyLogDO;
@@ -28,12 +30,16 @@ import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
+import com.htfp.service.cac.dao.service.ATCIssuedLogDalService;
+import com.htfp.service.cac.dao.service.AlarmIssuedLogDalService;
 import com.htfp.service.cac.dao.service.ApplyFlightPlanLogDalService;
 import com.htfp.service.cac.dao.service.ApplyFlyLogDalService;
 import com.htfp.service.cac.dao.service.ApplyUavVerifyLogDalService;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.cac.router.biz.model.http.request.ATCQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.AlarmQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
@@ -48,8 +54,9 @@ import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest
 import com.htfp.service.cac.router.biz.model.BaseResponse;
 import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PersonParam;
-import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PositionStringParam;
+import com.htfp.service.cac.router.biz.model.http.response.ATCQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.AlarmQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
@@ -61,8 +68,11 @@ import com.htfp.service.cac.router.biz.model.http.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyResponse;
+import com.htfp.service.cac.router.biz.model.http.response.param.ATCQueryResultParam;
+import com.htfp.service.cac.router.biz.model.http.response.param.AlarmQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlightPlanQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlyQueryResultParam;
+import com.htfp.service.cac.router.biz.model.http.response.param.PositionParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.UavVerifyResultParam;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
 import com.htfp.service.oac.biz.model.inner.request.param.UavDynamicParam;
@@ -110,6 +120,12 @@ public class GcsServiceImpl implements IGcsService {
 
     @Resource
     private ApplyFlyLogDalService applyFlyLogDalService;
+
+    @Resource
+    private AlarmIssuedLogDalService alarmIssuedLogDalService;
+
+    @Resource
+    private ATCIssuedLogDalService atcIssuedLogDalService;
 
     @Resource(name = "uavServiceImpl")
     private IUavService uavService;
@@ -1043,4 +1059,122 @@ public class GcsServiceImpl implements IGcsService {
             uavDalService.insertUavGcsMapping(uavGcsMapping);
         }
     }
+
+    /**
+     * 管制信息查询
+     *
+     * @param atcQueryRequest
+     * @return
+     */
+    @Override
+    public ATCQueryResponse atcQuery(ATCQueryRequest atcQueryRequest) {
+        ATCQueryResponse atcQueryResponse = new ATCQueryResponse();
+        atcQueryResponse.fail();
+        List<ATCQueryResultParam> atcQueryResultParamList = new ArrayList<>();
+        try {
+            log.info("[router]管制信息查询start，atcQueryRequest={}", atcQueryRequest);
+            final Long gcsId = Long.valueOf(atcQueryRequest.getGcsId());
+            //(1)校验地面站信息以及是否上线
+            BaseResponse validateGcsResult = validateGcs(gcsId);
+            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
+                Long uavId = Long.valueOf(atcQueryRequest.getUavId());
+                //(2)校验无人机地面站mapping关系
+                BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
+                    List<ATCIssuedLogDO> atcIssuedLogDOList = atcIssuedLogDalService.queryATCIssuedLogByApplyFlightPlanId(Long.valueOf(atcQueryRequest.getApplyFlightPlanId()));
+                    for (ATCIssuedLogDO atcIssuedLog : atcIssuedLogDOList) {
+                        if(atcQueryRequest.getApplyFlightPlanId().equals(atcIssuedLog.getApplyFlightPlanId().toString()) &&
+                        atcQueryRequest.getApplyFlyId().equals(atcIssuedLog.getApplyFlyId().toString())){
+                            ATCQueryResultParam atcQueryResultParam = buildATCQueryResultParam(atcIssuedLog);
+                            atcQueryResultParamList.add(atcQueryResultParam);
+                        }
+                    }
+                    atcQueryResponse.setAtcQueryResultParamList(atcQueryResultParamList);
+                    atcQueryResponse.success();
+                } else {
+                    atcQueryResponse.fail(response.getCode(), response.getMessage());
+                }
+            } else {
+                atcQueryResponse.fail(validateGcsResult.getCode(), validateGcsResult.getMessage());
+            }
+            log.info("[router]管制信息查询end，atcQueryRequest={}，atcQueryResponse={}", atcQueryRequest, JsonUtils.object2Json(atcQueryResponse));
+        } catch (Exception e) {
+            log.error("[router]管制信息查询异常，atcQueryRequest={}", atcQueryRequest, e);
+            atcQueryResponse.fail(e.getMessage());
+        }
+        return atcQueryResponse;
+    }
+
+    private ATCQueryResultParam buildATCQueryResultParam(ATCIssuedLogDO atcIssuedLog){
+        ATCQueryResultParam atcQueryResultParam = new ATCQueryResultParam();
+        atcQueryResultParam.setAtcId(atcIssuedLog.getId().toString());
+        atcQueryResultParam.setApplyFlightPlanId(atcIssuedLog.getApplyFlightPlanId().toString());
+        atcQueryResultParam.setApplyFlyId(atcIssuedLog.getApplyFlyId().toString());
+        atcQueryResultParam.setUavId(atcIssuedLog.getUavId());
+        atcQueryResultParam.setAtcType(atcIssuedLog.getAtcType());
+        atcQueryResultParam.setAtcEffectTime(atcIssuedLog.getAtcEffectTime());
+        atcQueryResultParam.setAtcLimitPeriod(atcIssuedLog.getAtcLimitPeriod());
+        atcQueryResultParam.setAtcOperator(atcIssuedLog.getAtcOperator());
+        atcQueryResultParam.setAtcSpecificPosition(JsonUtils.json2Object(atcIssuedLog.getAtcSpecificPosition(), PositionParam.class));
+        return atcQueryResultParam;
+    }
+
+    /**
+     * 告警信息查询
+     *
+     * @param alarmQueryRequest
+     * @return
+     */
+    @Override
+    public AlarmQueryResponse alarmQuery(AlarmQueryRequest alarmQueryRequest) {
+        AlarmQueryResponse alarmQueryResponse = new AlarmQueryResponse();
+        alarmQueryResponse.fail();
+        List<AlarmQueryResultParam> alarmQueryResultParamList = new ArrayList<>();
+        try {
+            log.info("[router]告警信息查询start，alarmQueryRequest={}", alarmQueryRequest);
+            final Long gcsId = Long.valueOf(alarmQueryRequest.getGcsId());
+            //(1)校验地面站信息以及是否上线
+            BaseResponse validateGcsResult = validateGcs(gcsId);
+            if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
+                Long uavId = Long.valueOf(alarmQueryRequest.getUavId());
+                //(2)校验无人机地面站mapping关系
+                BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
+                    List<AlarmIssuedLogDO> alarmIssuedLogList = alarmIssuedLogDalService.queryAlarmIssuedLogByApplyFlightPlanId(Long.valueOf(alarmQueryRequest.getApplyFlightPlanId()));
+                    for (AlarmIssuedLogDO alarmIssuedLog : alarmIssuedLogList) {
+                        if(alarmQueryRequest.getApplyFlightPlanId().equals(alarmIssuedLog.getApplyFlightPlanId().toString()) &&
+                                alarmQueryRequest.getApplyFlyId().equals(alarmIssuedLog.getApplyFlyId().toString())){
+                            AlarmQueryResultParam alarmQueryResultParam = buildAlarmQueryResultParam(alarmIssuedLog);
+                            alarmQueryResultParamList.add(alarmQueryResultParam);
+                        }
+                    }
+                    alarmQueryResponse.setAlarmQueryResultParamList(alarmQueryResultParamList);
+                    alarmQueryResponse.success();
+                } else {
+                    alarmQueryResponse.fail(response.getCode(), response.getMessage());
+                }
+            } else {
+                alarmQueryResponse.fail(validateGcsResult.getCode(), validateGcsResult.getMessage());
+            }
+            log.info("[router]告警信息查询end，alarmQueryRequest={}，alarmQueryResponse={}", alarmQueryRequest, JsonUtils.object2Json(alarmQueryResponse));
+        } catch (Exception e) {
+            log.error("[router]告警信息查询异常，alarmQueryRequest={}", alarmQueryRequest, e);
+            alarmQueryResponse.fail(e.getMessage());
+        }
+        return alarmQueryResponse;
+    }
+
+    private AlarmQueryResultParam buildAlarmQueryResultParam (AlarmIssuedLogDO alarmIssuedLogDO){
+        AlarmQueryResultParam alarmQueryResultParam = new AlarmQueryResultParam();
+        alarmQueryResultParam.setAlarmId(alarmIssuedLogDO.getId().toString());
+        alarmQueryResultParam.setApplyFlightPlanId(alarmIssuedLogDO.getApplyFlightPlanId().toString());
+        alarmQueryResultParam.setApplyFlyId(alarmIssuedLogDO.getApplyFlyId().toString());
+        alarmQueryResultParam.setUavId(alarmIssuedLogDO.getUavId());
+        alarmQueryResultParam.setAlarmLevel(alarmIssuedLogDO.getAlarmLevel());
+        alarmQueryResultParam.setAlarmContent(alarmIssuedLogDO.getAlarmContent());
+        alarmQueryResultParam.setAlarmEffectTime(alarmIssuedLogDO.getAlarmEffectTime());
+        alarmQueryResultParam.setAlarmOperator(alarmIssuedLogDO.getAlarmOperator());
+        return alarmQueryResultParam;
+    }
+
 }

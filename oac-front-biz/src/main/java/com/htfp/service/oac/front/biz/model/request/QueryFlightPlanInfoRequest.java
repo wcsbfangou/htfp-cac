@@ -20,7 +20,7 @@ public class QueryFlightPlanInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if (FlightPlanStatusTypeEnum.getFromCode(uavPlanStatus) != null) {
+        if (FlightPlanStatusTypeEnum.getFromCode(uavPlanStatus) == null) {
             return ErrorCodeEnum.LACK_OF_PLAN_STATUS;
         } else {
             return ErrorCodeEnum.SUCCESS;

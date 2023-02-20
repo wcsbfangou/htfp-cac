@@ -4,6 +4,8 @@ import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
 import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.router.biz.model.http.request.ATCQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.AlarmQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
@@ -16,6 +18,8 @@ import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavVerifyApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.response.ATCQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.AlarmQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
@@ -399,6 +403,68 @@ public class GcsController {
             }
         } catch (Exception e) {
             log.error("结束飞行计划失败, finishFlightPlanRequest={}", finishFlightPlanRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 管制信息查询
+     *
+     * @param atcQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/atcQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse atcQuery(@RequestBody ATCQueryRequest atcQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(atcQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 管制信息查询
+            ATCQueryResponse atcQueryResponse = gcsService.atcQuery(atcQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(atcQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(atcQueryResponse.getCode(), atcQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(atcQueryResponse.getAtcQueryResultParamList()));
+            }
+        } catch (Exception e) {
+            log.error("管制信息查询失败, atcQueryRequest={}", atcQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 告警信息查询
+     *
+     * @param alarmQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/alarmQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse alarmQuery(@RequestBody AlarmQueryRequest alarmQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(alarmQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 告警信息查询
+            AlarmQueryResponse alarmQueryResponse = gcsService.alarmQuery(alarmQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(alarmQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(alarmQueryResponse.getCode(), alarmQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(alarmQueryResponse.getAlarmQueryResultParamList()));
+            }
+        } catch (Exception e) {
+            log.error("告警信息查询失败, alarmQueryRequest={}", alarmQueryRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

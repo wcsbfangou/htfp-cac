@@ -15,7 +15,9 @@ public class QueryFlightPlanInfoParam {
     private String cpn;
     private String uavName;
     private String flightPlanId;
-    private List<String> routePointCoordinates;
+    private String shortCpn;
+    private String shortFlightPlanId;
+    private List<CoordinateParam> routePointCoordinates;
     private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;

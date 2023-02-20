@@ -1,5 +1,7 @@
 package com.htfp.service.cac.router.biz.service.http;
 
+import com.htfp.service.cac.router.biz.model.http.request.ATCQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.AlarmQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
 import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
@@ -11,6 +13,8 @@ import com.htfp.service.cac.router.biz.model.http.request.SignInRequest;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavVerifyApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.response.ATCQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.AlarmQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
@@ -79,7 +83,6 @@ public interface IGcsService {
      */
     FlyQueryResponse flyQuery(FlyQueryRequest flyQueryRequest);
 
-
     /**
      * 地面站在控无人机变更
      * @param gcsChangeUavRequest
@@ -107,4 +110,18 @@ public interface IGcsService {
      * @return
      */
     FinishFlightPlanResponse finishFlightPlan(FinishFlightPlanRequest finishFlightPlanRequest);
+
+    /**
+     * 管制信息查询
+     * @param atcQueryRequest
+     * @return
+     */
+    ATCQueryResponse atcQuery(ATCQueryRequest atcQueryRequest);
+
+    /**
+     * 告警信息查询
+     * @param alarmQueryRequest
+     * @return
+     */
+    AlarmQueryResponse alarmQuery(AlarmQueryRequest alarmQueryRequest);
 }

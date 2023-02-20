@@ -123,7 +123,7 @@ public interface ATCIssuedLogMapper {
             + "<if test=\"atcIssuedLog.uavReg != null\"> uav_reg = #{atcIssuedLog.uavReg}, </if>"
             + "<if test=\"atcIssuedLog.cpn != null\"> cpn = #{atcIssuedLog.cpn}, </if>"
             + "<if test=\"atcIssuedLog.atcType != null\"> atc_type = #{atcIssuedLog.atcType}, </if>"
-            + "<if test=\"atcIssuedLog.atcSpecificPosition != null\"> atc_specific_position = #{atcIssuedLog.atc_specificPosition}, </if>"
+            + "<if test=\"atcIssuedLog.atcSpecificPosition != null\"> atc_specific_position = #{atcIssuedLog.atcSpecificPosition}, </if>"
             + "<if test=\"atcIssuedLog.atcEffectTime != null\"> atc_effect_time = #{atcIssuedLog.atcEffectTime}, </if>"
             + "<if test=\"atcIssuedLog.atcLimitPeriod != null\"> atc_limit_period = #{atcIssuedLog.atcLimitPeriod}, </if>"
             + "<if test=\"atcIssuedLog.atcOperator != null\"> atc_operator = #{atcIssuedLog.atcOperator}, </if>"
