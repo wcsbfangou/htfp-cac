@@ -21,7 +21,6 @@ public class AlarmIssuedLogDO implements Serializable {
     private Integer alarmLevel;
     private String alarmContent;
     private String alarmEffectTime;
-    private Integer alarmLimitPeriod;
     private String alarmOperator;
     private Integer alarmDelivered;
     private Integer isDel;

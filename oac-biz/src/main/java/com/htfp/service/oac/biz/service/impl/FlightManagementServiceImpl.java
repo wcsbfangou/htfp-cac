@@ -1,10 +1,14 @@
 package com.htfp.service.oac.biz.service.impl;
 
+import com.htfp.service.cac.dao.model.oac.AlarmIssuedLogDO;
+import com.htfp.service.cac.dao.service.oac.OacAlarmIssuedLogDalService;
 import com.htfp.service.oac.biz.model.inner.request.UavDataTransferRequest;
 import com.htfp.service.oac.biz.model.inner.response.UavDataTransferResponse;
 import com.htfp.service.oac.biz.service.IFlightManagementService;
+import com.htfp.service.oac.common.enums.AlarmLevelTypeEnum;
 import com.htfp.service.oac.common.enums.ApplicantTypeEnum;
 import com.htfp.service.oac.common.enums.ApplyStatusEnum;
+import com.htfp.service.oac.common.enums.DeliverTypeEnum;
 import com.htfp.service.oac.common.enums.FlightPlanStatusTypeEnum;
 import com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest;
 import com.htfp.service.oac.biz.model.inner.request.FlightPlanApplyRequest;
@@ -72,6 +76,9 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
 
     @Resource
     private OacDynamicRouteInfoDalService oacDynamicRouteInfoDalService;
+
+    @Resource
+    private OacAlarmIssuedLogDalService oacAlarmIssuedLogDalService;
 
     /**
      * 飞行计划申请
@@ -269,17 +276,27 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
             dynamicUavInfo.setLat(uavDataTransferRequest.getLat());
             Integer distanceToLandingPoint = GpsDistanceUtils.getDistance(uavDataTransferRequest.getLng(), uavDataTransferRequest.getLat(), dynamicUavInfo.getLandingLng(), dynamicUavInfo.getLandingLat());
             dynamicUavInfo.setDistanceToLandingPoint(distanceToLandingPoint);
-            if(distanceToLandingPoint <= dynamicUavInfo.getLandingAirportIdentificationRadius()){
+            if (distanceToLandingPoint <= dynamicUavInfo.getLandingAirportIdentificationRadius()) {
                 dynamicUavInfo.setPlanStatus(FlightPlanStatusTypeEnum.ENTER_IDENTIFICATION_AREA.getCode());
-            } else if(distanceToLandingPoint <= dynamicUavInfo.getLandingAirportAlarmRadius()){
-                if(FlightPlanStatusTypeEnum.LANDING_APPLY_APPROVED.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicUavInfo.getPlanStatus()))){
+            } else if (distanceToLandingPoint <= dynamicUavInfo.getLandingAirportAlarmRadius()) {
+                if (FlightPlanStatusTypeEnum.LANDING_APPLY_APPROVED.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicUavInfo.getPlanStatus()))) {
                     dynamicUavInfo.setPlanStatus(FlightPlanStatusTypeEnum.PREPARE_LANDING.getCode());
                 } else {
-                    // TODO: 2023/2/20 告警
-                    String alarmId = "null";
-                    List<String> alarmIdList = JsonUtils.json2List(dynamicUavInfo.getAlarmIds(), String.class);
-                    alarmIdList.add(alarmId);
-                    dynamicUavInfo.setAlarmIds(JsonUtils.object2Json(alarmIdList));
+                    // TODO: 2023/2/20 告警需要优化,单独提出来一个模块搞报警
+                    List<AlarmIssuedLogDO> alarmIssuedLogDOList = oacAlarmIssuedLogDalService.queryAlarmIssuedLogByReplyFlightPlanId(dynamicUavInfo.getReplyFlightPlanId());
+                    if (CollectionUtils.isEmpty(alarmIssuedLogDOList)) {
+                        AlarmIssuedLogDO alarmIssuedLog = oacAlarmIssuedLogDalService.buildAlarmIssuedLog(dynamicUavInfo.getReplyFlightPlanId(), dynamicUavInfo.getReplyFlyId(), dynamicUavInfo.getCpn(), AlarmLevelTypeEnum.ALARM.getCode(), "无人机未经降落审批进入降落区域", currentTime, "oacSystem", DeliverTypeEnum.GENERATED.getCode());
+                        int id = oacAlarmIssuedLogDalService.insertAlarmIssuedLog(alarmIssuedLog);
+                        if (id > 0) {
+                            List<String> alarmIdList = new ArrayList<>();
+                            if (dynamicUavInfo.getAlarmIds() != null) {
+                                alarmIdList = JsonUtils.json2List(dynamicUavInfo.getAlarmIds(), String.class);
+                            }
+                            alarmIdList.add(alarmIssuedLog.getId().toString());
+                            dynamicUavInfo.setInAlarm(true);
+                            dynamicUavInfo.setAlarmIds(JsonUtils.object2Json(alarmIdList));
+                        }
+                    }
                 }
             }
         }

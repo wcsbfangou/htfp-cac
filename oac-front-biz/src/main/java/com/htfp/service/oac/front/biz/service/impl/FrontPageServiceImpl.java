@@ -1,7 +1,9 @@
 package com.htfp.service.oac.front.biz.service.impl;
 
 import com.htfp.service.cac.dao.model.oac.ATCIssuedLogDO;
+import com.htfp.service.cac.dao.model.oac.AlarmIssuedLogDO;
 import com.htfp.service.cac.dao.service.oac.OacATCIssuedLogDalService;
+import com.htfp.service.cac.dao.service.oac.OacAlarmIssuedLogDalService;
 import com.htfp.service.cac.inner.app.service.IOacService;
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
@@ -9,6 +11,7 @@ import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
+import com.htfp.service.oac.common.enums.AlarmLevelTypeEnum;
 import com.htfp.service.oac.common.enums.ApplyStatusEnum;
 import com.htfp.service.oac.common.enums.AtcTypeEnum;
 import com.htfp.service.oac.common.enums.DeliverTypeEnum;
@@ -49,6 +52,7 @@ import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.param.CoordinateParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAirportInfoResultParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryAlarmMessageInfoParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavRouteInfoResultParam;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
@@ -82,6 +86,9 @@ public class FrontPageServiceImpl implements IFrontPageService {
 
     @Resource
     private OacAirportInfoDalService oacAirportInfoDalService;
+
+    @Resource
+    private OacAlarmIssuedLogDalService oacAlarmIssuedLogDalService;
 
     @Resource
     private OacApplyFlightPlanLogDalService oacApplyFlightPlanLogDalService;
@@ -314,7 +321,36 @@ public class FrontPageServiceImpl implements IFrontPageService {
      */
     @Override
     public QueryAlarmMessageInfoResponse queryAlarmMessageInfoData(QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest) {
-        return null;
+        QueryAlarmMessageInfoResponse queryAlarmMessageInfoResponse = new QueryAlarmMessageInfoResponse();
+        queryAlarmMessageInfoResponse.fail();
+        try {
+            log.info("[oac]查询告警信息start，queryAlarmMessageInfoRequest={}", queryAlarmMessageInfoRequest);
+            List<QueryAlarmMessageInfoParam> queryAlarmMessageInfoParamList = new ArrayList<>();
+            for (String alarmId : queryAlarmMessageInfoRequest.getAlarmIds()) {
+                AlarmIssuedLogDO alarmIssuedLog = oacAlarmIssuedLogDalService.queryAlarmIssuedLog(Long.valueOf(alarmId));
+                queryAlarmMessageInfoParamList.add(buildQueryAlarmMessageInfoParam(alarmIssuedLog));
+            }
+            queryAlarmMessageInfoResponse.setQueryAlarmMessageInfoParamList(queryAlarmMessageInfoParamList);
+            queryAlarmMessageInfoResponse.success();
+            log.info("[oac]查询告警信息end，queryAlarmMessageInfoRequest={},queryAlarmMessageInfoResponse={}", queryAlarmMessageInfoRequest, JsonUtils.object2Json(queryAlarmMessageInfoResponse));
+        } catch (Exception e) {
+            log.error("[oac]查询告警信息异常，queryAlarmMessageInfoRequest={}", queryAlarmMessageInfoRequest, e);
+            queryAlarmMessageInfoResponse.fail(e.getMessage());
+        }
+        return queryAlarmMessageInfoResponse;
+    }
+
+    QueryAlarmMessageInfoParam buildQueryAlarmMessageInfoParam(AlarmIssuedLogDO alarmIssuedLog) {
+        QueryAlarmMessageInfoParam queryAlarmMessageInfoParam = new QueryAlarmMessageInfoParam();
+        queryAlarmMessageInfoParam.setAlarmId(alarmIssuedLog.getId().toString());
+        queryAlarmMessageInfoParam.setFlyId(alarmIssuedLog.getReplyFlyId().toString());
+        queryAlarmMessageInfoParam.setCpn(alarmIssuedLog.getCpn());
+        queryAlarmMessageInfoParam.setAlarmLevel(alarmIssuedLog.getAlarmLevel());
+        queryAlarmMessageInfoParam.setAlarmContent(alarmIssuedLog.getAlarmContent());
+        queryAlarmMessageInfoParam.setAlarmEffectTime(alarmIssuedLog.getAlarmEffectTime());
+        queryAlarmMessageInfoParam.setAlarmOperator(alarmIssuedLog.getAlarmOperator());
+        queryAlarmMessageInfoParam.setAlarmDeliver(alarmIssuedLog.getAlarmDelivered());
+        return queryAlarmMessageInfoParam;
     }
 
     /**

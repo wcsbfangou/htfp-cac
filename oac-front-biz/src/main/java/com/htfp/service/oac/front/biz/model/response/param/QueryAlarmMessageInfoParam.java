@@ -19,6 +19,6 @@ public class QueryAlarmMessageInfoParam {
     private String alarmContent;
     private String alarmEffectTime;
     private String alarmOperator;
-    private Boolean alarmDeliver;
+    private Integer alarmDeliver;
 
 }

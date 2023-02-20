@@ -139,7 +139,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }
-            // 查询无人机动态信息
+            // 查询无人机告警信息
             QueryAlarmMessageInfoResponse queryAlarmMessageInfoResponse = frontPageService.queryAlarmMessageInfoData(queryAlarmMessageInfoRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAlarmMessageInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryAlarmMessageInfoResponse.getCode(), queryAlarmMessageInfoResponse.getMessage());
@@ -147,7 +147,7 @@ public class OacController {
                 httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoParamList()));
             }
         } catch (Exception e) {
-            log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAlarmMessageInfoRequest, e);
+            log.error("查询告警信息失败, queryAlarmMessageInfoRequest={}", queryAlarmMessageInfoRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;
