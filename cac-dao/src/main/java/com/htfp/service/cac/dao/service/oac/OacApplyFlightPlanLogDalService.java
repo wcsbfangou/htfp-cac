@@ -43,6 +43,15 @@ public class OacApplyFlightPlanLogDalService {
         }
     }
 
+    public List<ApplyFlightPlanLogDO> queryApplyFlightPlanLogByStatus(Integer status){
+        List<ApplyFlightPlanLogDO> applyFlightPlanLogDOList = oacApplyFlightPlanLogMapper.selectByStatus(status);
+        if(CollectionUtils.isNotEmpty(applyFlightPlanLogDOList)){
+            return applyFlightPlanLogDOList;
+        } else {
+            return null;
+        }
+    }
+
     public int insertApplyFlightPlanLog(ApplyFlightPlanLogDO applyFlightPlanLogDO){
         return oacApplyFlightPlanLogMapper.insertApplyFlightPlanLog(applyFlightPlanLogDO);
     }

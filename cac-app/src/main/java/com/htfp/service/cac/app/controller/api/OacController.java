@@ -131,7 +131,7 @@ public class OacController {
      */
     @RequestMapping(value = "/QueryAlarmDetail", method = RequestMethod.POST)
     @ResponseBody
-    public BaseHttpResponse QueryAlarmMessageInfo(@RequestBody QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest, HttpServletRequest httpServletRequest) {
+    public BaseHttpResponse queryAlarmMessageInfo(@RequestBody QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
         try {
             // 校验
@@ -272,6 +272,37 @@ public class OacController {
             }
         } catch (Exception e) {
             log.error("告警信息下发失败, alarmIssuedRequest={}", alarmIssuedRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 查询飞行计划信息
+     *
+     * @param queryFlightPlanInfoRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/QueryFlightPlanInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse queryFlightPlanInfo(@RequestBody QueryFlightPlanInfoRequest queryFlightPlanInfoRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(queryFlightPlanInfoRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 查询无人机告警信息
+            QueryFlightPlanInfoResponse queryFlightPlanInfoResponse = frontPageService.queryFlightPlanInfo(queryFlightPlanInfoRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryFlightPlanInfoResponse.getCode())) {
+                return BaseHttpResponse.fail(queryFlightPlanInfoResponse.getCode(), queryFlightPlanInfoResponse.getMessage());
+            }else {
+                httpResponse.setData(JsonUtils.object2Json(queryFlightPlanInfoResponse.getQueryFlightPlanInfoParamList()));
+            }
+        } catch (Exception e) {
+            log.error("查询告警信息失败, queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

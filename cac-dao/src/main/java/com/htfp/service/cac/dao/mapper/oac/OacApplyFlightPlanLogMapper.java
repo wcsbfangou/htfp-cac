@@ -59,6 +59,15 @@ public interface OacApplyFlightPlanLogMapper {
     List<ApplyFlightPlanLogDO> selectByCpn(@Param(value = "cpn") String cpn);
 
     /**
+     * 根据status查询
+     *
+     * @param status
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE status = #{status} AND is_del = 0")
+    List<ApplyFlightPlanLogDO> selectByStatus(@Param(value = "status") Integer status);
+
+    /**
      * 查询总数量
      *
      * @return

@@ -11,7 +11,6 @@ import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
-import com.htfp.service.oac.common.enums.AlarmLevelTypeEnum;
 import com.htfp.service.oac.common.enums.ApplyStatusEnum;
 import com.htfp.service.oac.common.enums.AtcTypeEnum;
 import com.htfp.service.oac.common.enums.DeliverTypeEnum;
@@ -40,6 +39,7 @@ import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
@@ -48,11 +48,13 @@ import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.param.CoordinateParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAirportInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAlarmMessageInfoParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryFlightPlanInfoParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavRouteInfoResultParam;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
@@ -632,5 +634,66 @@ public class FrontPageServiceImpl implements IFrontPageService {
     @Override
     public AlarmIssuedResponse alarmIssued(AlarmIssuedRequest alarmIssuedRequest) {
         return null;
+    }
+
+    /**
+     * 查询飞行计划
+     *
+     * @param queryFlightPlanInfoRequest
+     * @return
+     */
+    // TODO: 2023/2/20 待优化,动态信息表,支持多种动态查询,现在查询耗性能
+    @Override
+    public QueryFlightPlanInfoResponse queryFlightPlanInfo(QueryFlightPlanInfoRequest queryFlightPlanInfoRequest) {
+        QueryFlightPlanInfoResponse queryFlightPlanInfoResponse = new QueryFlightPlanInfoResponse();
+        queryFlightPlanInfoResponse.fail();
+        try {
+            log.info("[oac]查询飞行计划start，queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest);
+            List<QueryFlightPlanInfoParam> flightPlanInfoParamList = new ArrayList<>();
+            List<ApplyFlightPlanLogDO> queryApplyFlightPlanLogList;
+            FlightPlanStatusTypeEnum flightPlanStatusTypeEnum = FlightPlanStatusTypeEnum.getFromCode(queryFlightPlanInfoRequest.getUavPlanStatus());
+            if (FlightPlanStatusTypeEnum.FLIGHT_PLAN_SUBMITTED.equals(flightPlanStatusTypeEnum)) {
+                queryApplyFlightPlanLogList = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByStatus(ApplyStatusEnum.PENDING.getCode());
+                for (ApplyFlightPlanLogDO queryApplyFlightPlanLog : queryApplyFlightPlanLogList) {
+                    DynamicUavInfoDO dynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId());
+                    flightPlanInfoParamList.add(buildQueryFlightPlanInfoParam(queryApplyFlightPlanLog, dynamicUavInfo.getUavName(), queryFlightPlanInfoRequest.getUavPlanStatus()));
+                }
+            } else {
+                queryApplyFlightPlanLogList = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByStatus(ApplyStatusEnum.APPROVED.getCode());
+                for (ApplyFlightPlanLogDO queryApplyFlightPlanLog : queryApplyFlightPlanLogList) {
+                    DynamicUavInfoDO dynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId());
+                    if (flightPlanStatusTypeEnum.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicUavInfo.getPlanStatus()))) {
+                        flightPlanInfoParamList.add(buildQueryFlightPlanInfoParam(queryApplyFlightPlanLog, dynamicUavInfo.getUavName(), queryFlightPlanInfoRequest.getUavPlanStatus()));
+                    }
+                }
+            }
+            queryFlightPlanInfoResponse.setQueryFlightPlanInfoParamList(flightPlanInfoParamList);
+            queryFlightPlanInfoResponse.success();
+            log.info("[oac]查询飞行计划end，queryFlightPlanInfoRequest={},queryFlightPlanInfoResponse={}", queryFlightPlanInfoRequest, JsonUtils.object2Json(queryFlightPlanInfoResponse));
+        } catch (Exception e) {
+            log.error("[oac]查询飞行计划异常，queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest, e);
+            queryFlightPlanInfoResponse.fail(e.getMessage());
+        }
+        return queryFlightPlanInfoResponse;
+    }
+
+    QueryFlightPlanInfoParam buildQueryFlightPlanInfoParam(ApplyFlightPlanLogDO queryApplyFlightPlanLog, String uavName, Integer planStatus) {
+        QueryFlightPlanInfoParam queryFlightPlanInfoParam = new QueryFlightPlanInfoParam();
+        queryFlightPlanInfoParam.setCpn(queryApplyFlightPlanLog.getCpn());
+        queryFlightPlanInfoParam.setUavName(uavName);
+        queryFlightPlanInfoParam.setFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId().toString());
+        queryFlightPlanInfoParam.setTakeoffAirportId(queryApplyFlightPlanLog.getTakeoffAirportId());
+        queryFlightPlanInfoParam.setLandingAirportId(queryApplyFlightPlanLog.getLandingAirportId());
+        queryFlightPlanInfoParam.setTakeoffSite(queryApplyFlightPlanLog.getTakeoffSite());
+        queryFlightPlanInfoParam.setLandingSite(queryApplyFlightPlanLog.getLandingSite());
+        queryFlightPlanInfoParam.setStartTime(queryApplyFlightPlanLog.getStartTime());
+        queryFlightPlanInfoParam.setEndTime(queryApplyFlightPlanLog.getEndTime());
+        queryFlightPlanInfoParam.setMissionType(queryApplyFlightPlanLog.getMissionType());
+        queryFlightPlanInfoParam.setEmergencyProcedure(queryApplyFlightPlanLog.getEmergencyProcedure());
+        queryFlightPlanInfoParam.setOperationScenarioType(queryApplyFlightPlanLog.getOperationScenarioType());
+        queryFlightPlanInfoParam.setIsEmergency(queryApplyFlightPlanLog.getIsEmergency());
+        queryFlightPlanInfoParam.setIsVlos(queryApplyFlightPlanLog.getIsVlos());
+        queryFlightPlanInfoParam.setPlanStatus(planStatus);
+        return queryFlightPlanInfoParam;
     }
 }

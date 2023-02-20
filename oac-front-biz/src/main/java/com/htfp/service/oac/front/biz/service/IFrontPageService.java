@@ -1,12 +1,12 @@
 package com.htfp.service.oac.front.biz.service;
 
-
 import com.htfp.service.oac.front.biz.model.request.ATCIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.AlarmIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
@@ -15,6 +15,7 @@ import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
 
@@ -79,4 +80,11 @@ public interface IFrontPageService {
      * @return
      */
     AlarmIssuedResponse alarmIssued(AlarmIssuedRequest alarmIssuedRequest);
+
+    /**
+     * 查询飞行计划
+     * @param queryFlightPlanInfoRequest
+     * @return
+     */
+    QueryFlightPlanInfoResponse queryFlightPlanInfo(QueryFlightPlanInfoRequest queryFlightPlanInfoRequest);
 }
