@@ -5,7 +5,7 @@
 
     <groupId>com.htfp.service</groupId>
     <artifactId>oac-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
     <name>oac-app</name>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.htfp.service</groupId>
             <artifactId>oac-biz</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

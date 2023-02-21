@@ -1,4 +1,4 @@
-package com.htfp.service.cac.app.controller;
+package com.htfp.service.cac.app.controller.test;
 
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.NavigationDalService;

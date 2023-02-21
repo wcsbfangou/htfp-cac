@@ -53,7 +53,7 @@
         <dependency>
             <groupId>com.htfp.service</groupId>
             <artifactId>oac-front-biz</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.0.1</version>
         </dependency>
     </dependencies>
 

@@ -1,4 +1,4 @@
-package com.htfp.service.cac.app.controller;
+package com.htfp.service.cac.app.controller.test;
 
 import com.google.common.collect.ImmutableMap;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -37,9 +37,11 @@ public class FlyApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_UAV_ID;
         } else if (StringUtils.isBlank(gcsId)) {
             return ErrorCodeEnum.LACK_OF_GCS_ID;
-        } else if(CollectionUtils.isEmpty(airspaceNumbers)){
+        }
+        // TODO: 2023/2/21 适配地面站无法发送结构体
+        /*else if(CollectionUtils.isEmpty(airspaceNumbers)){
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
-        } else if(flyAlt == null){
+        }*/ else if(flyAlt == null){
             return ErrorCodeEnum.LACK_OF_ALT;
         } else if(flyLng == null){
             return ErrorCodeEnum.LACK_OF_LNG;

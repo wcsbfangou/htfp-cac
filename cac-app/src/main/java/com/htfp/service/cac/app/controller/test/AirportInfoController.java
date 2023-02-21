@@ -1,11 +1,7 @@
-package com.htfp.service.cac.app.controller.background;
+package com.htfp.service.cac.app.controller.test;
 
-import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.dao.model.oac.AirportInfoDO;
 import com.htfp.service.cac.dao.service.oac.OacAirportInfoDalService;
-import com.htfp.service.cac.router.biz.model.BaseResponse;
-import com.htfp.service.cac.router.biz.model.background.request.GcsInfoRequest;
-import com.htfp.service.cac.router.biz.model.background.response.InsertGcsInfoResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;

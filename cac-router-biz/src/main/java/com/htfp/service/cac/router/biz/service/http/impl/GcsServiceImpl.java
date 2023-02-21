@@ -20,6 +20,7 @@ import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.common.utils.SnowflakeIdUtils;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.entity.PilotInfoDO;
+import com.htfp.service.cac.dao.model.entity.RouteInfoDO;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.log.ATCIssuedLogDO;
 import com.htfp.service.cac.dao.model.log.AlarmIssuedLogDO;
@@ -37,6 +38,7 @@ import com.htfp.service.cac.dao.service.ApplyFlyLogDalService;
 import com.htfp.service.cac.dao.service.ApplyUavVerifyLogDalService;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
+import com.htfp.service.cac.dao.service.RouteInfoDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.model.http.request.ATCQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.AlarmQueryRequest;
@@ -54,7 +56,7 @@ import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest
 import com.htfp.service.cac.router.biz.model.BaseResponse;
 import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PersonParam;
-import com.htfp.service.cac.router.biz.model.http.request.param.PositionStringParam;
+import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
 import com.htfp.service.cac.router.biz.model.http.response.ATCQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.AlarmQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
@@ -72,7 +74,6 @@ import com.htfp.service.cac.router.biz.model.http.response.param.ATCQueryResultP
 import com.htfp.service.cac.router.biz.model.http.response.param.AlarmQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlightPlanQueryResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.FlyQueryResultParam;
-import com.htfp.service.cac.router.biz.model.http.response.param.PositionParam;
 import com.htfp.service.cac.router.biz.model.http.response.param.UavVerifyResultParam;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
 import com.htfp.service.oac.biz.model.inner.request.param.UavDynamicParam;
@@ -126,6 +127,9 @@ public class GcsServiceImpl implements IGcsService {
 
     @Resource
     private ATCIssuedLogDalService atcIssuedLogDalService;
+
+    @Resource
+    private RouteInfoDalService routeInfoDalService;
 
     @Resource(name = "uavServiceImpl")
     private IUavService uavService;
@@ -263,12 +267,15 @@ public class GcsServiceImpl implements IGcsService {
                 // TODO: 2022/12/22 IDC ID && 机器ID
                 // 生成applyFlightPlanId
                 Long applyFlightPlanId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-                String applicantSubject;
-                if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType()))) {
+                String applicantSubject = null;
+                if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType())) && flightPlanApplyRequest.getApplicantOrganization() != null) {
                     applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantOrganization());
-                } else {
+                } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType())) && flightPlanApplyRequest.getApplicantPerson() != null) {
                     applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantPerson());
                 }
+                // TODO: 2023/2/21 query routePointCoordinate
+                RouteInfoDO routeInfo = routeInfoDalService.queryRouteInfo(Long.valueOf(flightPlanApplyRequest.getRouteId()));
+                flightPlanApplyRequest.setRoutePointCoordinates(JsonUtils.json2List(routeInfo.getRoutePointCoordinates(), PositionParam.class));
                 ApplyFlightPlanLogDO applyFlightPlanLog = applyFlightPlanLogDalService.buildApplyFlightPlanLogDO(applyFlightPlanId, null, Long.valueOf(flightPlanApplyRequest.getGcsId()), Long.valueOf(flightPlanApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), flightPlanApplyRequest.getApplicantType(), applicantSubject,
                         JsonUtils.object2Json(flightPlanApplyRequest.getPilots()), JsonUtils.object2Json(flightPlanApplyRequest.getAirspaceNumbers()), JsonUtils.object2Json(flightPlanApplyRequest.getRoutePointCoordinates()), flightPlanApplyRequest.getTakeoffAirportId(), flightPlanApplyRequest.getLandingAirportId(),
                         flightPlanApplyRequest.getTakeoffSite(), flightPlanApplyRequest.getLandingSite(), flightPlanApplyRequest.getMissionType(), flightPlanApplyRequest.getStartTime(), flightPlanApplyRequest.getEndTime(), flightPlanApplyRequest.getEmergencyProcedure(),
@@ -325,56 +332,72 @@ public class GcsServiceImpl implements IGcsService {
     }
 
     com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam buildOacPersonParam(OrganizationParam applicantOrganizationParam) {
-        com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam oacApplicantOrganizationParam = new com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam();
-        oacApplicantOrganizationParam.setOrgType(applicantOrganizationParam.getOrgType());
-        oacApplicantOrganizationParam.setOrgName(applicantOrganizationParam.getOrgName());
-        oacApplicantOrganizationParam.setSocialCreditCode(applicantOrganizationParam.getSocialCreditCode());
-        oacApplicantOrganizationParam.setContactName(applicantOrganizationParam.getContactName());
-        oacApplicantOrganizationParam.setContactPhone(applicantOrganizationParam.getContactPhone());
-        oacApplicantOrganizationParam.setContactEmail(applicantOrganizationParam.getContactEmail());
-        oacApplicantOrganizationParam.setMemo(applicantOrganizationParam.getMemo());
-        return oacApplicantOrganizationParam;
+        if(applicantOrganizationParam!=null){
+            com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam oacApplicantOrganizationParam = new com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam();
+            oacApplicantOrganizationParam.setOrgType(applicantOrganizationParam.getOrgType());
+            oacApplicantOrganizationParam.setOrgName(applicantOrganizationParam.getOrgName());
+            oacApplicantOrganizationParam.setSocialCreditCode(applicantOrganizationParam.getSocialCreditCode());
+            oacApplicantOrganizationParam.setContactName(applicantOrganizationParam.getContactName());
+            oacApplicantOrganizationParam.setContactPhone(applicantOrganizationParam.getContactPhone());
+            oacApplicantOrganizationParam.setContactEmail(applicantOrganizationParam.getContactEmail());
+            oacApplicantOrganizationParam.setMemo(applicantOrganizationParam.getMemo());
+            return oacApplicantOrganizationParam;
+        } else {
+            return null;
+        }
     }
 
     com.htfp.service.oac.biz.model.inner.request.param.PersonParam buildOacPersonParam(PersonParam applicantPersonParam) {
-        com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPersonParam = new com.htfp.service.oac.biz.model.inner.request.param.PersonParam();
-        oacPersonParam.setPersonName(applicantPersonParam.getPersonName());
-        oacPersonParam.setNationality(applicantPersonParam.getNationality());
-        oacPersonParam.setIdCardType(applicantPersonParam.getIdCardType());
-        oacPersonParam.setIdCardNumber(applicantPersonParam.getIdCardNumber());
-        oacPersonParam.setLicenseId(applicantPersonParam.getLicenseId());
-        oacPersonParam.setIllegalRecordType(applicantPersonParam.getIllegalRecordType());
-        oacPersonParam.setContactPhone(applicantPersonParam.getContactPhone());
-        oacPersonParam.setContactEmail(applicantPersonParam.getContactEmail());
-        oacPersonParam.setMemo(applicantPersonParam.getMemo());
-        return oacPersonParam;
+        if(applicantPersonParam!=null){
+            com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPersonParam = new com.htfp.service.oac.biz.model.inner.request.param.PersonParam();
+            oacPersonParam.setPersonName(applicantPersonParam.getPersonName());
+            oacPersonParam.setNationality(applicantPersonParam.getNationality());
+            oacPersonParam.setIdCardType(applicantPersonParam.getIdCardType());
+            oacPersonParam.setIdCardNumber(applicantPersonParam.getIdCardNumber());
+            oacPersonParam.setLicenseId(applicantPersonParam.getLicenseId());
+            oacPersonParam.setIllegalRecordType(applicantPersonParam.getIllegalRecordType());
+            oacPersonParam.setContactPhone(applicantPersonParam.getContactPhone());
+            oacPersonParam.setContactEmail(applicantPersonParam.getContactEmail());
+            oacPersonParam.setMemo(applicantPersonParam.getMemo());
+            return oacPersonParam;
+        } else {
+            return null;
+        }
     }
 
     List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> buildOacPilots(List<PersonParam> pilots) {
-        List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> oacPilots = new ArrayList<>();
-        for (PersonParam pilot : pilots) {
-            com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPilot = buildOacPersonParam(pilot);
-            oacPilots.add(oacPilot);
+        if(CollectionUtils.isNotEmpty(pilots)){
+            List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> oacPilots = new ArrayList<>();
+            for (PersonParam pilot : pilots) {
+                com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPilot = buildOacPersonParam(pilot);
+                oacPilots.add(oacPilot);
+            }
+            return oacPilots;
+        } else {
+            return null;
         }
-        return oacPilots;
     }
 
 
-    com.htfp.service.oac.biz.model.inner.request.param.PositionParam buildOacPositionParam(PositionStringParam positionStringParam) {
+    com.htfp.service.oac.biz.model.inner.request.param.PositionParam buildOacPositionParam(PositionParam positionParam) {
         com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacPositionParam = new com.htfp.service.oac.biz.model.inner.request.param.PositionParam();
-        oacPositionParam.setAlt(Integer.valueOf(positionStringParam.getAlt()));
-        oacPositionParam.setLat(Integer.valueOf(positionStringParam.getLat()));
-        oacPositionParam.setLng(Integer.valueOf(positionStringParam.getLng()));
+        oacPositionParam.setAlt(positionParam.getAlt());
+        oacPositionParam.setLat(positionParam.getLat());
+        oacPositionParam.setLng(positionParam.getLng());
         return oacPositionParam;
     }
 
-    List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionStringParam> routePointCoordinates) {
-        List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
-        for (PositionStringParam routePointCoordinate : routePointCoordinates) {
-            com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
-            oacRoutePointCoordinates.add(oacRoutePointCoordinate);
+    List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionParam> routePointCoordinates) {
+        if(CollectionUtils.isNotEmpty(routePointCoordinates)){
+            List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
+            for (PositionParam routePointCoordinate : routePointCoordinates) {
+                com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
+                oacRoutePointCoordinates.add(oacRoutePointCoordinate);
+            }
+            return oacRoutePointCoordinates;
+        } else {
+            return null;
         }
-        return oacRoutePointCoordinates;
     }
 
     FlightPlanApplyResponse buildFlightPlanApplyResponse(com.htfp.service.oac.biz.model.inner.response.FlightPlanApplyResponse oacFlightPlanApplyResponse) {
@@ -1121,7 +1144,7 @@ public class GcsServiceImpl implements IGcsService {
         atcQueryResultParam.setAtcEffectTime(atcIssuedLog.getAtcEffectTime());
         atcQueryResultParam.setAtcLimitPeriod(atcIssuedLog.getAtcLimitPeriod());
         atcQueryResultParam.setAtcOperator(atcIssuedLog.getAtcOperator());
-        atcQueryResultParam.setAtcSpecificPosition(JsonUtils.json2Object(atcIssuedLog.getAtcSpecificPosition(), PositionParam.class));
+        atcQueryResultParam.setAtcSpecificPosition(JsonUtils.json2Object(atcIssuedLog.getAtcSpecificPosition(), com.htfp.service.cac.router.biz.model.http.response.param.PositionParam.class));
         return atcQueryResultParam;
     }
 

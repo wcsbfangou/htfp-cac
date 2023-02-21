@@ -95,10 +95,10 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
             // TODO: 2022/12/22 IDC ID && 机器ID
             // 雪花算法生成replyFlightPlanId
             Long replyFlightPlanId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-            String applicantSubject;
-            if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType()))) {
+            String applicantSubject = null;
+            if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType())) && flightPlanApplyRequest.getApplicantOrganizationParam()!=null) {
                 applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantOrganizationParam());
-            } else {
+            } else if(ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType())) && flightPlanApplyRequest.getApplicantPersonParam()!=null){
                 applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantPersonParam());
             }
             ApplyFlightPlanLogDO applyFlightPlanLog = oacApplyFlightPlanLogDalService.buildApplyFlightPlanLogDO(flightPlanApplyRequest.getApplyFlightPlanId(), replyFlightPlanId, flightPlanApplyRequest.getCpn(), flightPlanApplyRequest.getApplicantType(), applicantSubject,
