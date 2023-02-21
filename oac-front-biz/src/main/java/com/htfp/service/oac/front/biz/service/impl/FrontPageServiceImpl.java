@@ -433,7 +433,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                         null, queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId(), queryApplyFlightPlanLog.getTakeoffSite(), queryApplyFlightPlanLog.getLandingSite(),
                         queryAirportInfo.getIdentificationAreaRadius(), queryAirportInfo.getAlarmAreaRadius(), queryAirportInfo.getLng(), queryAirportInfo.getLat(), queryAirportInfo.getAlt(),
                         null, false, null, false, flightPlanStatus, null);
-                DynamicRouteInfoDO dynamicRouteInfoDO = oacDynamicRouteInfoDalService.buildDynamicUavInfoDO(queryApplyFlightPlanLog.getReplyFlightPlanId(), null, queryUavInfo.getUavName(), cpn,
+                DynamicRouteInfoDO dynamicRouteInfoDO = oacDynamicRouteInfoDalService.buildDynamicRouteInfoDO(queryApplyFlightPlanLog.getReplyFlightPlanId(), null, queryUavInfo.getUavName(), cpn,
                         queryApplyFlightPlanLog.getRoutePointCoordinates(), null, null, null, null, null, null,
                         queryApplyFlightPlanLog.getTakeoffSite(), queryAirportInfo.getLandingSites(), flightPlanStatus);
                 // TODO: 2022/12/23 事务
@@ -474,13 +474,16 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     if (!updateDynamicInfoPlanStatusByReplyFlyId(replyFlyId, flightPlanStatusTypeEnum)) {
                         //ROLLBACK
                         oacApplyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, queryApplyFlyLog.getStatus());
-                        flyIssuedResponse.fail();
-                    } else {
-                        flyIssuedResponse.setCpn(flyIssuedRequest.getCpn());
                     }
                     FlyReplyRequest cacFlyReplyRequest = buildCacFlyReplyRequest(flyIssuedRequest, queryApplyFlyLog.getApplyFlyId());
                     FlyReplyResponse cacFlyReplyResponse = oacService.flyReply(cacFlyReplyRequest);
                     flyIssuedResponse = buildFlyIssuedResponse(cacFlyReplyResponse);
+                    if (flyIssuedResponse.getSuccess()) {
+                        flyIssuedResponse.setCpn(flyIssuedRequest.getCpn());
+                    } else {
+                        //ROLLBACK
+                        oacApplyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, queryApplyFlyLog.getStatus());
+                    }
                     log.info("[oac]放飞申请结果下发end，flyIssuedRequest={}, flyIssuedResponse={}", flyIssuedRequest, JsonUtils.object2Json(flyIssuedResponse));
                 } else {
                     flyIssuedResponse.fail("放飞申请结果已下发，不允许重复下发");
@@ -541,8 +544,8 @@ public class FrontPageServiceImpl implements IFrontPageService {
         atcIssuedResponse.fail();
         try {
             log.info("[oac]管制信息下发start，atcIssuedRequest={}", atcIssuedRequest);
-            DynamicRouteInfoDO queryDynamicRouteInfo = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(atcIssuedRequest.getFlyId()));
-            DynamicUavInfoDO queryDynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(Long.valueOf(atcIssuedRequest.getFlyId()));
+            DynamicRouteInfoDO queryDynamicRouteInfo = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(atcIssuedRequest.getFlightPlanId()));
+            DynamicUavInfoDO queryDynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(Long.valueOf(atcIssuedRequest.getFlightPlanId()));
             if (queryDynamicUavInfo != null && queryDynamicRouteInfo != null) {
                 String currentTime = DateUtils.getDateFormatString(new Date(), DateUtils.DATETIME_MSEC_PATTERN);
                 Long replyFlightPlanId = Long.valueOf(atcIssuedRequest.getFlightPlanId());
@@ -550,7 +553,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                 ATCIssuedLogDO atcIssuedLog = oacATCIssuedLogDalService.buildATCIssuedLog(replyFlightPlanId, replyFlyId, atcIssuedRequest.getCpn(), atcIssuedRequest.getAtcType(), null,
                         currentTime, null, "oacSystem", DeliverTypeEnum.DELIVERING.getCode());
                 int id = oacATCIssuedLogDalService.insertATCIssuedLog(atcIssuedLog);
-                if (id > 1) {
+                if (id > 0) {
                     ApplyFlyLogDO queryApplyFlyLog = oacApplyFlyLogDalService.queryApplyFlyLogByReplyFlyId(replyFlyId);
                     if (updateDynamicInfoStatus(queryDynamicUavInfo, queryDynamicRouteInfo, atcIssuedRequest.getAtcType())) {
                         ATCSendRequest cacATCSendRequest = buildCacATCSendRequest(atcIssuedRequest, queryApplyFlyLog);

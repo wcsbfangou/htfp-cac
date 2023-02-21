@@ -592,32 +592,38 @@ public class GcsServiceImpl implements IGcsService {
         flyApplyResponse.fail();
         try {
             log.info("[router]放飞申请start，flyApplyRequest={}", flyApplyRequest);
-            UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(flyApplyRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
-            UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flyApplyRequest.getUavId()));
-            UavNavigationMappingDO queryUavNavigationMapping = uavDalService.queryUavNavigationMapping(queryUavInfo.getId());
-            if (queryUavOacMapping != null && queryUavOacMapping.getReportCode().equals(queryUavInfo.getCpn())) {
-                // TODO: 2022/12/22 IDC ID && 机器ID
-                // 生成applyFlyId
-                Long applyFlyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-                ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
-                ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.buildApplyFlyLogDO(applyFlyId, null, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavNavigationMapping.getNavigationId(),
-                        Long.valueOf(flyApplyRequest.getGcsId()), Long.valueOf(flyApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), JsonUtils.object2Json(flyApplyRequest.getAirspaceNumbers()), flyApplyRequest.getOperationScenarioType(),
-                        flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
-                int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
-                if (id > 0) {
-                    com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
-                    com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
-                    // TODO: 2022/12/22 校验oacFlyApplyResponse
-                    flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
-                    if (flyApplyResponse.getSuccess()) {
-                        applyFlyLogDalService.updateApplyFlyLogReplyFlyIdById(applyFlyLogDO.getId(), oacFlyApplyResponse.getReplyFlyId());
-                        flyApplyResponse.setApplyFlyId(applyFlyId.toString());
+            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
+            if (queryApplyFlyLog == null) {
+                UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(flyApplyRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
+                UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flyApplyRequest.getUavId()));
+                UavNavigationMappingDO queryUavNavigationMapping = uavDalService.queryUavNavigationMapping(queryUavInfo.getId());
+                if (queryUavOacMapping != null && queryUavOacMapping.getReportCode().equals(queryUavInfo.getCpn())) {
+                    // TODO: 2022/12/22 IDC ID && 机器ID
+                    // 生成applyFlyId
+                    Long applyFlyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
+
+                    ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
+                    ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.buildApplyFlyLogDO(applyFlyId, null, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavNavigationMapping.getNavigationId(),
+                            Long.valueOf(flyApplyRequest.getGcsId()), Long.valueOf(flyApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), JsonUtils.object2Json(flyApplyRequest.getAirspaceNumbers()), flyApplyRequest.getOperationScenarioType(),
+                            flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
+                    int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
+                    if (id > 0) {
+                        com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                        com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
+                        // TODO: 2022/12/22 校验oacFlyApplyResponse
+                        flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
+                        if (flyApplyResponse.getSuccess()) {
+                            applyFlyLogDalService.updateApplyFlyLogReplyFlyIdById(applyFlyLogDO.getId(), oacFlyApplyResponse.getReplyFlyId());
+                            flyApplyResponse.setApplyFlyId(applyFlyId.toString());
+                        }
+                    } else {
+                        flyApplyResponse.fail("放飞申请失败，插入数据失败");
                     }
                 } else {
-                    flyApplyResponse.fail("放飞申请失败，插入数据失败");
+                    flyApplyResponse.fail("放飞申请失败，未接入运行管控或正在执飞");
                 }
             } else {
-                flyApplyResponse.fail("放飞申请失败，未接入运行管控或正在执飞");
+                flyApplyResponse.fail("放飞申请失败,已发起过放飞申请,无需重新下发");
             }
             log.info("[router]放飞申请end，flyApplyRequest={},flyApplyResponse={}", flyApplyRequest, JsonUtils.object2Json(flyApplyResponse));
         } catch (Exception e) {
@@ -1083,8 +1089,8 @@ public class GcsServiceImpl implements IGcsService {
                 if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                     List<ATCIssuedLogDO> atcIssuedLogDOList = atcIssuedLogDalService.queryATCIssuedLogByApplyFlightPlanId(Long.valueOf(atcQueryRequest.getApplyFlightPlanId()));
                     for (ATCIssuedLogDO atcIssuedLog : atcIssuedLogDOList) {
-                        if(atcQueryRequest.getApplyFlightPlanId().equals(atcIssuedLog.getApplyFlightPlanId().toString()) &&
-                        atcQueryRequest.getApplyFlyId().equals(atcIssuedLog.getApplyFlyId().toString())){
+                        if (atcQueryRequest.getApplyFlightPlanId().equals(atcIssuedLog.getApplyFlightPlanId().toString()) &&
+                                atcQueryRequest.getApplyFlyId().equals(atcIssuedLog.getApplyFlyId().toString())) {
                             ATCQueryResultParam atcQueryResultParam = buildATCQueryResultParam(atcIssuedLog);
                             atcQueryResultParamList.add(atcQueryResultParam);
                         }
@@ -1105,7 +1111,7 @@ public class GcsServiceImpl implements IGcsService {
         return atcQueryResponse;
     }
 
-    private ATCQueryResultParam buildATCQueryResultParam(ATCIssuedLogDO atcIssuedLog){
+    private ATCQueryResultParam buildATCQueryResultParam(ATCIssuedLogDO atcIssuedLog) {
         ATCQueryResultParam atcQueryResultParam = new ATCQueryResultParam();
         atcQueryResultParam.setAtcId(atcIssuedLog.getId().toString());
         atcQueryResultParam.setApplyFlightPlanId(atcIssuedLog.getApplyFlightPlanId().toString());
@@ -1142,8 +1148,8 @@ public class GcsServiceImpl implements IGcsService {
                 if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                     List<AlarmIssuedLogDO> alarmIssuedLogList = alarmIssuedLogDalService.queryAlarmIssuedLogByApplyFlightPlanId(Long.valueOf(alarmQueryRequest.getApplyFlightPlanId()));
                     for (AlarmIssuedLogDO alarmIssuedLog : alarmIssuedLogList) {
-                        if(alarmQueryRequest.getApplyFlightPlanId().equals(alarmIssuedLog.getApplyFlightPlanId().toString()) &&
-                                alarmQueryRequest.getApplyFlyId().equals(alarmIssuedLog.getApplyFlyId().toString())){
+                        if (alarmQueryRequest.getApplyFlightPlanId().equals(alarmIssuedLog.getApplyFlightPlanId().toString()) &&
+                                alarmQueryRequest.getApplyFlyId().equals(alarmIssuedLog.getApplyFlyId().toString())) {
                             AlarmQueryResultParam alarmQueryResultParam = buildAlarmQueryResultParam(alarmIssuedLog);
                             alarmQueryResultParamList.add(alarmQueryResultParam);
                         }
@@ -1164,7 +1170,7 @@ public class GcsServiceImpl implements IGcsService {
         return alarmQueryResponse;
     }
 
-    private AlarmQueryResultParam buildAlarmQueryResultParam (AlarmIssuedLogDO alarmIssuedLogDO){
+    private AlarmQueryResultParam buildAlarmQueryResultParam(AlarmIssuedLogDO alarmIssuedLogDO) {
         AlarmQueryResultParam alarmQueryResultParam = new AlarmQueryResultParam();
         alarmQueryResultParam.setAlarmId(alarmIssuedLogDO.getId().toString());
         alarmQueryResultParam.setApplyFlightPlanId(alarmIssuedLogDO.getApplyFlightPlanId().toString());

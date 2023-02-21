@@ -64,8 +64,8 @@ public class OacDynamicRouteInfoDalService {
         return updateDynamicRouteInfo(dynamicUavInfoDO);
     }
 
-    public DynamicRouteInfoDO buildDynamicUavInfoDO(Long replyFlightPlanId, Long replyFlyId, String uavName, String cpn, String routePointCoordinates, Integer currentLegStartLng, Integer currentLegStartLat, Integer currentLegStartAlt,
-                                                  Integer currentLegEndLng, Integer currentLegEndLat, Integer currentLegEndAlt, String takeoffSite, String landingSite, Integer planStatus) {
+    public DynamicRouteInfoDO buildDynamicRouteInfoDO(Long replyFlightPlanId, Long replyFlyId, String uavName, String cpn, String routePointCoordinates, Integer currentLegStartLng, Integer currentLegStartLat, Integer currentLegStartAlt,
+                                                      Integer currentLegEndLng, Integer currentLegEndLat, Integer currentLegEndAlt, String takeoffSite, String landingSite, Integer planStatus) {
         DynamicRouteInfoDO dynamicRouteInfoDO = new DynamicRouteInfoDO();
         dynamicRouteInfoDO.setReplyFlightPlanId(replyFlightPlanId);
         dynamicRouteInfoDO.setReplyFlyId(replyFlyId);
