@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 public class ATCQueryResponse extends BaseResponse {
 
-    private List<ATCQueryResultParam> atcQueryResultParamList;
+    // private List<ATCQueryResultParam> atcQueryResultParamList;
+    ATCQueryResultParam atcQueryResultParam;
 
 }

@@ -34,11 +34,11 @@ public class ApplyFlyLogDalService {
         return applyFlyMapper.selectByReplyFlyId(replyFlyId);
     }
 
-    public ApplyFlyLogDO queryApplyFlyLogByApplyFlightPlanId(Long applyFlightPlanId){
+    public List<ApplyFlyLogDO> queryApplyFlyLogByApplyFlightPlanId(Long applyFlightPlanId){
         return applyFlyMapper.selectByApplyFlightPlanId(applyFlightPlanId);
     }
 
-    public ApplyFlyLogDO queryApplyFlightPlanLogByReplyFlightPlanId(String replyFlightPlanId){
+    public List<ApplyFlyLogDO> queryApplyFlightPlanLogByReplyFlightPlanId(String replyFlightPlanId){
         return applyFlyMapper.selectByReplyFlightPlanId(replyFlightPlanId);
     }
 

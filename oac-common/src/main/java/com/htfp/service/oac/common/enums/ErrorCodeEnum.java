@@ -113,8 +113,17 @@ public enum ErrorCodeEnum {
     LACK_OF_AIRPORT_ID(3514, "机场ID缺失"),
     LACK_OF_ALARM_ID(3515, "告警ID缺失"),
     LACK_OF_ATC_TYPE(3516, "管制类型缺失"),
-    LACK_OF_ALARM_TYPE(3517, "告警类型缺失"),
-    LACK_OF_ALARM_CONTENT(3518, "告警内容缺失"),
+    WRONG_APPLY_AIRSPACE_ID(3517, "空域申请Id错误"),
+    WRONG_REPLY_AIRSPACE_ID(3518, "空域审批Id错误"),
+    WRONG_APPLY_FLIGHT_PLAN_ID(3519, "飞行计划申请Id错误"),
+    WRONG_REPLY_FLIGHT_PLAN_ID(3520, "飞行计划审批Id错误"),
+    WRONG_APPLY_VERIFY_ID(3521, "无人机接入申请Id错误"),
+    WRONG_REPLY_VERIFY_ID(3522, "无人机接入审批Id错误"),
+    WRONG_APPLY_FLY_ID(3523, "放飞申请Id错误"),
+    WRONG_REPLY_FLY_ID(3524, "放飞审批Id错误"),
+    LACK_OF_ALARM_TYPE(3525, "告警类型缺失"),
+    LACK_OF_ALARM_CONTENT(3526, "告警内容缺失"),
+    WRONG_AIRPORT_ID(3527, "机场编码缺错误"),
 
     SYSTEM_UNAVAILABLE(4001, "系统暂时不可用"),
     SYSTEM_ERROR(4002, "系统错误"),
@@ -134,6 +143,7 @@ public enum ErrorCodeEnum {
     AIRSPACE_NOT_APPROVED(5010, "空域申请未通过"),
     FLIGHT_PLAN_NOT_APPROVED(5011, "飞行计划未通过"),
     FlY_NOT_APPROVED(5012, "放飞申请未通过"),
+    IN_FLIGHT_PLAN(5013, "无人机正在执行飞行计划中"),
     OTHER_BIZ_ERROR(5900, "其他业务失败"),
     ;
 

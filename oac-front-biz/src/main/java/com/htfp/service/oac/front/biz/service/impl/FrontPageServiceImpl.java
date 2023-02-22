@@ -4,7 +4,7 @@ import com.htfp.service.cac.dao.model.oac.ATCIssuedLogDO;
 import com.htfp.service.cac.dao.model.oac.AlarmIssuedLogDO;
 import com.htfp.service.cac.dao.service.oac.OacATCIssuedLogDalService;
 import com.htfp.service.cac.dao.service.oac.OacAlarmIssuedLogDalService;
-import com.htfp.service.cac.inner.app.service.IOacService;
+import com.htfp.service.cac.router.biz.service.inner.IOacService;
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
@@ -198,9 +198,9 @@ public class FrontPageServiceImpl implements IFrontPageService {
             queryUavDynamicInfoResultParam.setLat(dynamicUavInfo.getLat());
             queryUavDynamicInfoResultParam.setSpeed(dynamicUavInfo.getSpeed());
             queryUavDynamicInfoResultParam.setCourse(dynamicUavInfo.getCourse());
-            queryUavDynamicInfoResultParam.setFuel(dynamicUavInfo.getFuel());
-            queryUavDynamicInfoResultParam.setBattery(dynamicUavInfo.getBattery());
-            queryUavDynamicInfoResultParam.setSignal(dynamicUavInfo.getSignalStrength());
+            queryUavDynamicInfoResultParam.setFuel(dynamicUavInfo.getFuel() == null ? 85 : dynamicUavInfo.getFuel());
+            queryUavDynamicInfoResultParam.setBattery(dynamicUavInfo.getBattery() == null ? 85 : dynamicUavInfo.getBattery());
+            queryUavDynamicInfoResultParam.setSignal(dynamicUavInfo.getSignalStrength() == null ? 5 : dynamicUavInfo.getSignalStrength());
             queryUavDynamicInfoResultParam.setUpdateTime(dynamicUavInfo.getUpdateTime());
             queryUavDynamicInfoResultParam.setFlightPlanStartTime(dynamicUavInfo.getFlightPlanStartTime());
             queryUavDynamicInfoResultParam.setFlightPlanEndTime(dynamicUavInfo.getFlightPlanEndTime());
@@ -377,8 +377,10 @@ public class FrontPageServiceImpl implements IFrontPageService {
                         if (!initializeDynamicInfo(queryApplyFlightPlanLog, flightPlanIssuedRequest.getCpn(), FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.getCode())) {
                             //ROLLBACK
                             oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, queryApplyFlightPlanLogStatus);
+                            flightPlanIssuedResponse.fail();
+                        } else {
+                            flightPlanIssuedResponse.success();
                         }
-                        flightPlanIssuedResponse.success();
                     } else {
                         oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.UNAPPROVED.getCode());
                         flightPlanIssuedResponse.success();
@@ -651,7 +653,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
         QueryFlightPlanInfoResponse queryFlightPlanInfoResponse = new QueryFlightPlanInfoResponse();
         queryFlightPlanInfoResponse.fail();
         try {
-            log.info("[oac]查询飞行计划start，queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest);
+            //log.info("[oac]查询飞行计划start，queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest);
             List<QueryFlightPlanInfoParam> flightPlanInfoParamList = new ArrayList<>();
             List<ApplyFlightPlanLogDO> queryApplyFlightPlanLogList;
             FlightPlanStatusTypeEnum flightPlanStatusTypeEnum = FlightPlanStatusTypeEnum.getFromCode(queryFlightPlanInfoRequest.getUavPlanStatus());
@@ -672,7 +674,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             }
             queryFlightPlanInfoResponse.setQueryFlightPlanInfoParamList(flightPlanInfoParamList);
             queryFlightPlanInfoResponse.success();
-            log.info("[oac]查询飞行计划end，queryFlightPlanInfoRequest={},queryFlightPlanInfoResponse={}", queryFlightPlanInfoRequest, JsonUtils.object2Json(queryFlightPlanInfoResponse));
+            //log.info("[oac]查询飞行计划end，queryFlightPlanInfoRequest={},queryFlightPlanInfoResponse={}", queryFlightPlanInfoRequest, JsonUtils.object2Json(queryFlightPlanInfoResponse));
         } catch (Exception e) {
             log.error("[oac]查询飞行计划异常，queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest, e);
             queryFlightPlanInfoResponse.fail(e.getMessage());

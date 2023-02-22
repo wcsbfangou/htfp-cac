@@ -55,7 +55,7 @@ public interface OacApplyFlyLogMapper {
      * @return
      */
     @Select("SELECT * FROM " + TABLE + " WHERE apply_flight_plan_id = #{applyFlightPlanId} AND is_del = 0")
-    ApplyFlyLogDO selectByApplyFlightPlanId(@Param(value = "applyFlightPlanId") String applyFlightPlanId);
+    List<ApplyFlyLogDO> selectByApplyFlightPlanId(@Param(value = "applyFlightPlanId") String applyFlightPlanId);
 
     /**
      * 根据replyFlightPlanId查询
@@ -64,7 +64,7 @@ public interface OacApplyFlyLogMapper {
      * @return
      */
     @Select("SELECT * FROM " + TABLE + " WHERE reply_flight_plan_id = #{replyFlightPlanId} AND is_del = 0")
-    ApplyFlyLogDO selectByReplyFlightPlanId(@Param(value = "replyFlightPlanId") Long replyFlightPlanId);
+    List<ApplyFlyLogDO> selectByReplyFlightPlanId(@Param(value = "replyFlightPlanId") Long replyFlightPlanId);
 
     /**
      * 根据cpn查询

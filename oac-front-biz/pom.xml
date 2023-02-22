@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>com.htfp.service</groupId>
-            <artifactId>cac-inner-app</artifactId>
+            <artifactId>cac-router-biz</artifactId>
             <version>0.0.1</version>
         </dependency>
     </dependencies>

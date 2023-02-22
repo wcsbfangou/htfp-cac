@@ -29,6 +29,10 @@ public class ATCIssuedLogDalService {
         return atcIssuedLogMapper.selectByApplyFlightPlanId(applyFlightPlanId);
     }
 
+    public List<ATCIssuedLogDO> queryATCIssuedLogByApplyFlightPlanIdAndAtcDelivered(Long applyFlightPlanId, Integer atcDelivered) {
+        return atcIssuedLogMapper.selectByApplyFlightPlanIdAndAtcDelivered(applyFlightPlanId, atcDelivered);
+    }
+
     public List<ATCIssuedLogDO> queryATCIssuedLogByApplyFlyId(Long applyFlyId) {
         return atcIssuedLogMapper.selectByApplyFlyId(applyFlyId);
     }

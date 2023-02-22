@@ -17,7 +17,6 @@
 
     <modules>
         <module>cac-app</module>
-        <module>cac-inner-app</module>
         <module>cac-command-biz</module>
         <module>cac-router-biz</module>
         <module>cac-dao</module>

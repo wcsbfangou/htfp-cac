@@ -41,6 +41,15 @@ public interface ATCIssuedLogMapper {
     List<ATCIssuedLogDO> selectByApplyFlightPlanId(@Param(value = "applyFlightPlanId") Long applyFlightPlanId);
 
     /**
+     * 根据applyFlightPlanId和atcDelivered查询
+     * @param applyFlightPlanId
+     * @param atcDelivered
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE apply_flight_plan_id = #{applyFlightPlanId} AND atc_delivered = #{atcDelivered} AND is_del = 0")
+    List<ATCIssuedLogDO> selectByApplyFlightPlanIdAndAtcDelivered(@Param(value = "applyFlightPlanId") Long applyFlightPlanId, @Param(value = "atcDelivered") Integer atcDelivered);
+
+    /**
      * 根据applyFlyId查询
      *
      * @param applyFlyId

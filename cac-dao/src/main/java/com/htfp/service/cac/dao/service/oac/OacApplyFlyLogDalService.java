@@ -34,11 +34,11 @@ public class OacApplyFlyLogDalService {
         return oacApplyFlyLogMapper.selectByReplyFlyId(replyFlyId);
     }
 
-    public ApplyFlyLogDO queryApplyFlyLogByApplyFlightPlanId(String applyFlightPlanId){
+    public List<ApplyFlyLogDO> queryApplyFlyLogByApplyFlightPlanId(String applyFlightPlanId){
         return oacApplyFlyLogMapper.selectByApplyFlightPlanId(applyFlightPlanId);
     }
 
-    public ApplyFlyLogDO queryApplyFlyLogByReplyFlightPlanId(Long replyFlightPlanId){
+    public List<ApplyFlyLogDO> queryApplyFlyLogByReplyFlightPlanId(Long replyFlightPlanId){
         return oacApplyFlyLogMapper.selectByReplyFlightPlanId(replyFlightPlanId);
     }
 

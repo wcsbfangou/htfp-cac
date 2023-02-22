@@ -55,7 +55,7 @@ public interface ApplyFlyLogMapper {
      * @return
      */
     @Select("SELECT * FROM " + TABLE + " WHERE apply_flight_plan_id = #{applyFlightPlanId} AND is_del = 0")
-    ApplyFlyLogDO selectByApplyFlightPlanId(@Param(value = "applyFlightPlanId") Long applyFlightPlanId);
+    List<ApplyFlyLogDO> selectByApplyFlightPlanId(@Param(value = "applyFlightPlanId") Long applyFlightPlanId);
 
     /**
      * 根据replyFlightPlanId查询
@@ -64,7 +64,7 @@ public interface ApplyFlyLogMapper {
      * @return
      */
     @Select("SELECT * FROM " + TABLE + " WHERE reply_flight_plan_id = #{replyFlightPlanId} AND is_del = 0")
-    ApplyFlyLogDO selectByReplyFlightPlanId(@Param(value = "replyFlightPlanId") String replyFlightPlanId);
+    List<ApplyFlyLogDO> selectByReplyFlightPlanId(@Param(value = "replyFlightPlanId") String replyFlightPlanId);
 
     /**
      * 根据navigationId查询

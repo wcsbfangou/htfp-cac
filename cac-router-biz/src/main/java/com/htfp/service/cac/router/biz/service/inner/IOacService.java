@@ -1,4 +1,4 @@
-package com.htfp.service.cac.inner.app.service;
+package com.htfp.service.cac.router.biz.service.inner;
 
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;

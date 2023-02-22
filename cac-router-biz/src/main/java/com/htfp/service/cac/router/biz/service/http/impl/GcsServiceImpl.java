@@ -10,6 +10,7 @@ import com.htfp.service.cac.command.biz.service.ICommandService;
 import com.htfp.service.cac.command.biz.service.IUavService;
 import com.htfp.service.cac.common.enums.ApplicantTypeEnum;
 import com.htfp.service.cac.common.enums.ApplyStatusEnum;
+import com.htfp.service.cac.common.enums.DeliverTypeEnum;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
@@ -80,6 +81,7 @@ import com.htfp.service.oac.biz.model.inner.request.param.UavDynamicParam;
 import com.htfp.service.oac.biz.model.inner.request.param.UavStaticParam;
 import com.htfp.service.oac.app.service.IFlyingService;
 import com.htfp.service.oac.app.service.IPreFlightService;
+import com.htfp.service.oac.common.enums.AtcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -332,7 +334,7 @@ public class GcsServiceImpl implements IGcsService {
     }
 
     com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam buildOacPersonParam(OrganizationParam applicantOrganizationParam) {
-        if(applicantOrganizationParam!=null){
+        if (applicantOrganizationParam != null) {
             com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam oacApplicantOrganizationParam = new com.htfp.service.oac.biz.model.inner.request.param.OrganizationParam();
             oacApplicantOrganizationParam.setOrgType(applicantOrganizationParam.getOrgType());
             oacApplicantOrganizationParam.setOrgName(applicantOrganizationParam.getOrgName());
@@ -348,7 +350,7 @@ public class GcsServiceImpl implements IGcsService {
     }
 
     com.htfp.service.oac.biz.model.inner.request.param.PersonParam buildOacPersonParam(PersonParam applicantPersonParam) {
-        if(applicantPersonParam!=null){
+        if (applicantPersonParam != null) {
             com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPersonParam = new com.htfp.service.oac.biz.model.inner.request.param.PersonParam();
             oacPersonParam.setPersonName(applicantPersonParam.getPersonName());
             oacPersonParam.setNationality(applicantPersonParam.getNationality());
@@ -366,7 +368,7 @@ public class GcsServiceImpl implements IGcsService {
     }
 
     List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> buildOacPilots(List<PersonParam> pilots) {
-        if(CollectionUtils.isNotEmpty(pilots)){
+        if (CollectionUtils.isNotEmpty(pilots)) {
             List<com.htfp.service.oac.biz.model.inner.request.param.PersonParam> oacPilots = new ArrayList<>();
             for (PersonParam pilot : pilots) {
                 com.htfp.service.oac.biz.model.inner.request.param.PersonParam oacPilot = buildOacPersonParam(pilot);
@@ -388,7 +390,7 @@ public class GcsServiceImpl implements IGcsService {
     }
 
     List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> buildOacRoutePointCoordinates(List<PositionParam> routePointCoordinates) {
-        if(CollectionUtils.isNotEmpty(routePointCoordinates)){
+        if (CollectionUtils.isNotEmpty(routePointCoordinates)) {
             List<com.htfp.service.oac.biz.model.inner.request.param.PositionParam> oacRoutePointCoordinates = new ArrayList<>();
             for (PositionParam routePointCoordinate : routePointCoordinates) {
                 com.htfp.service.oac.biz.model.inner.request.param.PositionParam oacRoutePointCoordinate = buildOacPositionParam(routePointCoordinate);
@@ -421,21 +423,25 @@ public class GcsServiceImpl implements IGcsService {
         try {
             log.info("[router]飞行计划查询start，flightPlanQueryRequest={}", flightPlanQueryRequest);
             ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flightPlanQueryRequest.getApplyFlightPlanId()));
-            if (!ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus()))) {
-                flightPlanQueryResponse.success();
-                FlightPlanQueryResultParam flightPlanQueryResultParam = new FlightPlanQueryResultParam();
-                flightPlanQueryResultParam.setApplyFlightPlanId(flightPlanQueryRequest.getApplyFlightPlanId());
-                flightPlanQueryResultParam.setReplyFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId());
-                flightPlanQueryResultParam.setStatus(queryApplyFlightPlanLog.getStatus());
-                flightPlanQueryResponse.setFlightPlanQueryResultParam(flightPlanQueryResultParam);
-            } else {
-                com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = buildOacFlightPlanQueryRequest(queryApplyFlightPlanLog.getReplyFlightPlanId());
-                com.htfp.service.oac.biz.model.inner.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightService.flightPlanQuery(oacFlightPlanQueryRequest);
-                // TODO: 2022/12/22 校验oacFlightPlanQueryResponse
-                flightPlanQueryResponse = buildOacFlightPlanQueryResponse(oacFlightPlanQueryResponse);
-                if (flightPlanQueryResponse.getSuccess() && !queryApplyFlightPlanLog.getStatus().equals(flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus())) {
-                    applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus());
+            if (queryApplyFlightPlanLog != null) {
+                if (!ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus()))) {
+                    flightPlanQueryResponse.success();
+                    FlightPlanQueryResultParam flightPlanQueryResultParam = new FlightPlanQueryResultParam();
+                    flightPlanQueryResultParam.setApplyFlightPlanId(flightPlanQueryRequest.getApplyFlightPlanId());
+                    flightPlanQueryResultParam.setReplyFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId());
+                    flightPlanQueryResultParam.setStatus(queryApplyFlightPlanLog.getStatus());
+                    flightPlanQueryResponse.setFlightPlanQueryResultParam(flightPlanQueryResultParam);
+                } else {
+                    com.htfp.service.oac.biz.model.inner.request.FlightPlanQueryRequest oacFlightPlanQueryRequest = buildOacFlightPlanQueryRequest(queryApplyFlightPlanLog.getReplyFlightPlanId());
+                    com.htfp.service.oac.biz.model.inner.response.FlightPlanQueryResponse oacFlightPlanQueryResponse = preFlightService.flightPlanQuery(oacFlightPlanQueryRequest);
+                    // TODO: 2022/12/22 校验oacFlightPlanQueryResponse
+                    flightPlanQueryResponse = buildOacFlightPlanQueryResponse(oacFlightPlanQueryResponse);
+                    if (flightPlanQueryResponse.getSuccess() && !queryApplyFlightPlanLog.getStatus().equals(flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus())) {
+                        applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, flightPlanQueryResponse.getFlightPlanQueryResultParam().getStatus());
+                    }
                 }
+            } else {
+                flightPlanQueryResponse.fail(ErrorCodeEnum.WRONG_APPLY_FLIGHT_PLAN_ID);
             }
             log.info("[router]飞行计划查询end，flightPlanQueryRequest={},flightPlanQueryResponse={}", flightPlanQueryRequest, JsonUtils.object2Json(flightPlanQueryResponse));
         } catch (Exception e) {
@@ -552,28 +558,34 @@ public class GcsServiceImpl implements IGcsService {
 
     com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest buildOacUavVerifyApplyRequest(UavVerifyApplyRequest uavVerifyApplyRequest, Long applyUavVerifyId, String cpn) {
         com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest oacUavVerifyApplyRequest = new com.htfp.service.oac.biz.model.inner.request.UavVerifyApplyRequest();
-        UavDynamicParam oacUavDynamicParam = new UavDynamicParam();
-        UavStaticParam oacUavStaticParam = new UavStaticParam();
-        oacUavDynamicParam.setTrueCourse(uavVerifyApplyRequest.getUavDynamicParam().getTrueCourse());
-        oacUavDynamicParam.setPitchAngle(uavVerifyApplyRequest.getUavDynamicParam().getPitchAngle());
-        oacUavDynamicParam.setRollAngle(uavVerifyApplyRequest.getUavDynamicParam().getRollAngle());
-        oacUavDynamicParam.setVoltage(uavVerifyApplyRequest.getUavDynamicParam().getVoltage());
-        oacUavDynamicParam.setFuel(uavVerifyApplyRequest.getUavDynamicParam().getFuel());
-        oacUavDynamicParam.setBattery(uavVerifyApplyRequest.getUavDynamicParam().getBattery());
-        oacUavDynamicParam.setFlyMode(uavVerifyApplyRequest.getUavDynamicParam().getFlyMode());
-        oacUavDynamicParam.setCameraOn(uavVerifyApplyRequest.getUavDynamicParam().getCameraOn());
-        oacUavDynamicParam.setEngineOn(uavVerifyApplyRequest.getUavDynamicParam().getEngineOn());
-        oacUavDynamicParam.setAirOn(uavVerifyApplyRequest.getUavDynamicParam().getAirOn());
-        oacUavDynamicParam.setAbsoluteSpeed(uavVerifyApplyRequest.getUavDynamicParam().getAbsoluteSpeed());
-        oacUavDynamicParam.setAmbientTemperature(uavVerifyApplyRequest.getUavDynamicParam().getAmbientTemperature());
-        oacUavDynamicParam.setCurrentFaultCode(uavVerifyApplyRequest.getUavDynamicParam().getCurrentFaultCode());
-        oacUavStaticParam.setImei(uavVerifyApplyRequest.getUavStaticParam().getImei());
-        oacUavStaticParam.setImsi(uavVerifyApplyRequest.getUavStaticParam().getImsi());
-        oacUavStaticParam.setPhoneNumber(uavVerifyApplyRequest.getUavStaticParam().getPhoneNumber());
-        oacUavStaticParam.setPowerType(uavVerifyApplyRequest.getUavStaticParam().getPowerType());
-        oacUavStaticParam.setHorizontalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getHorizontalPositionAcc());
-        oacUavStaticParam.setVerticalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getVerticalPositionAcc());
-        oacUavStaticParam.setTotalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getTotalPositionAcc());
+        if (uavVerifyApplyRequest.getUavDynamicParam() != null) {
+            UavDynamicParam oacUavDynamicParam = new UavDynamicParam();
+            oacUavDynamicParam.setTrueCourse(uavVerifyApplyRequest.getUavDynamicParam().getTrueCourse());
+            oacUavDynamicParam.setPitchAngle(uavVerifyApplyRequest.getUavDynamicParam().getPitchAngle());
+            oacUavDynamicParam.setRollAngle(uavVerifyApplyRequest.getUavDynamicParam().getRollAngle());
+            oacUavDynamicParam.setVoltage(uavVerifyApplyRequest.getUavDynamicParam().getVoltage());
+            oacUavDynamicParam.setFuel(uavVerifyApplyRequest.getUavDynamicParam().getFuel());
+            oacUavDynamicParam.setBattery(uavVerifyApplyRequest.getUavDynamicParam().getBattery());
+            oacUavDynamicParam.setFlyMode(uavVerifyApplyRequest.getUavDynamicParam().getFlyMode());
+            oacUavDynamicParam.setCameraOn(uavVerifyApplyRequest.getUavDynamicParam().getCameraOn());
+            oacUavDynamicParam.setEngineOn(uavVerifyApplyRequest.getUavDynamicParam().getEngineOn());
+            oacUavDynamicParam.setAirOn(uavVerifyApplyRequest.getUavDynamicParam().getAirOn());
+            oacUavDynamicParam.setAbsoluteSpeed(uavVerifyApplyRequest.getUavDynamicParam().getAbsoluteSpeed());
+            oacUavDynamicParam.setAmbientTemperature(uavVerifyApplyRequest.getUavDynamicParam().getAmbientTemperature());
+            oacUavDynamicParam.setCurrentFaultCode(uavVerifyApplyRequest.getUavDynamicParam().getCurrentFaultCode());
+            oacUavVerifyApplyRequest.setUavDynamicParam(oacUavDynamicParam);
+        }
+        if (uavVerifyApplyRequest.getUavStaticParam() != null) {
+            UavStaticParam oacUavStaticParam = new UavStaticParam();
+            oacUavStaticParam.setImei(uavVerifyApplyRequest.getUavStaticParam().getImei());
+            oacUavStaticParam.setImsi(uavVerifyApplyRequest.getUavStaticParam().getImsi());
+            oacUavStaticParam.setPhoneNumber(uavVerifyApplyRequest.getUavStaticParam().getPhoneNumber());
+            oacUavStaticParam.setPowerType(uavVerifyApplyRequest.getUavStaticParam().getPowerType());
+            oacUavStaticParam.setHorizontalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getHorizontalPositionAcc());
+            oacUavStaticParam.setVerticalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getVerticalPositionAcc());
+            oacUavStaticParam.setTotalPositionAcc(uavVerifyApplyRequest.getUavStaticParam().getTotalPositionAcc());
+            oacUavVerifyApplyRequest.setUavStaticParam(oacUavStaticParam);
+        }
         oacUavVerifyApplyRequest.setCpn(cpn);
         oacUavVerifyApplyRequest.setApplyUavVerifyId(applyUavVerifyId.toString());
         oacUavVerifyApplyRequest.setLng(uavVerifyApplyRequest.getLng());
@@ -583,8 +595,6 @@ public class GcsServiceImpl implements IGcsService {
         oacUavVerifyApplyRequest.setRelativeHeight(uavVerifyApplyRequest.getRelativeHeight());
         oacUavVerifyApplyRequest.setFlightControlSn(uavVerifyApplyRequest.getFlightControlSn());
         oacUavVerifyApplyRequest.setFlightControlVersion(uavVerifyApplyRequest.getFlightControlVersion());
-        oacUavVerifyApplyRequest.setUavDynamicParam(oacUavDynamicParam);
-        oacUavVerifyApplyRequest.setUavStaticParam(oacUavStaticParam);
         return oacUavVerifyApplyRequest;
     }
 
@@ -615,8 +625,8 @@ public class GcsServiceImpl implements IGcsService {
         flyApplyResponse.fail();
         try {
             log.info("[router]放飞申请start，flyApplyRequest={}", flyApplyRequest);
-            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
-            if (queryApplyFlyLog == null) {
+            List<ApplyFlyLogDO> queryApplyFlyLogList = applyFlyLogDalService.queryApplyFlyLogByUavId(Long.valueOf(flyApplyRequest.getUavId()));
+            if (!judgeUavHasApplyFly(queryApplyFlyLogList)) {
                 UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(flyApplyRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
                 UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flyApplyRequest.getUavId()));
                 UavNavigationMappingDO queryUavNavigationMapping = uavDalService.queryUavNavigationMapping(queryUavInfo.getId());
@@ -624,29 +634,35 @@ public class GcsServiceImpl implements IGcsService {
                     // TODO: 2022/12/22 IDC ID && 机器ID
                     // 生成applyFlyId
                     Long applyFlyId = SnowflakeIdUtils.generateSnowFlakeId(1, 1);
-
                     ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flyApplyRequest.getApplyFlightPlanId()));
-                    ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.buildApplyFlyLogDO(applyFlyId, null, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavNavigationMapping.getNavigationId(),
-                            Long.valueOf(flyApplyRequest.getGcsId()), Long.valueOf(flyApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), JsonUtils.object2Json(flyApplyRequest.getAirspaceNumbers()), flyApplyRequest.getOperationScenarioType(),
-                            flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
-                    int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
-                    if (id > 0) {
-                        com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
-                        com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
-                        // TODO: 2022/12/22 校验oacFlyApplyResponse
-                        flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
-                        if (flyApplyResponse.getSuccess()) {
-                            applyFlyLogDalService.updateApplyFlyLogReplyFlyIdById(applyFlyLogDO.getId(), oacFlyApplyResponse.getReplyFlyId());
-                            flyApplyResponse.setApplyFlyId(applyFlyId.toString());
+                    if (queryApplyFlightPlanLog.getUavId().equals(Long.valueOf(flyApplyRequest.getUavId())) && ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus()))) {
+                        ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.buildApplyFlyLogDO(applyFlyId, null, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavNavigationMapping.getNavigationId(),
+                                Long.valueOf(flyApplyRequest.getGcsId()), Long.valueOf(flyApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), JsonUtils.object2Json(flyApplyRequest.getAirspaceNumbers()), flyApplyRequest.getOperationScenarioType(),
+                                flyApplyRequest.getFlyLng(), flyApplyRequest.getFlyLat(), flyApplyRequest.getFlyAlt(), flyApplyRequest.getVin(), flyApplyRequest.getPvin(), flyApplyRequest.getFlightControlSn(), flyApplyRequest.getImei(), ApplyStatusEnum.PENDING.getCode());
+                        int id = applyFlyLogDalService.insertApplyFlyLog(applyFlyLogDO);
+                        if (id > 0) {
+                            com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest oacFlyApplyRequest = buildOacFlyApplyRequest(flyApplyRequest, applyFlyId, queryApplyFlightPlanLog.getApplyFlightPlanId(), queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                            com.htfp.service.oac.biz.model.inner.response.FlyApplyResponse oacFlyApplyResponse = flyingService.flyApply(oacFlyApplyRequest);
+                            // TODO: 2022/12/22 校验oacFlyApplyResponse
+                            flyApplyResponse = buildFlyApplyResponse(oacFlyApplyResponse);
+                            if (flyApplyResponse.getSuccess()) {
+                                applyFlyLogDalService.updateApplyFlyLogReplyFlyIdById(applyFlyLogDO.getId(), oacFlyApplyResponse.getReplyFlyId());
+                                flyApplyResponse.setApplyFlyId(applyFlyId.toString());
+                            } else {
+                                applyFlyLogDalService.updateApplyFlyLogStatus(applyFlyLogDO, ApplyStatusEnum.UNAPPROVED.getCode());
+                            }
+                        } else {
+                            flyApplyResponse.fail("放飞申请失败，插入数据失败");
                         }
                     } else {
-                        flyApplyResponse.fail("放飞申请失败，插入数据失败");
+                        flyApplyResponse.fail(ErrorCodeEnum.WRONG_APPLY_FLIGHT_PLAN_ID);
                     }
+
                 } else {
                     flyApplyResponse.fail("放飞申请失败，未接入运行管控或正在执飞");
                 }
             } else {
-                flyApplyResponse.fail("放飞申请失败,已发起过放飞申请,无需重新下发");
+                flyApplyResponse.fail("放飞申请失败,该无人机已发起过放飞申请,无需重新下发");
             }
             log.info("[router]放飞申请end，flyApplyRequest={},flyApplyResponse={}", flyApplyRequest, JsonUtils.object2Json(flyApplyResponse));
         } catch (Exception e) {
@@ -654,6 +670,20 @@ public class GcsServiceImpl implements IGcsService {
             flyApplyResponse.fail(e.getMessage());
         }
         return flyApplyResponse;
+    }
+
+    private boolean judgeUavHasApplyFly(List<ApplyFlyLogDO> queryApplyFlyLogList) {
+        boolean result = false;
+        if (CollectionUtils.isNotEmpty(queryApplyFlyLogList)) {
+            for (ApplyFlyLogDO applyFlyLog : queryApplyFlyLogList) {
+                ApplyStatusEnum applyStatusEnum = ApplyStatusEnum.getFromCode(applyFlyLog.getStatus());
+                if (ApplyStatusEnum.APPROVED.equals(applyStatusEnum) || ApplyStatusEnum.PENDING.equals(applyStatusEnum)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     com.htfp.service.oac.biz.model.inner.request.FlyApplyRequest buildOacFlyApplyRequest(FlyApplyRequest flyApplyRequest, Long applyFlyId, Long applyFlightPlanId, String replyFlightPlanId, String cpn) {
@@ -695,27 +725,31 @@ public class GcsServiceImpl implements IGcsService {
         try {
             log.info("[router]放飞申请查询start，flyQueryRequest={}", flyQueryRequest);
             ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(flyQueryRequest.getApplyFlyId()));
-            if (!ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus()))) {
-                flyQueryResponse.success();
-                FlyQueryResultParam flyQueryResultParam = new FlyQueryResultParam();
-                flyQueryResultParam.setApplyFlyId(flyQueryRequest.getApplyFlyId());
-                flyQueryResultParam.setReplyFlyId(queryApplyFlyLog.getReplyFlyId());
-                flyQueryResultParam.setStatus(queryApplyFlyLog.getStatus());
-                flyQueryResponse.setFlyQueryResultParam(flyQueryResultParam);
-            } else {
-                com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest oacFlyQueryRequest = buildOacFlyQueryRequest(queryApplyFlyLog.getReplyFlyId());
-                com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse oacFlyQueryResponse = flyingService.flyQuery(oacFlyQueryRequest);
-                // TODO: 2022/12/22 校验oacFlyResponse
-                flyQueryResponse = buildOacFlyQueryResponse(oacFlyQueryResponse);
-                // 如果成功更新flyLog表的状态
-                // TODO: 2023/2/19 status不通用
-                if (flyQueryResponse.getSuccess() && !queryApplyFlyLog.getStatus().equals(flyQueryResponse.getFlyQueryResultParam().getStatus())) {
-                    applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyQueryResponse.getFlyQueryResultParam().getStatus());
-                    // 如果放飞申请通过,更新reportCode
-                    if (ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(flyQueryResponse.getFlyQueryResultParam().getStatus()))) {
-                        updateUavOacMappingReportCode(queryApplyFlyLog.getUavId(), queryApplyFlyLog.getReplyFlyId());
+            if (queryApplyFlyLog != null) {
+                if (!ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus()))) {
+                    flyQueryResponse.success();
+                    FlyQueryResultParam flyQueryResultParam = new FlyQueryResultParam();
+                    flyQueryResultParam.setApplyFlyId(flyQueryRequest.getApplyFlyId());
+                    flyQueryResultParam.setReplyFlyId(queryApplyFlyLog.getReplyFlyId());
+                    flyQueryResultParam.setStatus(queryApplyFlyLog.getStatus());
+                    flyQueryResponse.setFlyQueryResultParam(flyQueryResultParam);
+                } else {
+                    com.htfp.service.oac.biz.model.inner.request.FlyQueryRequest oacFlyQueryRequest = buildOacFlyQueryRequest(queryApplyFlyLog.getReplyFlyId());
+                    com.htfp.service.oac.biz.model.inner.response.FlyQueryResponse oacFlyQueryResponse = flyingService.flyQuery(oacFlyQueryRequest);
+                    // TODO: 2022/12/22 校验oacFlyResponse
+                    flyQueryResponse = buildOacFlyQueryResponse(oacFlyQueryResponse);
+                    // 如果成功更新flyLog表的状态
+                    // TODO: 2023/2/19 status不通用
+                    if (flyQueryResponse.getSuccess() && !queryApplyFlyLog.getStatus().equals(flyQueryResponse.getFlyQueryResultParam().getStatus())) {
+                        applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyQueryResponse.getFlyQueryResultParam().getStatus());
+                        // 如果放飞申请通过,更新reportCode
+                        if (ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(flyQueryResponse.getFlyQueryResultParam().getStatus()))) {
+                            updateUavOacMappingReportCode(queryApplyFlyLog.getUavId(), queryApplyFlyLog.getReplyFlyId());
+                        }
                     }
                 }
+            } else {
+                flyQueryResponse.fail(ErrorCodeEnum.WRONG_APPLY_FLY_ID);
             }
             log.info("[router]放飞申请查询end，flyQueryRequest={},flyQueryResponse={}", flyQueryRequest, JsonUtils.object2Json(flyQueryResponse));
         } catch (Exception e) {
@@ -828,21 +862,25 @@ public class GcsServiceImpl implements IGcsService {
                 //(2)校验无人机地面站mapping关系
                 BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
                 if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
-                    // (3)构造请求体
-                    UavChangeStatusRequest uavChangeStatusRequest = buildUavChangeStatusRequest(gcsId, uavId, uavStatusChangeRequest.getUavStatus());
-                    // (4)调用指控模块接口，变更无人机状态
-                    UavChangeStatusResponse uavChangeStatusResponse = uavService.uavChangeStatus(uavChangeStatusRequest);
-                    if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(uavChangeStatusResponse.getCode()))) {
-                        uavStatusChangeResponse.success();
-                        // (5)如果为终态，更新uav和gcs的mapping关系表的状态，更新，，，，
-                        if (UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavStatusChangeRequest.getUavStatus()))) {
-                            UavGcsMappingDO uavGcsMapping = uavDalService.queryValidUavGcsMapping(uavId, gcsId);
-                            UavOacMappingDO uavOacMapping = uavDalService.queryUavOacMapping(uavId);
-                            uavDalService.updateUavGcsMappingStatus(uavGcsMapping, MappingStatusEnum.INVALID);
-                            uavDalService.updateUavOacMappingReportCodeAndStatus(uavOacMapping, null, MappingStatusEnum.INVALID);
+                    if (!judgeUavHasApplyFly(uavId)) {
+                        // (3)构造请求体
+                        UavChangeStatusRequest uavChangeStatusRequest = buildUavChangeStatusRequest(gcsId, uavId, uavStatusChangeRequest.getUavStatus());
+                        // (4)调用指控模块接口，变更无人机状态
+                        UavChangeStatusResponse uavChangeStatusResponse = uavService.uavChangeStatus(uavChangeStatusRequest);
+                        if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(uavChangeStatusResponse.getCode()))) {
+                            uavStatusChangeResponse.success();
+                            // (5)如果为终态，更新uav和gcs的mapping关系表的状态，更新，，，，
+                            if (UavStatusEnum.SHUT_DOWN.equals(UavStatusEnum.getFromCode(uavStatusChangeRequest.getUavStatus()))) {
+                                UavGcsMappingDO uavGcsMapping = uavDalService.queryValidUavGcsMapping(uavId, gcsId);
+                                UavOacMappingDO uavOacMapping = uavDalService.queryUavOacMapping(uavId);
+                                uavDalService.updateUavGcsMappingStatus(uavGcsMapping, MappingStatusEnum.INVALID);
+                                uavDalService.updateUavOacMappingReportCodeAndStatus(uavOacMapping, null, MappingStatusEnum.INVALID);
+                            }
+                        } else {
+                            uavStatusChangeResponse.fail(uavChangeStatusResponse.getCode(), uavChangeStatusResponse.getMessage());
                         }
                     } else {
-                        uavStatusChangeResponse.fail(uavChangeStatusResponse.getCode(), uavChangeStatusResponse.getMessage());
+                        uavStatusChangeResponse.fail(ErrorCodeEnum.EXECUTING_FLIGHT_PLAN);
                     }
                 } else {
                     uavStatusChangeResponse.fail(response.getCode(), response.getMessage());
@@ -856,6 +894,21 @@ public class GcsServiceImpl implements IGcsService {
             uavStatusChangeResponse.fail(e.getMessage());
         }
         return uavStatusChangeResponse;
+    }
+
+    private boolean judgeUavHasApplyFly(Long uavId) {
+        List<ApplyFlyLogDO> queryApplyFlyLogList = applyFlyLogDalService.queryApplyFlyLogByUavId(uavId);
+        boolean result = false;
+        if (CollectionUtils.isNotEmpty(queryApplyFlyLogList)) {
+            for (ApplyFlyLogDO applyFlyLog : queryApplyFlyLogList) {
+                ApplyStatusEnum applyStatusEnum = ApplyStatusEnum.getFromCode(applyFlyLog.getStatus());
+                if (ApplyStatusEnum.APPROVED.equals(applyStatusEnum) || ApplyStatusEnum.PENDING.equals(applyStatusEnum)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -909,31 +962,36 @@ public class GcsServiceImpl implements IGcsService {
             UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(finishFlightPlanRequest.getUavId()));
             UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(finishFlightPlanRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
             ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getApplyFlightPlanId()));
-            ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getApplyFlightPlanId()));
-            if (queryUavInfo != null && queryUavOacMapping != null && queryApplyFlightPlanLog != null && queryApplyFlyLog != null) {
-                ApplyStatusEnum flightPlanStatus = ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus());
-                ApplyStatusEnum flyStatus = ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus());
-                if (ApplyStatusEnum.APPROVED.equals(flightPlanStatus) && !ApplyStatusEnum.PENDING.equals(flyStatus)) {
-                    com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = buildOacFinishFlightPlanRequest(finishFlightPlanRequest, queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
-                    com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingService.finishFlightPlan(oacFinishFlightPlanRequest);
-                    finishFlightPlanResponse = buildFinishFlightPlanResponse(oacFinishFlightPlanResponse);
-                    if (finishFlightPlanResponse.getSuccess()) {
-                        // 更新reportCode和连接状态
-                        uavDalService.updateUavOacMappingReportCodeAndLinkStatus(queryUavOacMapping, queryUavInfo.getCpn(), LinkStatusEnum.OFFLINE);
-                        // 更新飞行计划状态
-                        applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.COMPLETE.getCode());
-                        // 飞行计划处于通过状态，则结束飞行计划
-                        if (ApplyStatusEnum.APPROVED.equals(flyStatus)) {
-                            applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, ApplyStatusEnum.COMPLETE.getCode());
+            if (queryUavInfo != null && queryUavOacMapping != null && queryApplyFlightPlanLog != null) {
+                // TODO: 2023/2/23 待更改为uav与ApplyFly的mapping关系 并提到外面
+                ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByReplyFlyId(queryUavOacMapping.getReportCode());
+                if(queryApplyFlyLog!=null){
+                    ApplyStatusEnum flightPlanStatus = ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus());
+                    ApplyStatusEnum flyStatus = ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus());
+                    if (ApplyStatusEnum.APPROVED.equals(flightPlanStatus) && !ApplyStatusEnum.PENDING.equals(flyStatus)) {
+                        com.htfp.service.oac.biz.model.inner.request.FinishFlightPlanRequest oacFinishFlightPlanRequest = buildOacFinishFlightPlanRequest(finishFlightPlanRequest, queryApplyFlightPlanLog.getReplyFlightPlanId(), queryUavInfo.getCpn());
+                        com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingService.finishFlightPlan(oacFinishFlightPlanRequest);
+                        finishFlightPlanResponse = buildFinishFlightPlanResponse(oacFinishFlightPlanResponse);
+                        if (finishFlightPlanResponse.getSuccess()) {
+                            // 更新reportCode和连接状态
+                            uavDalService.updateUavOacMappingReportCodeAndLinkStatus(queryUavOacMapping, queryUavInfo.getCpn(), LinkStatusEnum.OFFLINE);
+                            // 更新飞行计划状态
+                            applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.COMPLETE.getCode());
+                            // 飞行计划处于通过状态，则结束飞行计划
+                            if (ApplyStatusEnum.APPROVED.equals(flyStatus)) {
+                                applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, ApplyStatusEnum.COMPLETE.getCode());
+                            }
+                            finishFlightPlanResponse.success();
                         }
+                    } else {
+                        finishFlightPlanResponse.fail("正在执行飞行计划未进行放飞申请，无需结束");
                     }
                 } else {
-                    finishFlightPlanResponse.fail("飞行计划未处于通过状态或飞行计划，不需要结束");
+                    finishFlightPlanResponse.fail(ErrorCodeEnum.WRONG_APPLY_FLIGHT_PLAN_ID);
                 }
             } else {
                 finishFlightPlanResponse.fail("未查询到相应数据");
             }
-
             log.info("[router]飞行计划结束end，finishFlightPlanRequest={}, finishFlightPlanResponse={}", finishFlightPlanRequest, JsonUtils.object2Json(finishFlightPlanResponse));
         } catch (Exception e) {
             log.error("[router]飞行计划结束异常，finishFlightPlanRequest={}", finishFlightPlanRequest, e);
@@ -1110,15 +1168,13 @@ public class GcsServiceImpl implements IGcsService {
                 //(2)校验无人机地面站mapping关系
                 BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
                 if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
-                    List<ATCIssuedLogDO> atcIssuedLogDOList = atcIssuedLogDalService.queryATCIssuedLogByApplyFlightPlanId(Long.valueOf(atcQueryRequest.getApplyFlightPlanId()));
-                    for (ATCIssuedLogDO atcIssuedLog : atcIssuedLogDOList) {
-                        if (atcQueryRequest.getApplyFlightPlanId().equals(atcIssuedLog.getApplyFlightPlanId().toString()) &&
-                                atcQueryRequest.getApplyFlyId().equals(atcIssuedLog.getApplyFlyId().toString())) {
-                            ATCQueryResultParam atcQueryResultParam = buildATCQueryResultParam(atcIssuedLog);
-                            atcQueryResultParamList.add(atcQueryResultParam);
-                        }
+                    List<ATCIssuedLogDO> atcIssuedLogDOList = atcIssuedLogDalService.queryATCIssuedLogByApplyFlightPlanIdAndAtcDelivered(Long.valueOf(atcQueryRequest.getApplyFlightPlanId()), DeliverTypeEnum.DELIVERING.getCode());
+                    // TODO: 2023/2/22 适配地面站，待优化
+                    if (CollectionUtils.isNotEmpty(atcIssuedLogDOList)) {
+                        ATCIssuedLogDO atcIssuedLog = atcIssuedLogDOList.get(0);
+                        atcQueryResponse.setAtcQueryResultParam(buildATCQueryResultParam(atcIssuedLog));
+                        atcIssuedLogDalService.updateATCIssuedLogDelivered(atcIssuedLog, DeliverTypeEnum.DELIVERED.getCode());
                     }
-                    atcQueryResponse.setAtcQueryResultParamList(atcQueryResultParamList);
                     atcQueryResponse.success();
                 } else {
                     atcQueryResponse.fail(response.getCode(), response.getMessage());

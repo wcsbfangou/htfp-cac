@@ -430,7 +430,7 @@ public class GcsController {
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(atcQueryResponse.getCode())) {
                 return BaseHttpResponse.fail(atcQueryResponse.getCode(), atcQueryResponse.getMessage());
             } else {
-                httpResponse.setData(JsonUtils.object2Json(atcQueryResponse.getAtcQueryResultParamList()));
+                httpResponse.setData(JsonUtils.object2Json(atcQueryResponse.getAtcQueryResultParam()));
             }
         } catch (Exception e) {
             log.error("管制信息查询失败, atcQueryRequest={}", atcQueryRequest, e);
