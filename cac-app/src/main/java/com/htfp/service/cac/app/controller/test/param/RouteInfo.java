@@ -1,4 +1,4 @@
-package com.htfp.service.cac.app.controller.test;
+package com.htfp.service.cac.app.controller.test.param;
 
 import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.htfp.service.cac.app.controller.test;
+package com.htfp.service.cac.app.controller.test.param;
 
 import lombok.Data;
 

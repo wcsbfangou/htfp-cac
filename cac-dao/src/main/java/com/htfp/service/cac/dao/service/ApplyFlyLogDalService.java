@@ -38,7 +38,7 @@ public class ApplyFlyLogDalService {
         return applyFlyMapper.selectByApplyFlightPlanId(applyFlightPlanId);
     }
 
-    public List<ApplyFlyLogDO> queryApplyFlightPlanLogByReplyFlightPlanId(String replyFlightPlanId){
+    public List<ApplyFlyLogDO> queryApplyFlyLogByReplyFlightPlanId(String replyFlightPlanId){
         return applyFlyMapper.selectByReplyFlightPlanId(replyFlightPlanId);
     }
 

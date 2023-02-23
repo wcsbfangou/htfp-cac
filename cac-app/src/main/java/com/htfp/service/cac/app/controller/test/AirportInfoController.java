@@ -1,5 +1,6 @@
 package com.htfp.service.cac.app.controller.test;
 
+import com.htfp.service.cac.app.controller.test.param.AirportInfo;
 import com.htfp.service.cac.dao.model.oac.AirportInfoDO;
 import com.htfp.service.cac.dao.service.oac.OacAirportInfoDalService;
 import lombok.extern.slf4j.Slf4j;
@@ -7,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -25,7 +28,7 @@ public class AirportInfoController {
     OacAirportInfoDalService oacAirportInfoDalService;
 
     /**
-     * 插入gcs信息
+     * 插入机场信息
      *
      * @param airportInfo
      * @return
@@ -40,5 +43,25 @@ public class AirportInfoController {
                 airportInfo.getAlarmAreaRadius(), airportInfo.getLandingSites(), airportInfo.getStatus());
         int id=oacAirportInfoDalService.insertAirportInfo(airportInfoDO);
         return id;
+    }
+
+    /**
+     * 根据airportId查询airport信息
+     *
+     * @param airportId
+     * @return
+     */
+    @RequestMapping(value = "/queryAirportInfoByAirportId", method = RequestMethod.POST)
+    @ResponseBody
+    public AirportInfoDO queryAirPortInfoByAirportId(@RequestParam(value = "airportId") String airportId) {
+        AirportInfoDO airportInfoDO = oacAirportInfoDalService.queryAirportInfoByAirportId(airportId);
+        return airportInfoDO;
+    }
+
+    @RequestMapping(value = "/queryAllAirportInfo", method = RequestMethod.POST)
+    @ResponseBody
+    public List<AirportInfoDO> queryAllAirPortInfo() {
+        List<AirportInfoDO> airportInfoDOList = oacAirportInfoDalService.queryAllAirportInfo();
+        return airportInfoDOList;
     }
 }
