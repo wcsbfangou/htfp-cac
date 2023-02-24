@@ -55,7 +55,7 @@ public class OacDynamicUavInfoController {
 
     @RequestMapping(value = "/updateDynamicUavInfoStatusByReplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateDynamicUavInfoStatusByApplyFlyId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, Integer planStatus) {
+    public Integer updateDynamicUavInfoStatusByApplyFlyId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, @RequestParam(value = "planStatus") Integer planStatus) {
         DynamicUavInfoDO dynamicUavInfoDO = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(Long.valueOf(replyFlightPlanId));
         int id = oacDynamicUavInfoDalService.updateDynamicUavInfoPlanStatus(dynamicUavInfoDO, planStatus);
         return id;
@@ -63,8 +63,8 @@ public class OacDynamicUavInfoController {
 
     @RequestMapping(value = "/updateDynamicUavInfoStatusByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateDynamicUavInfoStatusByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId, Integer planStatus) {
-        DynamicUavInfoDO dynamicUavInfoDO = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(Long.valueOf(replyFlyId));
+    public Integer updateDynamicUavInfoStatusByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId, @RequestParam(value = "planStatus") Integer planStatus) {
+        DynamicUavInfoDO dynamicUavInfoDO = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlyId(Long.valueOf(replyFlyId));
         int id = oacDynamicUavInfoDalService.updateDynamicUavInfoPlanStatus(dynamicUavInfoDO, planStatus);
         return id;
     }

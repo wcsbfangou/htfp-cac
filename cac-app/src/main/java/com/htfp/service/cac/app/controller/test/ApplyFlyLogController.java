@@ -38,14 +38,14 @@ public class ApplyFlyLogController {
         return applyFlyLogDOList;
     }
 
-    @RequestMapping(value = "/queryApplyFlightPlanLogByApplyFlyId", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryApplyFlyLogByApplyFlyId", method = RequestMethod.POST)
     @ResponseBody
     public ApplyFlyLogDO queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlyId") String applyFlyId) {
         ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(applyFlyId));
         return applyFlyLogDO;
     }
 
-    @RequestMapping(value = "/queryApplyFlightPlanLogByReplyFlyId", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryApplyFlyLogByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
     public ApplyFlyLogDO queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId) {
         ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.queryApplyFlyLogByReplyFlyId(replyFlyId);
@@ -68,7 +68,7 @@ public class ApplyFlyLogController {
 
     @RequestMapping(value = "/updateApplyFlyLogStatusByApplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateApplyFlyLogStatusByApplyFlyId(@RequestParam(value = "applyFlyId") String applyFlyId, Integer status) {
+    public Integer updateApplyFlyLogStatusByApplyFlyId(@RequestParam(value = "applyFlyId") String applyFlyId, @RequestParam(value = "status")Integer status) {
         ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(applyFlyId));
         int id = applyFlyLogDalService.updateApplyFlyLogStatus(applyFlyLogDO, status);
         return id;
@@ -76,7 +76,7 @@ public class ApplyFlyLogController {
 
     @RequestMapping(value = "/updateApplyFlyLogStatusByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId, Integer status) {
+    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId, @RequestParam(value = "status")Integer status) {
         ApplyFlyLogDO applyFlyLogDO = applyFlyLogDalService.queryApplyFlyLogByReplyFlyId(replyFlyId);
         int id = applyFlyLogDalService.updateApplyFlyLogStatus(applyFlyLogDO, status);
         return id;

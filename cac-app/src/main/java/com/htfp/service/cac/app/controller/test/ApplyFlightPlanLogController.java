@@ -55,7 +55,7 @@ public class ApplyFlightPlanLogController {
 
     @RequestMapping(value = "/updateApplyFlightPlanLogStatusByApplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlightPlanId") String applyFlightPlanId, Integer status) {
+    public Integer queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlightPlanId") String applyFlightPlanId, @RequestParam(value = "status") Integer status) {
         ApplyFlightPlanLogDO applyFlightPlanLogDO = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(applyFlightPlanId));
         int id = applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(applyFlightPlanLogDO, status);
         return id;
@@ -63,7 +63,7 @@ public class ApplyFlightPlanLogController {
 
     @RequestMapping(value = "/updateApplyFlightPlanLogStatusByReplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, Integer status) {
+    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, @RequestParam(value = "status") Integer status) {
         ApplyFlightPlanLogDO applyFlightPlanLogDO = applyFlightPlanLogDalService.queryApplyFlightPlanLogByReplyFlightPlanId(replyFlightPlanId);
         int id = applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(applyFlightPlanLogDO, status);
         return id;

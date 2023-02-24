@@ -1,6 +1,9 @@
 package com.htfp.service.cac.app.controller.test;
 
 import com.htfp.service.cac.app.controller.test.param.AirportInfo;
+import com.htfp.service.cac.app.controller.test.param.RouteInfo;
+import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.dao.model.entity.RouteInfoDO;
 import com.htfp.service.cac.dao.model.oac.AirportInfoDO;
 import com.htfp.service.cac.dao.service.oac.OacAirportInfoDalService;
 import lombok.extern.slf4j.Slf4j;
@@ -63,5 +66,16 @@ public class AirportInfoController {
     public List<AirportInfoDO> queryAllAirPortInfo() {
         List<AirportInfoDO> airportInfoDOList = oacAirportInfoDalService.queryAllAirportInfo();
         return airportInfoDOList;
+    }
+
+    @RequestMapping(value = "/updateAirportInfoCoordinate", method = RequestMethod.POST)
+    @ResponseBody
+    public int updateAirportInfoCoordinate(@RequestBody AirportInfo airportInfo) {
+        AirportInfoDO airportInfoDO = oacAirportInfoDalService.queryAirportInfoByAirportId(airportInfo.getAirportId());
+        airportInfoDO.setLat(airportInfo.getLat());
+        airportInfoDO.setLng(airportInfo.getLng());
+        airportInfoDO.setAlt(airportInfo.getAlt());
+        int id = oacAirportInfoDalService.updateAirportInfo(airportInfoDO);
+        return id;
     }
 }

@@ -4,6 +4,7 @@ import com.htfp.service.cac.app.controller.test.param.RouteInfo;
 import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.cac.dao.model.entity.RouteInfoDO;
 import com.htfp.service.cac.dao.service.RouteInfoDalService;
+import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +37,7 @@ public class RouteInfoController {
      */
     @RequestMapping(value = "/insertRouteInfo", method = RequestMethod.POST)
     @ResponseBody
-    public int insertAirportInfo(@RequestBody RouteInfo routeInfo) {
+    public int insertRouteInfo(@RequestBody RouteInfo routeInfo) {
 
         RouteInfoDO routeInfoDO = routeInfoDalService.buildRouteInfoDO(routeInfo.getRouteCode(), routeInfo.getRouteName(), JsonUtils.object2Json(routeInfo.getRoutePointCoordinates()),
                 routeInfo.getRouteLength(), routeInfo.getRouteStartTime(), routeInfo.getRouteEndTime(), routeInfo.getRouteIdentificationRadius(), routeInfo.getRouteAlarmRadius(),
@@ -70,5 +71,14 @@ public class RouteInfoController {
     public List<RouteInfoDO> queryAllRouteInfo() {
         List<RouteInfoDO> routeInfoDOList = routeInfoDalService.queryAllRouteInfo();
         return routeInfoDOList;
+    }
+
+    @RequestMapping(value = "/updateRouteInfoRoutePointCoordinates", method = RequestMethod.POST)
+    @ResponseBody
+    public int updateRouteInfoRoutePointCoordinates(@RequestBody RouteInfo routeInfo) {
+        RouteInfoDO routeInfoDO = routeInfoDalService.queryRouteInfoByRouteId(Long.valueOf(routeInfo.getRouteId()));
+        routeInfoDO.setRoutePointCoordinates(JsonUtils.object2Json(routeInfo.getRoutePointCoordinates()));
+        int id = routeInfoDalService.updateRouteInfo(routeInfoDO);
+        return id;
     }
 }

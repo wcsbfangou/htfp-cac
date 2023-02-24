@@ -55,7 +55,7 @@ public class ATCIssuedLogController {
 
     @RequestMapping(value = "/updateATCIssuedLogDeliveredById", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateATCIssuedLogDeliveredByApplyFlightPlanId(@RequestParam(value = "id") String id, Integer delivered) {
+    public Integer updateATCIssuedLogDeliveredByApplyFlightPlanId(@RequestParam(value = "id") String id, @RequestParam(value = "delivered") Integer delivered) {
         ATCIssuedLogDO atcIssuedLogDO = atcIssuedLogDalService.queryATCIssuedLog(Long.valueOf(id));
         int result = atcIssuedLogDalService.updateATCIssuedLogDelivered(atcIssuedLogDO, delivered);
         return result;

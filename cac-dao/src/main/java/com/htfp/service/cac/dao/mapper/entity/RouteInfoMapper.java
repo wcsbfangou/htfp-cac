@@ -108,7 +108,7 @@ public interface RouteInfoMapper {
             + "<if test=\"routeInfo.routeLength != null\"> route_length = #{routeInfo.routeLength}, </if>"
             + "<if test=\"routeInfo.routeStartTime != null\"> route_start_time = #{routeInfo.routeStartTime}, </if>"
             + "<if test=\"routeInfo.routeEndTime != null\"> route_end_time = #{routeInfo.routeEndTime}, </if>"
-            + "<if test=\"routeInfo.routeIdentificationRadius != null\"> route-identification_radius = #{routeInfo.routeIdentificationRadius}, </if>"
+            + "<if test=\"routeInfo.routeIdentificationRadius != null\"> route_identification_radius = #{routeInfo.routeIdentificationRadius}, </if>"
             + "<if test=\"routeInfo.routeAlarmRadius != null\"> route_alarm_radius = #{routeInfo.routeAlarmRadius}, </if>"
             + "<if test=\"routeInfo.routeLevel != null\"> route_level = #{routeInfo.routeLevel}, </if>"
             + "<if test=\"routeInfo.routeOperatorId != null\"> route_operator_id = #{routeInfo.routeOperatorId}, </if>"

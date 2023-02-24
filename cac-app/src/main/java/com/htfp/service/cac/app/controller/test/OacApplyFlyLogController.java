@@ -39,16 +39,16 @@ public class OacApplyFlyLogController {
         return applyFlyLogDOList;
     }
 
-    @RequestMapping(value = "/queryApplyFlightPlanLogByApplyFlyId", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryApplyFlyLogByApplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public ApplyFlyLogDO queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlyId") String applyFlyId) {
+    public ApplyFlyLogDO queryApplyFlyLogByApplyFlyId(@RequestParam(value = "applyFlyId") String applyFlyId) {
         ApplyFlyLogDO applyFlyLogDO = oacApplyFlyLogDalService.queryApplyFlyLogByApplyFlyId(applyFlyId);
         return applyFlyLogDO;
     }
 
-    @RequestMapping(value = "/queryApplyFlightPlanLogByReplyFlyId", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryApplyFlyLogByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public ApplyFlyLogDO queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId) {
+    public ApplyFlyLogDO queryApplyFlyLogByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId) {
         ApplyFlyLogDO applyFlyLogDO = oacApplyFlyLogDalService.queryApplyFlyLogByReplyFlyId(Long.valueOf(replyFlyId));
         return applyFlyLogDO;
     }
@@ -62,7 +62,7 @@ public class OacApplyFlyLogController {
 
     @RequestMapping(value = "/updateApplyFlyLogStatusByApplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateApplyFlyLogStatusByApplyFlyId(@RequestParam(value = "applyFlyId") String applyFlyId, Integer status) {
+    public Integer updateApplyFlyLogStatusByApplyFlyId(@RequestParam(value = "applyFlyId") String applyFlyId, @RequestParam(value = "status") Integer status) {
         ApplyFlyLogDO applyFlyLogDO = oacApplyFlyLogDalService.queryApplyFlyLogByApplyFlyId(applyFlyId);
         int id = oacApplyFlyLogDalService.updateApplyFlyLogStatus(applyFlyLogDO, status);
         return id;
@@ -70,7 +70,7 @@ public class OacApplyFlyLogController {
 
     @RequestMapping(value = "/updateApplyFlyLogStatusByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId, Integer status) {
+    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlyId") String replyFlyId, @RequestParam(value = "status") Integer status) {
         ApplyFlyLogDO applyFlyLogDO = oacApplyFlyLogDalService.queryApplyFlyLogByReplyFlyId(Long.valueOf(replyFlyId));
         int id = oacApplyFlyLogDalService.updateApplyFlyLogStatus(applyFlyLogDO, status);
         return id;

@@ -47,7 +47,7 @@ public class OacApplyFlightPlanLogController {
 
     @RequestMapping(value = "/updateApplyFlightPlanLogStatusByApplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlightPlanId") String applyFlightPlanId, Integer status) {
+    public Integer queryApplyFlightPlanLogByApplyFlightPlanId(@RequestParam(value = "applyFlightPlanId") String applyFlightPlanId, @RequestParam(value = "status") Integer status) {
         ApplyFlightPlanLogDO applyFlightPlanLogDO = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(applyFlightPlanId);
         int id = oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(applyFlightPlanLogDO, status);
         return id;
@@ -55,7 +55,7 @@ public class OacApplyFlightPlanLogController {
 
     @RequestMapping(value = "/updateApplyFlightPlanLogStatusByReplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, Integer status) {
+    public Integer queryApplyFlightPlanLogByReplyFlightPlanId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, @RequestParam(value = "status") Integer status) {
         ApplyFlightPlanLogDO applyFlightPlanLogDO = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByReplyFlightPlanId(Long.valueOf(replyFlightPlanId));
         int id = oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(applyFlightPlanLogDO, status);
         return id;

@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class RouteInfo {
 
+    private Integer routeId;
     private String routeCode;
     private String routeName;
     private List<PositionParam> routePointCoordinates;

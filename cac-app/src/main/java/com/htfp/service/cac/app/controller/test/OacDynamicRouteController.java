@@ -34,7 +34,7 @@ public class OacDynamicRouteController {
 
     @RequestMapping(value = "/queryDynamicRouteInfoByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public DynamicRouteInfoDO queryApplyFlightPlanLogByApplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId) {
+    public DynamicRouteInfoDO queryDynamicRouteInfoByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId) {
         DynamicRouteInfoDO dynamicRouteInfoDO = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlyId(Long.valueOf(replyFlyId));
         return dynamicRouteInfoDO;
     }
@@ -48,7 +48,7 @@ public class OacDynamicRouteController {
 
     @RequestMapping(value = "/updateDynamicRouteInfoStatusByReplyFlightPlanId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateDynamicUavInfoStatusByApplyFlyId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, Integer planStatus) {
+    public Integer updateDynamicUavInfoStatusByApplyFlyId(@RequestParam(value = "replyFlightPlanId") String replyFlightPlanId, @RequestParam(value = "planStatus") Integer planStatus) {
         DynamicRouteInfoDO dynamicUavInfoDO = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(replyFlightPlanId));
         int id = oacDynamicRouteInfoDalService.updateDynamicRouteInfoPlanStatus(dynamicUavInfoDO, planStatus);
         return id;
@@ -56,7 +56,7 @@ public class OacDynamicRouteController {
 
     @RequestMapping(value = "/updateDynamicRouteInfoStatusByReplyFlyId", method = RequestMethod.POST)
     @ResponseBody
-    public Integer updateDynamicUavInfoStatusByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId, Integer planStatus) {
+    public Integer updateDynamicUavInfoStatusByReplyFlyId(@RequestParam(value = "replyFlyId") String replyFlyId, @RequestParam(value = "planStatus") Integer planStatus) {
         DynamicRouteInfoDO dynamicUavInfoDO = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlyId(Long.valueOf(replyFlyId));
         int id = oacDynamicRouteInfoDalService.updateDynamicRouteInfoPlanStatus(dynamicUavInfoDO, planStatus);
         return id;
