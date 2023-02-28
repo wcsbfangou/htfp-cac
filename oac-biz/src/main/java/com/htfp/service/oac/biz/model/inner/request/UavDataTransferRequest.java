@@ -40,7 +40,7 @@ public class UavDataTransferRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_UAV_CPN;
         }else if (StringUtils.isBlank(reportCode)) {
             return ErrorCodeEnum.LACK_OF_UAV_REPORT_CODE;
-        } else if (alt == null) {
+        } /*else if (alt == null) {
             return ErrorCodeEnum.LACK_OF_ALT;
         } else if (lng == null) {
             return ErrorCodeEnum.LACK_OF_LNG;
@@ -50,7 +50,7 @@ public class UavDataTransferRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_GROUND_SPEED;
         } else if (relativeHeight == null) {
             return ErrorCodeEnum.LACK_OF_RELATIVE_HEIGHT;
-        } else {
+        } */else {
             return ErrorCodeEnum.SUCCESS;
         }
     }

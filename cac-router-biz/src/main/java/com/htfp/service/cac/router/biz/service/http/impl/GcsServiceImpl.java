@@ -1159,7 +1159,7 @@ public class GcsServiceImpl implements IGcsService {
         atcQueryResponse.fail();
         List<ATCQueryResultParam> atcQueryResultParamList = new ArrayList<>();
         try {
-            log.info("[router]管制信息查询start，atcQueryRequest={}", atcQueryRequest);
+            // log.info("[router]管制信息查询start，atcQueryRequest={}", atcQueryRequest);
             final Long gcsId = Long.valueOf(atcQueryRequest.getGcsId());
             //(1)校验地面站信息以及是否上线
             BaseResponse validateGcsResult = validateGcs(gcsId);
@@ -1182,7 +1182,7 @@ public class GcsServiceImpl implements IGcsService {
             } else {
                 atcQueryResponse.fail(validateGcsResult.getCode(), validateGcsResult.getMessage());
             }
-            log.info("[router]管制信息查询end，atcQueryRequest={}，atcQueryResponse={}", atcQueryRequest, JsonUtils.object2Json(atcQueryResponse));
+            // log.info("[router]管制信息查询end，atcQueryRequest={}，atcQueryResponse={}", atcQueryRequest, JsonUtils.object2Json(atcQueryResponse));
         } catch (Exception e) {
             log.error("[router]管制信息查询异常，atcQueryRequest={}", atcQueryRequest, e);
             atcQueryResponse.fail(e.getMessage());

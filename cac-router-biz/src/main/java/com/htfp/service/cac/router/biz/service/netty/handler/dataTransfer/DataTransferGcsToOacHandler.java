@@ -135,8 +135,10 @@ public class DataTransferGcsToOacHandler implements IDataFrameHandler {
             if (originDataBytes[2] == UdpDataFrameConstant.IDENTIFY_A1) {
                 int pitchAngle = byteToShortLittle(originDataBytes, 5, 6);
                 int rollAngle = byteToShortLittle(originDataBytes, 7, 8);
+                int courseAngle = byteToShortLittle(originDataBytes, 9, 10);
                 uavDataTransferRequest.setPitchAngle(pitchAngle);
                 uavDataTransferRequest.setRollAngle(rollAngle);
+                uavDataTransferRequest.setTrueCourse(courseAngle);
                 return uavDataTransferRequest;
             } else if (originDataBytes[2] == UdpDataFrameConstant.IDENTIFY_A2) {
                 int lng = bytes2IntLittle(originDataBytes, 5, 6, 7, 8);

@@ -196,6 +196,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             queryUavDynamicInfoResultParam.setUavOperatorName(dynamicUavInfo.getUavOperatorName());
             queryUavDynamicInfoResultParam.setLng(dynamicUavInfo.getLng());
             queryUavDynamicInfoResultParam.setLat(dynamicUavInfo.getLat());
+            queryUavDynamicInfoResultParam.setAlt(dynamicUavInfo.getAlt());
             queryUavDynamicInfoResultParam.setSpeed(dynamicUavInfo.getSpeed());
             queryUavDynamicInfoResultParam.setCourse(dynamicUavInfo.getCourse());
             queryUavDynamicInfoResultParam.setFuel(dynamicUavInfo.getFuel() == null ? 85 : dynamicUavInfo.getFuel());
