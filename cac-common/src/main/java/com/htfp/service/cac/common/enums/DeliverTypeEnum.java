@@ -6,8 +6,10 @@ package com.htfp.service.cac.common.enums;
  * @Description 描述
  */
 public enum DeliverTypeEnum {
-    DELIVERING(0, "正在下发"),
-    DELIVERED(1, "已下发"),
+
+    GENERATED(0, "已生成"),
+    DELIVERING(1, "正在下发"),
+    DELIVERED(2, "已下发"),
     ;
 
     public final Integer code;

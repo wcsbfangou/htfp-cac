@@ -4,9 +4,14 @@ import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.NavigationDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.oac.biz.model.inner.request.UavDataTransferRequest;
+import com.htfp.service.oac.biz.model.inner.response.UavDataTransferResponse;
+import com.htfp.service.oac.biz.service.IFlightManagementService;
+import com.htfp.service.oac.common.enums.ErrorCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +39,9 @@ public class TestController {
 
     @Resource
     private NavigationDalService navigationDalService;
+
+    @Resource(name="flightManagementServiceImpl")
+    private IFlightManagementService flightManagementService;
 
 
     @RequestMapping(value = "/deleteGcsInfo", method = RequestMethod.POST)
@@ -187,5 +195,24 @@ public class TestController {
             log.error("删除CommandAndControl的Log信息异常, id={}", id, e);
         }
         return result;
+    }
+
+    @RequestMapping(value = "/uavDataTransferTest", method = RequestMethod.POST)
+    @ResponseBody
+    public UavDataTransferResponse uavDataTransfer(@RequestBody UavDataTransferRequest uavDataTransferRequest) {
+        UavDataTransferResponse uavDataTransferResponse = new UavDataTransferResponse();
+        uavDataTransferResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = uavDataTransferRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                uavDataTransferResponse = flightManagementService.uavDataTransfer(uavDataTransferRequest);
+            } else {
+                uavDataTransferResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("无人机遥测数据校验异常, uavDataTransferRequest={}", uavDataTransferRequest, e);
+            uavDataTransferResponse.fail("无人机遥测数据校验异常");
+        }
+        return uavDataTransferResponse;
     }
 }

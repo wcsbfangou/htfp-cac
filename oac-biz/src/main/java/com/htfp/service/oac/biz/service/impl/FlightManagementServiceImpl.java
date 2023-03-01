@@ -255,7 +255,7 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
                 uavDataTransferResponse.setReportCode(uavDataTransferRequest.getReportCode());
                 uavDataTransferResponse.success();
             }
-            //log.info("[oac]无人机遥测数据透传end，uavDataTransferRequest={}, uavDataTransferResponse={}", uavDataTransferRequest, JsonUtils.object2Json(uavDataTransferResponse));
+            // log.info("[oac]无人机遥测数据透传end，uavDataTransferRequest={}, uavDataTransferResponse={}", uavDataTransferRequest, JsonUtils.object2Json(uavDataTransferResponse));
         } catch (Exception e) {
             log.error("[oac]无人机遥测数据透传异常，uavDataTransferRequest={}", uavDataTransferRequest, e);
             uavDataTransferResponse.fail(e.getMessage());
@@ -271,7 +271,7 @@ public class FlightManagementServiceImpl implements IFlightManagementService {
             dynamicUavInfo.setLat(uavDataTransferRequest.getLat());
             Integer distanceToLandingPoint = GpsDistanceUtils.getDistance(uavDataTransferRequest.getLng(), uavDataTransferRequest.getLat(), dynamicUavInfo.getLandingLng(), dynamicUavInfo.getLandingLat());
             dynamicUavInfo.setDistanceToLandingPoint(distanceToLandingPoint);
-            if (distanceToLandingPoint <= dynamicUavInfo.getLandingAirportIdentificationRadius()) {
+            if (distanceToLandingPoint <= dynamicUavInfo.getLandingAirportIdentificationRadius() && distanceToLandingPoint > dynamicUavInfo.getLandingAirportAlarmRadius()) {
                 dynamicUavInfo.setPlanStatus(FlightPlanStatusTypeEnum.ENTER_IDENTIFICATION_AREA.getCode());
             } else if (distanceToLandingPoint <= dynamicUavInfo.getLandingAirportAlarmRadius()) {
                 if (FlightPlanStatusTypeEnum.LANDING_APPLY_APPROVED.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicUavInfo.getPlanStatus()))) {
