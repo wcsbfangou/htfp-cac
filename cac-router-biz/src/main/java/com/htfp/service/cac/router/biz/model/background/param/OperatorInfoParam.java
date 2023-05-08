@@ -17,7 +17,7 @@ public class OperatorInfoParam implements BaseValidate<ErrorCodeEnum> {
 
     private String operatorId;
     /**
-     * pilotCode = idCardType+'#'+idCardNumber
+     * operatorCode = idCardType+'#'+idCardNumber
      */
     private String operatorCode;
     private String operatorName;

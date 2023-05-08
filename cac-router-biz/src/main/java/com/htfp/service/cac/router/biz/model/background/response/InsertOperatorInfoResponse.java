@@ -10,5 +10,5 @@ import lombok.Data;
  */
 @Data
 public class InsertOperatorInfoResponse extends BaseResponse {
-    String Data;
+    String data;
 }

@@ -145,7 +145,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/QueryAlarmDetail", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryAlarmDetail", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse queryAlarmMessageInfo(@RequestBody QueryAlarmMessageInfoRequest queryAlarmMessageInfoRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
@@ -176,7 +176,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/IssuedFlightPlanResult", method = RequestMethod.POST)
+    @RequestMapping(value = "/issuedFlightPlanResult", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse flightPlanIssued(@RequestBody FlightPlanIssuedRequest flightPlanIssuedRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
@@ -207,7 +207,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/AuthorizedTakeoff", method = RequestMethod.POST)
+    @RequestMapping(value = "/authorizedTakeoff", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse flyIssued(@RequestBody FlyIssuedRequest flyIssuedRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
@@ -238,7 +238,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/SendATCMessage", method = RequestMethod.POST)
+    @RequestMapping(value = "/sendATCMessage", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse atcIssued(@RequestBody ATCIssuedRequest atcIssuedRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
@@ -269,7 +269,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/SendAlarmSuggestion", method = RequestMethod.POST)
+    @RequestMapping(value = "/sendAlarmSuggestion", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse alarmIssued(@RequestBody AlarmIssuedRequest alarmIssuedRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();
@@ -300,7 +300,7 @@ public class OacController {
      * @param httpServletRequest
      * @return
      */
-    @RequestMapping(value = "/QueryFlightPlanInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/queryFlightPlanInfo", method = RequestMethod.POST)
     @ResponseBody
     public BaseHttpResponse queryFlightPlanInfo(@RequestBody QueryFlightPlanInfoRequest queryFlightPlanInfoRequest, HttpServletRequest httpServletRequest) {
         BaseHttpResponse httpResponse = BaseHttpResponse.success();

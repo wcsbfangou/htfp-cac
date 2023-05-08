@@ -118,7 +118,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
         QueryUavDynamicInfoResponse queryUavDynamicInfoResponse = new QueryUavDynamicInfoResponse();
         queryUavDynamicInfoResponse.success();
         try {
-            UavDynamicInfoQueryStatusEnum frontQueryPlanStatusEnum = UavDynamicInfoQueryStatusEnum.getFromCode(queryUavDynamicInfoRequest.getUavPlanStatus());
+            UavDynamicInfoQueryStatusEnum uavDynamicInfoQueryStatus = UavDynamicInfoQueryStatusEnum.getFromCode(queryUavDynamicInfoRequest.getQueryUavDynamicInfoStatus());
             List<DynamicUavInfoDO> dynamicUavInfoDOList = new ArrayList<>();
             if (queryUavDynamicInfoRequest.getCpn() != null) {
                 List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryDynamicUavInfoByCpn(queryUavDynamicInfoRequest.getCpn());
@@ -133,11 +133,11 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     }
                 }
             } else {
-                if (UavDynamicInfoQueryStatusEnum.ALL.equals(frontQueryPlanStatusEnum)) {
+                if (UavDynamicInfoQueryStatusEnum.ALL.equals(uavDynamicInfoQueryStatus)) {
                     // TODO: 2023/2/20 待优化
                     List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLY_APPLY_SUBMITTED.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
                     dynamicUavInfoDOList.addAll(queryDynamicUavInfoDOList);
-                } else if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(frontQueryPlanStatusEnum)) {
+                } else if (UavDynamicInfoQueryStatusEnum.FLIGHT_PLAN_PASS_AND_NOT_OVER.equals(uavDynamicInfoQueryStatus)) {
                     List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLIGHT_PLAN_IMPLEMENT.getCode(), FlightPlanStatusTypeEnum.COMPLETE_LANDING.getCode());
                     if (CollectionUtils.isNotEmpty(queryDynamicUavInfoDOList) && queryUavDynamicInfoRequest.getInAlarm() != null && queryUavDynamicInfoRequest.getInAlarm()) {
                         for (DynamicUavInfoDO dynamicUavInfo : queryDynamicUavInfoDOList) {
@@ -148,7 +148,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     } else {
                         dynamicUavInfoDOList.addAll(queryDynamicUavInfoDOList);
                     }
-                } else if (UavDynamicInfoQueryStatusEnum.ARRIVAL.equals(frontQueryPlanStatusEnum)) {
+                } else if (UavDynamicInfoQueryStatusEnum.ARRIVAL.equals(uavDynamicInfoQueryStatus)) {
                     if (StringUtils.isNotBlank(queryUavDynamicInfoRequest.getLandingAirportId())) {
                         List<DynamicUavInfoDO> queryDynamicUavInfoDOList = oacDynamicUavInfoDalService.queryByPlanStatusInterval(FlightPlanStatusTypeEnum.FLY_APPLY_SUBMITTED.getCode(), FlightPlanStatusTypeEnum.FLY_APPLY_APPROVED.getCode());
                         for (DynamicUavInfoDO dynamicUavInfo : queryDynamicUavInfoDOList) {

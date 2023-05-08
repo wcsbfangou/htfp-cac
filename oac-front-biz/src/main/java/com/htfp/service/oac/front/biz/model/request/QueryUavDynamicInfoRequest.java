@@ -14,7 +14,7 @@ import lombok.Data;
 public class QueryUavDynamicInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
     private String cpn;
-    private Integer uavPlanStatus;
+    private Integer queryUavDynamicInfoStatus;
     private Boolean inAlarm;
     private String takeoffAirportId;
     private String landingAirportId;
@@ -22,7 +22,7 @@ public class QueryUavDynamicInfoRequest implements BaseValidate<ErrorCodeEnum> {
 
     @Override
     public ErrorCodeEnum validate() {
-        if (UavDynamicInfoQueryStatusEnum.getFromCode(uavPlanStatus) == null) {
+        if (UavDynamicInfoQueryStatusEnum.getFromCode(queryUavDynamicInfoStatus) == null) {
             return ErrorCodeEnum.LACK_OF_PLAN_STATUS;
         } else {
             return ErrorCodeEnum.SUCCESS;
