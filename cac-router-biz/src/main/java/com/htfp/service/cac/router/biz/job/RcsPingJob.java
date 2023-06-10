@@ -36,14 +36,14 @@ public class RcsPingJob extends QuartzJobBean {
     public static final String RCS_ECHO_TOKEN = "hello,rcs:";
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         List<GcsInfoDO> rcsInfoDOList = gcsDalService.queryGcsInfo(GcsTypeEnum.RCS);
         if (CollectionUtils.isNotEmpty(rcsInfoDOList)) {
             for (GcsInfoDO rcsInfoDO : rcsInfoDOList) {
-                GcsIpMappingDO rcsIpMapping = gcsDalService.queryGcsIpMapping(rcsInfoDO.getGcsId(), MappingStatusEnum.VALID);
+                GcsIpMappingDO rcsIpMapping = gcsDalService.queryGcsIpMapping(rcsInfoDO.getId(), MappingStatusEnum.VALID);
                 if (rcsIpMapping != null) {
                     // TODO: 2022/6/14 报警
                     boolean pingResult = pingRcs(rcsIpMapping.getGcsId(), rcsIpMapping.getGcsIp());

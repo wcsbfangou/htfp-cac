@@ -33,28 +33,37 @@ public interface PilotInfoMapper {
     PilotInfoDO selectById(@Param(value = "id") Long id);
 
     /**
-     * 根据pilotId查询
+     * 根据pilotCode查询
      *
-     * @param pilotId
+     * @param pilotCode
      * @return
      */
-    @Select("SELECT * FROM " + TABLE + " WHERE pilot_id = #{pilotId} AND is_del = 0")
-    List<PilotInfoDO> selectByPilotId(@Param(value = "pilotId") Long pilotId);
+    @Select("SELECT * FROM " + TABLE + " WHERE pilot_code = #{pilotCode} AND is_del = 0")
+    List<PilotInfoDO> selectByPilotCode(@Param(value = "pilotCode") String pilotCode);
 
     /**
-     * 根据pilotIdList查询
+     * 根据pilotUniId查询
      *
-     * @param pilotIdList
+     * @param pilotUniId
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE pilot_uni_id = #{pilotUniId} AND is_del = 0")
+    List<PilotInfoDO> selectByPilotUniId(@Param(value = "pilotUniId") String pilotUniId);
+
+    /**
+     * 根据pilotCodeList查询
+     *
+     * @param pilotCodeList
      * @return
      */
     @Select("<script>SELECT * FROM " + TABLE
             + "<where>"
-            + "<if test=\"pilotIdList != null and pilotIdList.size() > 0\">pilot_id in"
-            + "<foreach item=\"item\" index=\"index\" collection=\"pilotIdList\" open=\"(\" separator=\",\" close=\")\">#{item}"
+            + "<if test=\"pilotCodeList != null and pilotCodeList.size() > 0\">pilot_code in"
+            + "<foreach item=\"item\" index=\"index\" collection=\"pilotCodeList\" open=\"(\" separator=\",\" close=\")\">#{item}"
             + "</foreach>"
             + "</if>"
             + "</where></script>")
-    List<PilotInfoDO> getPilotInfoByPilotIdList(@Param(value = "pilotIdList") List<Long> pilotIdList);
+    List<PilotInfoDO> getPilotInfoByPilotCodeList(@Param(value = "pilotCodeList") List<String> pilotCodeList);
 
     /**
      * 根据pilotName查询
@@ -63,7 +72,7 @@ public interface PilotInfoMapper {
      * @return
      */
     @Select("SELECT * FROM " + TABLE + " WHERE pilot_name = #{pilotName} AND is_del = 0")
-    List<PilotInfoDO> selectByPilotName(@Param(value = "pilotName") Long pilotName);
+    List<PilotInfoDO> selectByPilotName(@Param(value = "pilotName") String pilotName);
 
     /**
      * 根据controllableUavType查询
@@ -75,14 +84,14 @@ public interface PilotInfoMapper {
     List<PilotInfoDO> selectByControllableUavType(@Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
-     * 根据pilotId && controllableUavType
+     * 根据 id && controllableUavType
      *
-     * @param pilotId
+     * @param id
      * @param controllableUavType
      * @return
      */
-    @Select("SELECT * FROM " + TABLE + " WHERE pilot_id = #{pilotId} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
-    List<PilotInfoDO> selectByPilotIdAndControllableUavType(@Param(value = "pilotId") Long pilotId, @Param(value = "controllableUavType") Integer controllableUavType);
+    @Select("SELECT * FROM " + TABLE + " WHERE id = #{id} AND controllable_uav_type = #{controllableUavType} AND is_del = 0")
+    List<PilotInfoDO> selectByIdAndControllableUavType(@Param(value = "id") Long id, @Param(value = "controllableUavType") Integer controllableUavType);
 
     /**
      * 查询总数量
@@ -99,20 +108,20 @@ public interface PilotInfoMapper {
      * @param pilotInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (pilot_id, pilot_name, controllable_uav_type, gmt_create, gmt_modify) "
-            + "VALUES (#{pilotInfo.pilotId}, #{pilotInfo.pilotName}, #{pilotInfo.controllableUavType}, #{pilotInfo.gmtCreate}, #{pilotInfo.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE pilot_name=#{pilotInfo.pilotName}, controllable_uav_type=#{pilotInfo.controllableUavType}, gmt_modify=#{pilotInfo.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (pilot_code, pilot_uni_id, pilot_name, pilot_type, controllable_uav_type, license_type, license_id, license_picture_address, id_card_type, id_card_number, id_card_picture_address, gender, nationality, phone_number, email_address, status, gmt_create, gmt_modify) "
+            + "VALUES (#{pilotInfo.pilotCode}, #{pilotInfo.pilotUniId}, #{pilotInfo.pilotName}, #{pilotInfo.pilotType}, #{pilotInfo.controllableUavType}, #{pilotInfo.licenseType}, #{pilotInfo.licenseId}, #{pilotInfo.licensePictureAddress}, #{pilotInfo.idCardType}, #{pilotInfo.idCardNumber}, #{pilotInfo.idCardPictureAddress}, #{pilotInfo.gender}, #{pilotInfo.nationality}, #{pilotInfo.phoneNumber}, #{pilotInfo.emailAddress}, #{pilotInfo.status}, #{pilotInfo.gmtCreate}, #{pilotInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE pilot_code=#{pilotInfo.pilotCode}, pilot_uni_id=#{pilotInfo.pilotUniId}, pilot_name=#{pilotInfo.pilotName}, pilot_type=#{pilotInfo.pilotType}, controllable_uav_type=#{pilotInfo.controllableUavType}, license_type=#{pilotInfo.licenseType}, license_id=#{pilotInfo.licenseId}, license_picture_address=#{pilotInfo.licensePictureAddress}, id_card_type=#{pilotInfo.idCardType}, id_card_number=#{pilotInfo.idCardNumber}, id_card_picture_address=#{pilotInfo.idCardPictureAddress}, gender=#{pilotInfo.gender}, nationality=#{pilotInfo.nationality}, phone_number=#{pilotInfo.phoneNumber}, email_address=#{pilotInfo.emailAddress}, status=#{pilotInfo.status}, gmt_modify=#{pilotInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "pilotInfo.id")
     int insertPilotInfo(@Param(value = "pilotInfo") PilotInfoDO pilotInfo);
 
     /**
-     * 根据pilotId逻辑删除一条驾驶员记录
+     * 根据pilotCode逻辑删除一条驾驶员记录
      *
-     * @param pilotId
+     * @param pilotCode
      * @return
      */
-    @Update("UPDATE " + TABLE + " SET is_del = 1 WHERE pilot_id = #{pilotId}")
-    int deleteByPilotId(@Param(value = "pilotId") Long pilotId);
+    @Update("UPDATE " + TABLE + " SET is_del = 1 WHERE pilot_code = #{pilotCode}")
+    int deleteByPilotCode(@Param(value = "pilotCode") String pilotCode);
 
     /**
      * 根据id逻辑删除一条驾驶员记录
@@ -124,37 +133,61 @@ public interface PilotInfoMapper {
     int deleteById(@Param(value = "id") Long id);
 
     /**
-     * 根据pilotId更改controllableUavType
+     * 根据id更改controllableUavType
      *
      * @param controllableUavType
-     * @param pilotId
+     * @param id
      * @return
      */
-    @Update("UPDATE " + TABLE + " SET controllable_uav_type = #{controllableUavType} WHERE pilot_id = #{pilotId}")
-    int updateTypeByPilotId(@Param(value = "controllableUavType") Integer controllableUavType, @Param(value = "pilotId") Long pilotId);
+    @Update("UPDATE " + TABLE + " SET controllable_uav_type = #{controllableUavType} WHERE id = #{id}")
+    int updateTypeById(@Param(value = "controllableUavType") Integer controllableUavType, @Param(value = "id") Long id);
 
     /**
-     * 根据pilotId更改pilotName
+     * 根据id更改status
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @Update("UPDATE " + TABLE + " SET status = #{status} WHERE id = #{id}")
+    int updateStatusById(@Param(value = "status") Integer status, @Param(value = "id") Long id);
+
+    /**
+     * 根据id更改pilotName
      *
      * @param pilotName
-     * @param pilotId
+     * @param id
      * @return
      */
-    @Update("UPDATE " + TABLE + " SET pilot_name = #{pilotName} WHERE pilot_id = #{pilotId}")
-    int updateNameByPilotId(@Param(value = "pilotName") Integer pilotName, @Param(value = "pilotId") Long pilotId);
+    @Update("UPDATE " + TABLE + " SET pilot_name = #{pilotName} WHERE id = #{id}")
+    int updateNameById(@Param(value = "pilotName") Integer pilotName, @Param(value = "id") Long id);
 
     /**
-     * 根据pilotId更新pilotInfo
+     * 根据id更新pilotInfo
      *
      * @param pilotInfo
      * @return
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
+            + "<if test=\"pilotInfo.pilotCode != null\"> pilot_code = #{pilotInfo.pilotCode}, </if>"
+            + "<if test=\"pilotInfo.pilotUniId != null\"> pilot_uni_id = #{pilotInfo.pilotUniId}, </if>"
             + "<if test=\"pilotInfo.pilotName != null\"> pilot_name = #{pilotInfo.pilotName}, </if>"
+            + "<if test=\"pilotInfo.pilotType != null\"> pilot_type = #{pilotInfo.pilotType}, </if>"
             + "<if test=\"pilotInfo.controllableUavType != null\"> controllable_uav_type = #{pilotInfo.controllableUavType}, </if>"
+            + "<if test=\"pilotInfo.licenseType != null\"> license_type = #{pilotInfo.licenseType}, </if>"
+            + "<if test=\"pilotInfo.licenseId != null\"> license_id = #{pilotInfo.licenseId}, </if>"
+            + "<if test=\"pilotInfo.licensePictureAddress != null\"> license_picture_address = #{pilotInfo.licensePictureAddress}, </if>"
+            + "<if test=\"pilotInfo.idCardType != null\"> id_card_type = #{pilotInfo.idCardType}, </if>"
+            + "<if test=\"pilotInfo.idCardNumber != null\"> id_card_number = #{pilotInfo.idCardNumber}, </if>"
+            + "<if test=\"pilotInfo.idCardPictureAddress != null\"> id_card_picture_address = #{pilotInfo.idCardPictureAddress}, </if>"
+            + "<if test=\"pilotInfo.gender != null\"> gender = #{pilotInfo.gender}, </if>"
+            + "<if test=\"pilotInfo.nationality != null\"> nationality = #{pilotInfo.nationality}, </if>"
+            + "<if test=\"pilotInfo.phoneNumber != null\"> phone_number = #{pilotInfo.phoneNumber}, </if>"
+            + "<if test=\"pilotInfo.emailAddress != null\"> email_address = #{pilotInfo.emailAddress}, </if>"
+            + "<if test=\"pilotInfo.status != null\"> status = #{pilotInfo.status}, </if>"
             + "<if test=\"pilotInfo.isDel != null\"> is_del = #{pilotInfo.isDel}, </if>"
             + "<if test=\"pilotInfo.gmtModify != null\"> gmt_modify = #{pilotInfo.gmtModify} </if>"
             + "</set>"
-            + "WHERE pilot_id = #{pilotInfo.pilotId} </script>")
+            + "WHERE id = #{pilotInfo.id} </script>")
     int updateByPilotInfo(@Param(value = "pilotInfo") PilotInfoDO pilotInfo);
 }

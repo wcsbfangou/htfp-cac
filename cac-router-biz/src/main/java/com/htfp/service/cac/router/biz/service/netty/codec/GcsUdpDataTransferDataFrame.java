@@ -18,8 +18,10 @@ public class GcsUdpDataTransferDataFrame implements BaseDataFrame {
     private String gcsId;
     private byte gcsTokenLength;
     private String gcsToken;
+    private byte uavIdLength;
+    private String uavId;
     private short sequenceId;
     private int length;
     private String data;
-
+    private byte[] originDataBytes;
 }

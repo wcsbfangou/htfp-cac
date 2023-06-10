@@ -27,10 +27,10 @@ import javax.annotation.Resource;
 public class CommandServiceImpl implements ICommandService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    NavigationDalService navigationDalService;
+    private NavigationDalService navigationDalService;
 
     /**
      * 地面站在控无人机变更

@@ -32,47 +32,56 @@ public interface UavInfoMapper {
     UavInfoDO selectById(@Param(value = "id") Long id);
 
     /**
-     * 根据uavId查询
+     * 根据uavReg查询
      *
-     * @param uavId
+     * @param uavReg
      * @return
      */
-    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND is_del = 0")
-    List<UavInfoDO> selectByUavId(@Param(value = "uavId") Long uavId);
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_reg = #{uavReg} AND is_del = 0")
+    List<UavInfoDO> selectByUavReg(@Param(value = "uavReg") String uavReg);
 
     /**
-     * 根据uavIdList查询
+     * 根据operatorId查询
      *
-     * @param uavIdList
+     * @param operatorId
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE operator_id = #{operatorId} AND is_del = 0")
+    List<UavInfoDO> selectByOperatorId(@Param(value = "operatorId") Long operatorId);
+
+
+    /**
+     * 根据cpn查询
+     *
+     * @param cpn
+     * @return
+     */
+    @Select("SELECT * FROM " + TABLE + " WHERE cpn = #{cpn} AND is_del = 0")
+    UavInfoDO selectByCpn(@Param(value = "cpn") String cpn);
+
+    /**
+     * 根据uavRegList查询
+     *
+     * @param uavRegList
      * @return
      */
     @Select("<script>SELECT * FROM " + TABLE
             + "<where>"
-            + "<if test=\"uavIdList != null and uavIdList.size() > 0\">uav_id in"
-            + "<foreach item=\"item\" index=\"index\" collection=\"uavIdList\" open=\"(\" separator=\",\" close=\")\">#{item}"
+            + "<if test=\"uavRegList != null and uavRegList.size() > 0\">uav_reg in"
+            + "<foreach item=\"item\" index=\"index\" collection=\"uavRegList\" open=\"(\" separator=\",\" close=\")\">#{item}"
             + "</foreach>"
             + "</if>"
             + "</where></script>")
-    List<UavInfoDO> getUavInfoByUavIdList(@Param(value = "uavIdList") List<Long> uavIdList);
+    List<UavInfoDO> getUavInfoByUavRegList(@Param(value = "uavRegList") List<Long> uavRegList);
 
     /**
-     * 根据typeId查询
+     * 根据uavType查询
      *
-     * @param typeId
+     * @param uavType
      * @return
      */
-    @Select("SELECT * FROM " + TABLE + " WHERE type_id = #{typeId} AND is_del = 0")
-    List<UavInfoDO> selectByTypeId(@Param(value = "typeId") Integer typeId);
-
-    /**
-     * 根据uavId && TypeId查询
-     *
-     * @param uavId
-     * @param typeId
-     * @return
-     */
-    @Select("SELECT * FROM " + TABLE + " WHERE uav_id = #{uavId} AND type_id = #{typeId} AND is_del = 0")
-    List<UavInfoDO> selectByUavIdAndTypeId(@Param(value = "uavId") Long uavId, @Param(value = "typeId") Integer typeId);
+    @Select("SELECT * FROM " + TABLE + " WHERE uav_type = #{uavType} AND is_del = 0")
+    List<UavInfoDO> selectByUavType(@Param(value = "uavType") Integer uavType);
 
     /**
      * 查询总数量
@@ -89,20 +98,29 @@ public interface UavInfoMapper {
      * @param uavInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_id, type_id, gmt_create, gmt_modify) "
-            + "VALUES (#{uavInfo.uavId}, #{uavInfo.typeId},#{uavInfo.gmtCreate},#{uavInfo.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE type_id=#{uavInfo.typeId}, gmt_modify=#{uavInfo.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (uav_reg, uav_name, uav_type, cpn, vin, pvin, sn, flight_control_sn, imei, imsi, manufacturer_name, product_name, product_type, product_size_type, max_fly_time, operation_scenario_type, operator_id, status, gmt_create, gmt_modify) "
+            + "VALUES (#{uavInfo.uavReg}, #{uavInfo.uavName}, #{uavInfo.uavType}, #{uavInfo.cpn}, #{uavInfo.vin}, #{uavInfo.pvin}, #{uavInfo.sn}, #{uavInfo.flightControlSn}, #{uavInfo.imei}, #{uavInfo.imsi}, #{uavInfo.manufacturerName}, #{uavInfo.productName}, #{uavInfo.productType}, #{uavInfo.productSizeType}, #{uavInfo.maxFlyTime}, #{uavInfo.operationScenarioType}, #{uavInfo.operatorId}, #{uavInfo.status}, #{uavInfo.gmtCreate}, #{uavInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE uav_reg=#{uavInfo.uavReg}, uav_name=#{uavInfo.uavName}, uav_type=#{uavInfo.uavType}, cpn=#{uavInfo.cpn}, vin=#{uavInfo.vin}, pvin=#{uavInfo.pvin}, sn=#{uavInfo.sn}, flight_control_sn=#{uavInfo.flightControlSn}, imei=#{uavInfo.imei}, imsi=#{uavInfo.imsi}, manufacturer_name=#{uavInfo.manufacturerName}, product_name=#{uavInfo.productName}, product_type=#{uavInfo.productType}, product_size_type=#{uavInfo.productSizeType}, max_fly_time=#{uavInfo.maxFlyTime}, operation_scenario_type=#{uavInfo.operationScenarioType}, operator_id=#{uavInfo.operatorId}, status=#{uavInfo.status}, gmt_modify=#{uavInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "uavInfo.id")
     int insertUavInfo(@Param(value = "uavInfo") UavInfoDO uavInfo);
 
     /**
-     * 根据uavId逻辑删除一条无人机记录
+     * 根据uavReg逻辑删除一条无人机记录
      *
-     * @param uavId
+     * @param uavReg
      * @return
      */
-    @Update("UPDATE " + TABLE + " SET is_del = 1 WHERE uav_id = #{uavId}")
-    int deleteByUavId(@Param(value = "uavId") Long uavId);
+    @Update("UPDATE " + TABLE + " SET is_del = 1 WHERE uav_reg = #{uavReg}")
+    int deleteByUavReg(@Param(value = "uavReg") String uavReg);
+
+    /**
+     * 根据cpn逻辑删除一条无人机记录
+     *
+     * @param cpn
+     * @return
+     */
+    @Update("UPDATE " + TABLE + " SET is_del = 1 WHERE cpn = #{cpn}")
+    int deleteByCpn(@Param(value = "cpn") String cpn);
 
     /**
      * 根据id逻辑删除一条无人机记录
@@ -114,26 +132,53 @@ public interface UavInfoMapper {
     int deleteById(@Param(value = "id") Long id);
 
     /**
-     * 根据uavId更改typeId
+     * 根据id更改cpn
      *
-     * @param typeId
-     * @param uavId
+     * @param cpn
+     * @param id
      * @return
      */
-    @Update("UPDATE " + TABLE + " SET type_id = #{typeId} WHERE uav_id = #{uavId}")
-    int updateTypeByUavId(@Param(value = "typeId") Integer typeId, @Param(value = "uavId") Long uavId);
+    @Update("UPDATE " + TABLE + " SET cpn = #{cpn} WHERE id = #{id}")
+    int updateCpnByUavId(@Param(value = "cpn") String cpn, @Param(value = "id") Long id);
 
     /**
-     * 根据uavId更新uavInfo
+     * 根据id更改status
+     *
+     * @param status
+     * @param id
+     * @return
+     */
+    @Update("UPDATE " + TABLE + " SET status = #{status} WHERE id = #{id}")
+    int updateStatusById(@Param(value = "status") Integer status, @Param(value = "id") Long id);
+
+    /**
+     * 根据id更新uavInfo
      *
      * @param uavInfo
      * @return
      */
     @Update("<script> UPDATE " + TABLE + " <set> "
-            + "<if test=\"uavInfo.typeId != null\"> type_id = #{uavInfo.typeId}, </if>"
+            + "<if test=\"uavInfo.uavReg != null\"> uav_reg = #{uavInfo.uavReg}, </if>"
+            + "<if test=\"uavInfo.uavName != null\"> uav_name = #{uavInfo.uavName}, </if>"
+            + "<if test=\"uavInfo.uavType != null\"> uav_type = #{uavInfo.uavType}, </if>"
+            + "<if test=\"uavInfo.cpn != null\"> cpn = #{uavInfo.cpn}, </if>"
+            + "<if test=\"uavInfo.vin != null\"> vin = #{uavInfo.vin}, </if>"
+            + "<if test=\"uavInfo.pvin != null\"> pvin = #{uavInfo.pvin}, </if>"
+            + "<if test=\"uavInfo.sn != null\"> sn = #{uavInfo.sn}, </if>"
+            + "<if test=\"uavInfo.flightControlSn != null\"> flight_control_sn = #{uavInfo.flightControlSn}, </if>"
+            + "<if test=\"uavInfo.imei != null\"> imei = #{uavInfo.imei}, </if>"
+            + "<if test=\"uavInfo.imsi != null\"> imsi = #{uavInfo.imsi}, </if>"
+            + "<if test=\"uavInfo.manufacturerName != null\"> manufacturer_name = #{uavInfo.manufacturerName}, </if>"
+            + "<if test=\"uavInfo.productName != null\"> product_name = #{uavInfo.productName}, </if>"
+            + "<if test=\"uavInfo.productType != null\"> product_type = #{uavInfo.productType}, </if>"
+            + "<if test=\"uavInfo.productSizeType != null\"> product_size_type = #{uavInfo.productSizeType}, </if>"
+            + "<if test=\"uavInfo.maxFlyTime != null\"> max_fly_time = #{uavInfo.maxFlyTime}, </if>"
+            + "<if test=\"uavInfo.operationScenarioType != null\"> operation_scenario_type = #{uavInfo.operationScenarioType}, </if>"
+            + "<if test=\"uavInfo.operatorId != null\"> operator_id = #{uavInfo.operatorId}, </if>"
+            + "<if test=\"uavInfo.status != null\"> status = #{uavInfo.status}, </if>"
             + "<if test=\"uavInfo.isDel != null\"> is_del = #{uavInfo.isDel}, </if>"
             + "<if test=\"uavInfo.gmtModify != null\"> gmt_modify = #{uavInfo.gmtModify} </if>"
             + "</set>"
-            + "WHERE uav_id = #{uavInfo.uavId} </script>")
+            + "WHERE id = #{uavInfo.id} </script>")
     int updateByUavInfo(@Param(value = "uavInfo") UavInfoDO uavInfo);
 }

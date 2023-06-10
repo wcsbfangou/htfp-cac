@@ -13,8 +13,27 @@ import java.util.Date;
 public class UavInfoDO implements Serializable {
 
     private Long id;
-    private Long uavId;
-    private Integer typeId;
+    private String uavReg;
+    private String uavName;
+    private Integer uavType;
+
+    private String cpn;
+    private String vin;
+    private String pvin;
+    private String sn;
+    private String flightControlSn;
+    private String imei;
+    private String imsi;
+
+    private String manufacturerName;
+    private String productName;
+    private Integer productType;
+    private Integer productSizeType;
+    private Integer maxFlyTime;
+    private String operationScenarioType;
+    private Long operatorId;
+
+    private Integer status;
     private Integer isDel;
     private Date gmtCreate;
     private Date gmtModify;

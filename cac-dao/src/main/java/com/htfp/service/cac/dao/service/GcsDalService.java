@@ -1,6 +1,9 @@
 package com.htfp.service.cac.dao.service;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
+import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.GcsInfoMapper;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author sunjipeng
@@ -25,30 +29,37 @@ import java.util.List;
 public class GcsDalService {
 
     @Resource
-    GcsInfoMapper gcsInfoMapper;
+    private GcsInfoMapper gcsInfoMapper;
     @Resource
-    GcsIpMappingMapper gcsIpMappingMapper;
+    private GcsIpMappingMapper gcsIpMappingMapper;
+
+    private Cache<Long,Integer> gcsLinkStatusCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(365, TimeUnit.DAYS)
+            .expireAfterAccess(365, TimeUnit.DAYS)
+            .concurrencyLevel(10)
+            .recordStats()
+            .build();
 
     public boolean validateGcsId(Long gcsId) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        return CollectionUtils.isNotEmpty(gcsInfoDOList);
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        return gcsInfoDO != null;
     }
 
     public boolean validateGcsType(Long gcsId, GcsTypeEnum gcsTypeEnum) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            GcsInfoDO gcsInfoDO = gcsInfoDOList.get(0);
-            return gcsTypeEnum.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getTypeId()));
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        if (gcsInfoDO != null) {
+            return gcsTypeEnum.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()));
         } else {
             return false;
         }
     }
 
     public boolean validateRcsToken(Long rcsId, String rcsToken) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(rcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            if (gcsInfoDOList.get(0).getToken().equals(rcsToken) &&
-                    GcsTypeEnum.RCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))) {
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(rcsId);
+        if (gcsInfoDO != null) {
+            if (gcsInfoDO.getToken().equals(rcsToken) &&
+                    GcsTypeEnum.RCS.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()))) {
                 return true;
             }
         }
@@ -56,10 +67,10 @@ public class GcsDalService {
     }
 
     public boolean validateGcsToken(Long gcsId, String gcsToken) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
-        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
-            if (gcsInfoDOList.get(0).getToken().equals(gcsToken) &&
-                    GcsTypeEnum.GCS.equals(GcsTypeEnum.getFromCode(gcsInfoDOList.get(0).getTypeId()))) {
+        GcsInfoDO gcsInfoDO = gcsInfoMapper.selectById(gcsId);
+        if (gcsInfoDO != null) {
+            if (gcsInfoDO.getToken().equals(gcsToken) &&
+                    GcsTypeEnum.GCS.equals(GcsTypeEnum.getFromCode(gcsInfoDO.getGcsType()))) {
                 return true;
             }
         }
@@ -67,7 +78,11 @@ public class GcsDalService {
     }
 
     public GcsInfoDO queryGcsInfo(Long gcsId) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsId(gcsId);
+        return gcsInfoMapper.selectById(gcsId);
+    }
+
+    public GcsInfoDO queryGcsInfo(String gcsReg) {
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsReg(gcsReg);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
             return gcsInfoDOList.get(0);
         } else {
@@ -75,8 +90,18 @@ public class GcsDalService {
         }
     }
 
+
     public List<GcsInfoDO> queryGcsInfo(GcsTypeEnum gcsTypeEnum) {
-        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByTypeId(gcsTypeEnum.getCode());
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByGcsType(gcsTypeEnum.getCode());
+        if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
+            return gcsInfoDOList;
+        } else {
+            return null;
+        }
+    }
+
+    public List<GcsInfoDO> queryGcsInfoByOperatorId(Long operatorId) {
+        List<GcsInfoDO> gcsInfoDOList = gcsInfoMapper.selectByOperatorId(operatorId);
         if (CollectionUtils.isNotEmpty(gcsInfoDOList)) {
             return gcsInfoDOList;
         } else {
@@ -93,11 +118,7 @@ public class GcsDalService {
     }
 
     public int deleteGcsInfoByGcsId(Long gcsId) {
-        return gcsInfoMapper.deleteByGcsId(gcsId);
-    }
-
-    public int deleteGcsInfoById(Long id) {
-        return gcsInfoMapper.deleteById(id);
+        return gcsInfoMapper.deleteById(gcsId);
     }
 
     public int updateGcsInfoControllableUavType(GcsInfoDO gcsInfoDO, Integer controllableUavType) {
@@ -166,6 +187,7 @@ public class GcsDalService {
     public int updateGcsIpMappingIp(GcsIpMappingDO gcsIpMappingDO, String gcsIp) {
         gcsIpMappingDO.setGcsIp(gcsIp);
         gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
         gcsIpMappingDO.setGmtModify(new Date());
         return updateGcsIpMapping(gcsIpMappingDO);
     }
@@ -176,8 +198,29 @@ public class GcsDalService {
         return updateGcsIpMapping(gcsIpMappingDO);
     }
 
+    public int updateGcsIpMappingLinkStatus(GcsIpMappingDO gcsIpMappingDO, LinkStatusEnum linkStatusEnum) {
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
+    public int updateGcsIpMappingStatusAndLinkStatus(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
+        gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
     public int updateGcsIpMappingStatusAndSubscribe(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, SubscribeDataEnum subscribeDataEnum) {
         gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setSubscribe(subscribeDataEnum.getCode());
+        gcsIpMappingDO.setGmtModify(new Date());
+        return updateGcsIpMapping(gcsIpMappingDO);
+    }
+
+    public int updateGcsIpMappingStatusAndLinkStatusAndSubscribe(GcsIpMappingDO gcsIpMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum, SubscribeDataEnum subscribeDataEnum) {
+        gcsIpMappingDO.setStatus(statusEnum.getCode());
+        gcsIpMappingDO.setLinkStatus(linkStatusEnum.getCode());
         gcsIpMappingDO.setSubscribe(subscribeDataEnum.getCode());
         gcsIpMappingDO.setGmtModify(new Date());
         return updateGcsIpMapping(gcsIpMappingDO);
@@ -194,19 +237,22 @@ public class GcsDalService {
         gcsIpMappingDO.setGcsId(gcsId);
         gcsIpMappingDO.setGcsIp(gcsIp);
         gcsIpMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        gcsIpMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
         gcsIpMappingDO.setSubscribe(SubscribeDataEnum.UN_SUBSCRIBE.getCode());
         gcsIpMappingDO.setGmtCreate(new Date());
         gcsIpMappingDO.setGmtModify(new Date());
         return gcsIpMappingDO;
     }
 
-    public GcsInfoDO buildGcsInfoDO(Long gcsId, Integer typeId, Integer controllableUavType, Integer dataLinkType, String token) {
+    public GcsInfoDO buildGcsInfoDO(String gcsReg, String gcsSn, Integer gcsType, Integer controllableUavType, Integer dataLinkType, String token, Long operatorId) {
         GcsInfoDO gcsInfoDO = new GcsInfoDO();
-        gcsInfoDO.setGcsId(gcsId);
-        gcsInfoDO.setTypeId(typeId);
+        gcsInfoDO.setGcsReg(gcsReg);
+        gcsInfoDO.setGcsSn(gcsSn);
+        gcsInfoDO.setGcsType(gcsType);
         gcsInfoDO.setControllableUavType(controllableUavType);
         gcsInfoDO.setDataLinkType(dataLinkType);
         gcsInfoDO.setToken(token);
+        gcsInfoDO.setOperatorId(operatorId);
         gcsInfoDO.setGmtCreate(new Date());
         gcsInfoDO.setGmtModify(new Date());
         return gcsInfoDO;

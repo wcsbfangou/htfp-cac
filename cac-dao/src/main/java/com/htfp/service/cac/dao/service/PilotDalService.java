@@ -21,10 +21,14 @@ import java.util.List;
 public class PilotDalService {
 
     @Resource
-    PilotInfoMapper pilotInfoMapper;
+    private PilotInfoMapper pilotInfoMapper;
 
     public PilotInfoDO queryPilotInfo(Long pilotId){
-        List<PilotInfoDO> pilotInfoDOList = pilotInfoMapper.selectByPilotId(pilotId);
+        return pilotInfoMapper.selectById(pilotId);
+    }
+
+    public PilotInfoDO queryPilotInfo(String pilotCode){
+        List<PilotInfoDO> pilotInfoDOList = pilotInfoMapper.selectByPilotCode(pilotCode);
         if(CollectionUtils.isNotEmpty(pilotInfoDOList)){
             return pilotInfoDOList.get(0);
         } else {
@@ -45,11 +49,11 @@ public class PilotDalService {
     }
 
     public int deletePilotInfoByPilotId(Long pilotId){
-        return pilotInfoMapper.deleteByPilotId(pilotId);
+        return pilotInfoMapper.deleteById(pilotId);
     }
 
-    public int deletePilotInfoById(Long id){
-        return pilotInfoMapper.deleteById(id);
+    public int deletePilotInfoByPilotCode(String pilotCode){
+        return pilotInfoMapper.deleteByPilotCode(pilotCode);
     }
 
     public int updatePilotInfoControllableUavType(PilotInfoDO pilotInfoDO, Integer controllableUavType){
@@ -58,11 +62,43 @@ public class PilotDalService {
         return updatePilotInfo(pilotInfoDO);
     }
 
-    public PilotInfoDO buildPilotInfoDO(Long pilotId, String pilotName, Integer controllableUavType) {
+    public int updatePilotInfoStatus(PilotInfoDO pilotInfoDO, Integer status){
+        pilotInfoDO.setStatus(status);
+        pilotInfoDO.setGmtModify(new Date());
+        return updatePilotInfo(pilotInfoDO);
+    }
+
+    public int updatePilotInfoUniIdAndStatus(PilotInfoDO pilotInfoDO, String pilotUniId, Integer status){
+        pilotInfoDO.setPilotUniId(pilotUniId);
+        pilotInfoDO.setStatus(status);
+        pilotInfoDO.setGmtModify(new Date());
+        return updatePilotInfo(pilotInfoDO);
+    }
+
+    public int updatePilotInfoUniId(PilotInfoDO pilotInfoDO, String pilotUniId){
+        pilotInfoDO.setPilotUniId(pilotUniId);
+        pilotInfoDO.setGmtModify(new Date());
+        return updatePilotInfo(pilotInfoDO);
+    }
+
+    public PilotInfoDO buildPilotInfoDO(String pilotCode, String pilotUniId, String pilotName, Integer pilotType, Integer controllableUavType, Integer licenseType, String licenseId, String licensePictureAddress, Integer idCardType, String idCardNumber, String idCardPictureAddress, Integer gender, String nationality, String phoneNumber, String emailAddress, Integer status) {
         PilotInfoDO pilotInfoDO = new PilotInfoDO();
-        pilotInfoDO.setPilotId(pilotId);
+        pilotInfoDO.setPilotCode(pilotCode);
+        pilotInfoDO.setPilotUniId(pilotUniId);
         pilotInfoDO.setPilotName(pilotName);
+        pilotInfoDO.setPilotType(pilotType);
         pilotInfoDO.setControllableUavType(controllableUavType);
+        pilotInfoDO.setLicenseType(licenseType);
+        pilotInfoDO.setLicenseId(licenseId);
+        pilotInfoDO.setLicensePictureAddress(licensePictureAddress);
+        pilotInfoDO.setIdCardType(idCardType);
+        pilotInfoDO.setIdCardNumber(idCardNumber);
+        pilotInfoDO.setIdCardPictureAddress(idCardPictureAddress);
+        pilotInfoDO.setGender(gender);
+        pilotInfoDO.setNationality(nationality);
+        pilotInfoDO.setPhoneNumber(phoneNumber);
+        pilotInfoDO.setEmailAddress(emailAddress);
+        pilotInfoDO.setStatus(status);
         pilotInfoDO.setGmtCreate(new Date());
         pilotInfoDO.setGmtModify(new Date());
         return pilotInfoDO;

@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 public class SubscribeManager {
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     public Boolean subscribe(String gcsId) {
         Boolean result = false;

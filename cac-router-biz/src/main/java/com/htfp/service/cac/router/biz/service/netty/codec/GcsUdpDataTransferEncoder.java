@@ -38,7 +38,7 @@ public class GcsUdpDataTransferEncoder extends MessageToMessageEncoder<NettyBase
                 buf.writeInt(dataFrame.getLength());
                 buf.writeBytes(dataFrame.getData().getBytes());
                 // TODO: 2022/6/13 测试之后记得删除此log
-                log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
+                // log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
                 list.add(new DatagramPacket(buf, baseContext.getOriginSender()));
                 if (CollectionUtils.isNotEmpty(baseContext.getReceiverList())) {
                     for (InetSocketAddress inetSocketAddress : baseContext.getReceiverList()) {

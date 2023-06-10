@@ -16,6 +16,7 @@ public class GcsIpMappingDO implements Serializable {
     private Long gcsId;
     private String gcsIp;
     private Integer status;
+    private Integer linkStatus;
     private Integer subscribe;
     private Integer isDel;
     private Date gmtCreate;

@@ -35,7 +35,7 @@ import java.util.TimeZone;
 public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRequest> {
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     /**
      * 校验HTTP请求体
@@ -65,11 +65,12 @@ public class HttpValidator implements BaseValidator<ErrorCodeEnum, HttpServletRe
      */
     public ErrorCodeEnum httpRequestValidate(BaseValidate<ErrorCodeEnum> request, HttpServletRequest httpServletRequest) {
         try {
+            // TODO: 2023/2/17 校验加回来
             // 校验请求头
-            ErrorCodeEnum headerValidateResult = validate(httpServletRequest);
+            /*ErrorCodeEnum headerValidateResult = validate(httpServletRequest);
             if (!ErrorCodeEnum.SUCCESS.equals(headerValidateResult)) {
                 return headerValidateResult;
-            }
+            }*/
             // 校验请求体
             ErrorCodeEnum requestValidateResult = request.validate();
             if (!ErrorCodeEnum.SUCCESS.equals(requestValidateResult)) {

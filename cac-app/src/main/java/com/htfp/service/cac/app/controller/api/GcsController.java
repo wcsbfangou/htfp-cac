@@ -3,17 +3,34 @@ package com.htfp.service.cac.app.controller.api;
 import com.htfp.service.cac.app.validator.HttpValidator;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.utils.HttpUtils;
+import com.htfp.service.cac.common.utils.JsonUtils;
+import com.htfp.service.cac.router.biz.model.http.request.ATCQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.AlarmQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FinishFlightPlanRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FlightPlanApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FlightPlanQueryRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FlyApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.request.FlyQueryRequest;
 import com.htfp.service.cac.router.biz.model.http.request.GcsChangeUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.GcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.SignInRequest;
 import com.htfp.service.cac.app.model.BaseHttpResponse;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.http.request.UavStatusChangeRequest;
+import com.htfp.service.cac.router.biz.model.http.request.UavVerifyApplyRequest;
+import com.htfp.service.cac.router.biz.model.http.response.ATCQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.AlarmQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FinishFlightPlanResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FlightPlanApplyResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FlightPlanQueryResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FlyApplyResponse;
+import com.htfp.service.cac.router.biz.model.http.response.FlyQueryResponse;
 import com.htfp.service.cac.router.biz.model.http.response.GcsChangeUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.GcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignInResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignOutResponse;
 import com.htfp.service.cac.router.biz.model.http.response.UavStatusChangeResponse;
+import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyResponse;
 import com.htfp.service.cac.router.biz.service.http.IGcsService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,7 +60,7 @@ public class GcsController {
     private IGcsService gcsService;
 
     /**
-     * 地面站注册
+     * 地面站上线
      *
      * @param signInRequest
      * @param httpServletRequest
@@ -68,20 +85,20 @@ public class GcsController {
                     signInRequest.setGcsIp(gcsIp);
                 }
             }
-            // 注册地面站
+            // 地面站上线
             SignInResponse signInResponse = gcsService.gcsSignIn(signInRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(signInResponse.getCode())) {
                 return BaseHttpResponse.fail(signInResponse.getCode(), signInResponse.getMessage());
             }
         } catch (Exception e) {
-            log.error("地面站注册失败, signInRequest={}", signInRequest, e);
+            log.error("地面站上线失败, signInRequest={}", signInRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;
     }
 
     /**
-     * 地面站注销
+     * 地面站下线
      *
      * @param signOutRequest
      * @param httpServletRequest
@@ -112,7 +129,101 @@ public class GcsController {
                 return BaseHttpResponse.fail(signOutResponse.getCode(), signOutResponse.getMessage());
             }
         } catch (Exception e) {
-            log.error("地面站注销失败, signOutRequest={}", signOutRequest, e);
+            log.error("地面站下线失败, signOutRequest={}", signOutRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 飞行计划申请
+     *
+     * @param flightPlanApplyRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flightPlanApply", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flightPlanApply(@RequestBody FlightPlanApplyRequest flightPlanApplyRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flightPlanApplyRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 飞行计划申请
+            FlightPlanApplyResponse flightPlanApplyResponse = gcsService.flightPlanApply(flightPlanApplyRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flightPlanApplyResponse.getCode())) {
+                return BaseHttpResponse.fail(flightPlanApplyResponse.getCode(), flightPlanApplyResponse.getMessage());
+            } else {
+                httpResponse.setData(flightPlanApplyResponse.getApplyFlightPlanId());
+            }
+        } catch (Exception e) {
+            log.error("飞行计划申请失败, flightPlanApplyRequest={}", flightPlanApplyRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+
+    /**
+     * 飞行计划查询
+     *
+     * @param flightPlanQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flightPlanQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flightPlanQuery(@RequestBody FlightPlanQueryRequest flightPlanQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flightPlanQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 飞行计划查询
+            FlightPlanQueryResponse flightPlanQueryResponse = gcsService.flightPlanQuery(flightPlanQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flightPlanQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(flightPlanQueryResponse.getCode(), flightPlanQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(flightPlanQueryResponse.getFlightPlanQueryResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("飞行计划查询失败, flightPlanQueryRequest={}", flightPlanQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 无人机接入校验
+     *
+     * @param uavVerifyApplyRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/uavVerifyApply", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse uavVerifyApply(@RequestBody UavVerifyApplyRequest uavVerifyApplyRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(uavVerifyApplyRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 无人机接入校验申请
+            UavVerifyApplyResponse uavVerifyApplyResponse = gcsService.uavVerifyApply(uavVerifyApplyRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(uavVerifyApplyResponse.getCode())) {
+                return BaseHttpResponse.fail(uavVerifyApplyResponse.getCode(), uavVerifyApplyResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(uavVerifyApplyResponse.getUavVerifyResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("无人机接入校验失败, uavVerifyApplyRequest={}", uavVerifyApplyRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;
@@ -200,6 +311,160 @@ public class GcsController {
             }
         } catch (Exception e) {
             log.error("无人机状态变更失败, gcsControlUavRequest={}", gcsControlUavRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 放飞申请
+     *
+     * @param flyApplyRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flyApply", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flyApply(@RequestBody FlyApplyRequest flyApplyRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flyApplyRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 放飞申请
+            FlyApplyResponse flyApplyResponse = gcsService.flyApply(flyApplyRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flyApplyResponse.getCode())) {
+                return BaseHttpResponse.fail(flyApplyResponse.getCode(), flyApplyResponse.getMessage());
+            } else {
+                httpResponse.setData(flyApplyResponse.getApplyFlyId());
+            }
+        } catch (Exception e) {
+            log.error("放飞申请失败, flyApplyRequest={}", flyApplyRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+
+    /**
+     * 放飞结果查询
+     *
+     * @param flyQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/flyQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flyQuery(@RequestBody FlyQueryRequest flyQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(flyQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 放飞结果查询
+            FlyQueryResponse flyQueryResponse = gcsService.flyQuery(flyQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flyQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(flyQueryResponse.getCode(), flyQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(flyQueryResponse.getFlyQueryResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("飞行计划查询失败, flyQueryRequest={}", flyQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 结束飞行计划
+     *
+     * @param finishFlightPlanRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/finishUavFlightPlan", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse finishFlightPlan(@RequestBody FinishFlightPlanRequest finishFlightPlanRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(finishFlightPlanRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 结束飞行计划
+            FinishFlightPlanResponse finishFlightPlanResponse = gcsService.finishFlightPlan(finishFlightPlanRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(finishFlightPlanResponse.getCode())) {
+                return BaseHttpResponse.fail(finishFlightPlanResponse.getCode(), finishFlightPlanResponse.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("结束飞行计划失败, finishFlightPlanRequest={}", finishFlightPlanRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 管制信息查询
+     *
+     * @param atcQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/atcQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse atcQuery(@RequestBody ATCQueryRequest atcQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(atcQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 管制信息查询
+            ATCQueryResponse atcQueryResponse = gcsService.atcQuery(atcQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(atcQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(atcQueryResponse.getCode(), atcQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(atcQueryResponse.getAtcQueryResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("管制信息查询失败, atcQueryRequest={}", atcQueryRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 告警信息查询
+     *
+     * @param alarmQueryRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/alarmQuery", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse alarmQuery(@RequestBody AlarmQueryRequest alarmQueryRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum httpRequestValidateResult = httpValidator.httpRequestValidate(alarmQueryRequest, httpServletRequest);
+            if (!ErrorCodeEnum.SUCCESS.equals(httpRequestValidateResult)) {
+                return BaseHttpResponse.fail(httpRequestValidateResult);
+            }
+            // 告警信息查询
+            AlarmQueryResponse alarmQueryResponse = gcsService.alarmQuery(alarmQueryRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(alarmQueryResponse.getCode())) {
+                return BaseHttpResponse.fail(alarmQueryResponse.getCode(), alarmQueryResponse.getMessage());
+            } else {
+                httpResponse.setData(JsonUtils.object2Json(alarmQueryResponse.getAlarmQueryResultParamList()));
+            }
+        } catch (Exception e) {
+            log.error("告警信息查询失败, alarmQueryRequest={}", alarmQueryRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

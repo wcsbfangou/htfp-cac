@@ -1,6 +1,6 @@
 package com.htfp.service.cac.router.biz.model.background.request;
 
-import com.htfp.service.cac.router.biz.model.background.GcsInfoParam;
+import com.htfp.service.cac.router.biz.model.background.param.GcsInfoParam;
 import lombok.Data;
 
 /**

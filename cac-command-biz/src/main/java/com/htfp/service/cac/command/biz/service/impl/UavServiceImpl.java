@@ -33,10 +33,10 @@ import java.util.List;
 public class UavServiceImpl implements IUavService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    NavigationDalService navigationDalService;
+    private NavigationDalService navigationDalService;
 
     /**
      * 无人机状态变更

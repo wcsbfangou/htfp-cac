@@ -13,11 +13,13 @@ import java.util.Date;
 public class GcsInfoDO implements Serializable {
 
     private Long id;
-    private Long gcsId;
-    private Integer typeId;
+    private String gcsReg;
+    private String gcsSn;
+    private Integer gcsType;
     private Integer controllableUavType;
     private Integer dataLinkType;
     private String token;
+    private Long operatorId;
     private Integer isDel;
     private Date gmtCreate;
     private Date gmtModify;

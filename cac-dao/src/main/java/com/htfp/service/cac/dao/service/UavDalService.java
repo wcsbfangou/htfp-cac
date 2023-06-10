@@ -1,24 +1,32 @@
 package com.htfp.service.cac.dao.service;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.CommandResultEnum;
+import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
+import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
 import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavGcsMappingMapper;
 import com.htfp.service.cac.dao.mapper.mapping.UavNavigationMappingMapper;
+import com.htfp.service.cac.dao.mapper.mapping.UavOacMappingMapper;
 import com.htfp.service.cac.dao.model.entity.UavInfoDO;
 import com.htfp.service.cac.dao.model.log.CommandAndControlLogDO;
 import com.htfp.service.cac.dao.model.log.UavStatusLogDO;
 import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
+import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author sunjipeng
@@ -30,19 +38,30 @@ import java.util.List;
 public class UavDalService {
 
     @Resource
-    UavGcsMappingMapper uavGcsMappingMapper;
+    private UavGcsMappingMapper uavGcsMappingMapper;
 
     @Resource
-    UavNavigationMappingMapper uavNavigationMappingMapper;
+    private UavNavigationMappingMapper uavNavigationMappingMapper;
 
     @Resource
-    UavInfoMapper uavInfoMapper;
+    private UavInfoMapper uavInfoMapper;
 
     @Resource
-    UavStatusLogMapper uavStatusLogMapper;
+    private UavStatusLogMapper uavStatusLogMapper;
 
     @Resource
-    CommandAndControlLogMapper commandAndControlLogMapper;
+    private CommandAndControlLogMapper commandAndControlLogMapper;
+
+    @Resource
+    private UavOacMappingMapper uavOacMappingMapper;
+
+    private Cache<Long, String> uavReportCache = CacheBuilder.newBuilder()
+            .maximumSize(100)
+            .expireAfterWrite(365, TimeUnit.DAYS)
+            .expireAfterAccess(365, TimeUnit.DAYS)
+            .concurrencyLevel(10)
+            .recordStats()
+            .build();
 
     public List<UavGcsMappingDO> queryUavGcsMapping(Long gcsId, MappingStatusEnum status) {
         return uavGcsMappingMapper.selectByGcsIdAndStatus(gcsId, status.getCode());
@@ -101,12 +120,20 @@ public class UavDalService {
     }
 
     public boolean validateUavId(Long uavId) {
-        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavId(uavId);
-        return CollectionUtils.isNotEmpty(uavInfoDOList);
+        UavInfoDO uavInfoDO = uavInfoMapper.selectById(uavId);
+        return uavInfoDO != null;
     }
 
     public UavInfoDO queryUavInfo(Long uavId) {
-        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavId(uavId);
+        return uavInfoMapper.selectById(uavId);
+    }
+
+    public UavInfoDO queryUavInfoByCpn(String cpn) {
+        return uavInfoMapper.selectByCpn(cpn);
+    }
+
+    public UavInfoDO queryUavInfoByUavReg(String uavReg) {
+        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByUavReg(uavReg);
         if (CollectionUtils.isNotEmpty(uavInfoDOList)) {
             return uavInfoDOList.get(0);
         } else {
@@ -114,8 +141,17 @@ public class UavDalService {
         }
     }
 
-    public List<UavInfoDO> queryUavInfo(Integer typeId) {
-        return uavInfoMapper.selectByTypeId(typeId);
+    public List<UavInfoDO> queryUavInfoByOperatorId(Long operatorId) {
+        List<UavInfoDO> uavInfoDOList = uavInfoMapper.selectByOperatorId(operatorId);
+        if (CollectionUtils.isNotEmpty(uavInfoDOList)) {
+            return uavInfoDOList;
+        } else {
+            return null;
+        }
+    }
+
+    public List<UavInfoDO> queryUavInfo(Integer uavType) {
+        return uavInfoMapper.selectByUavType(uavType);
     }
 
     public int insertUavInfo(UavInfoDO uavInfoDO) {
@@ -126,8 +162,27 @@ public class UavDalService {
         return uavInfoMapper.updateByUavInfo(uavInfoDO);
     }
 
+    public int updateUavInfoStatus(UavInfoDO uavInfoDO, Integer status) {
+        uavInfoDO.setStatus(status);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
+    public int updateUavInfoCpnAndStatus(UavInfoDO uavInfoDO, String cpn, Integer status) {
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setStatus(status);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
+    public int updateUavInfoCpn(UavInfoDO uavInfoDO, String cpn) {
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setGmtModify(new Date());
+        return updateUavInfo(uavInfoDO);
+    }
+
     public int deleteUavInfoByUavId(Long uavId) {
-        return uavInfoMapper.deleteByUavId(uavId);
+        return uavInfoMapper.deleteById(uavId);
     }
 
     public int deleteUavInfoById(Long id) {
@@ -135,7 +190,7 @@ public class UavDalService {
     }
 
     public int updateUavInfoTypeId(UavInfoDO uavInfoDO, Integer typeId) {
-        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setUavType(typeId);
         uavInfoDO.setGmtModify(new Date());
         return updateUavInfo(uavInfoDO);
     }
@@ -190,6 +245,116 @@ public class UavDalService {
         return commandAndControlLogMapper.deleteById(id);
     }
 
+    public UavOacMappingDO queryUavOacMapping(Long uavId) {
+        return uavOacMappingMapper.selectByUavId(uavId);
+    }
+
+    public String queryUavReportCode(Long uavId) {
+        String reportCode = uavReportCache.getIfPresent(uavId);
+        if (StringUtils.isEmpty(reportCode)) {
+            UavOacMappingDO uavOacMapping = uavOacMappingMapper.selectByUavId(uavId);
+            if (uavOacMapping != null) {
+                reportCode = uavOacMapping.getReportCode();
+            }
+        }
+        return reportCode;
+    }
+
+    public UavOacMappingDO queryUavOacMapping(Long uavId, MappingStatusEnum mappingStatusEnum) {
+        return uavOacMappingMapper.selectByUavIdAndStatus(uavId, mappingStatusEnum.getCode());
+    }
+
+    public UavOacMappingDO queryUavOacMapping(Long uavId, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
+        return uavOacMappingMapper.selectByUavIdAndStatusAndLinkStatus(uavId, mappingStatusEnum.getCode(), linkStatusEnum.getCode());
+    }
+
+    public int updateUavOacMapping(UavOacMappingDO uavOacMappingDO) {
+        return uavOacMappingMapper.updateByUavOacMapping(uavOacMappingDO);
+    }
+
+    public int insertUavOacMapping(UavOacMappingDO uavOacMappingDO) {
+        int id = uavOacMappingMapper.insertUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), uavOacMappingDO.getReportCode());
+        }
+        return id;
+    }
+
+    public int deleteUavOacMapping(Long uavId) {
+        uavReportCache.invalidate(uavId);
+        return uavOacMappingMapper.deleteByUavId(uavId);
+    }
+
+    public int updateUavOacMappingReportCode(UavOacMappingDO uavOacMappingDO, String reportCode) {
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
+    public int updateUavOacMappingReportCodeAndLinkStatus(UavOacMappingDO uavOacMappingDO, String reportCode, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
+    public int updateUavOacMappingReportCodeAndStatus(UavOacMappingDO uavOacMappingDO, String reportCode, MappingStatusEnum mappingStatusEnum) {
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
+    void uavReportCacheSaveReportCode(Long uavId, String reportCode) {
+        if (StringUtils.isNotBlank(reportCode)) {
+            uavReportCache.put(uavId, reportCode);
+        } else {
+            uavReportCache.invalidate(uavId);
+        }
+    }
+
+    public int updateUavOacMappingStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum) {
+        uavOacMappingDO.setStatus(statusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public int updateUavOacMappingLinkStatus(UavOacMappingDO uavOacMappingDO, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setStatus(statusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        return updateUavOacMapping(uavOacMappingDO);
+    }
+
+    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode) {
+        UavOacMappingDO uavOacMappingDO = new UavOacMappingDO();
+        uavOacMappingDO.setUavId(uavId);
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
+        uavOacMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
+        uavOacMappingDO.setGmtCreate(new Date());
+        uavOacMappingDO.setGmtModify(new Date());
+        return uavOacMappingDO;
+    }
+
     public UavStatusLogDO buildUavStatusLogDO(Long uavId, Long navigationId, Integer uavStatus) {
         UavStatusLogDO uavStatusLogDO = new UavStatusLogDO();
         uavStatusLogDO.setUavId(uavId);
@@ -235,10 +400,26 @@ public class UavDalService {
         return commandAndControlLogDO;
     }
 
-    public UavInfoDO buildUavInfoDO(Long uavId, Integer typeId) {
+    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, Integer status) {
         UavInfoDO uavInfoDO = new UavInfoDO();
-        uavInfoDO.setUavId(uavId);
-        uavInfoDO.setTypeId(typeId);
+        uavInfoDO.setUavReg(uavReg);
+        uavInfoDO.setUavName(uavName);
+        uavInfoDO.setUavType(uavType);
+        uavInfoDO.setCpn(cpn);
+        uavInfoDO.setVin(vin);
+        uavInfoDO.setPvin(pvin);
+        uavInfoDO.setSn(sn);
+        uavInfoDO.setFlightControlSn(flightControlSn);
+        uavInfoDO.setImei(imei);
+        uavInfoDO.setImsi(imsi);
+        uavInfoDO.setManufacturerName(manufacturerName);
+        uavInfoDO.setProductName(productName);
+        uavInfoDO.setProductType(productType);
+        uavInfoDO.setProductSizeType(productSizeType);
+        uavInfoDO.setMaxFlyTime(maxFlyTime);
+        uavInfoDO.setOperationScenarioType(operationScenarioType);
+        uavInfoDO.setOperatorId(operatorId);
+        uavInfoDO.setStatus(status);
         uavInfoDO.setGmtCreate(new Date());
         uavInfoDO.setGmtModify(new Date());
         return uavInfoDO;

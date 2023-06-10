@@ -8,6 +8,7 @@ import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
 import com.htfp.service.cac.common.constant.HttpUriConstant;
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.common.enums.GcsTypeEnum;
+import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
 import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.common.utils.JsonUtils;
@@ -22,13 +23,13 @@ import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
-import com.htfp.service.cac.router.biz.model.http.request.CommandUavParam;
+import com.htfp.service.cac.router.biz.model.http.request.param.CommandUavParam;
 import com.htfp.service.cac.router.biz.model.http.request.RcsControlUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.RouterControlUavRequest;
 import com.htfp.service.cac.router.biz.model.http.request.SignInRequest;
 import com.htfp.service.cac.router.biz.model.http.request.SignOutRequest;
 import com.htfp.service.cac.router.biz.model.BaseResponse;
-import com.htfp.service.cac.router.biz.model.http.response.CommandUavResultParam;
+import com.htfp.service.cac.router.biz.model.http.response.param.CommandUavResultParam;
 import com.htfp.service.cac.router.biz.model.http.response.RcsControlUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.RouterControlUavResponse;
 import com.htfp.service.cac.router.biz.model.http.response.SignInResponse;
@@ -50,20 +51,20 @@ import java.util.Map;
  * @Description 远程地面站服务类
  */
 @Slf4j
-@Service
+@Service("rcsServiceImpl")
 public class RcsServiceImpl implements IRcsService {
 
     @Resource
-    UavDalService uavDalService;
+    private UavDalService uavDalService;
 
     @Resource
-    GcsDalService gcsDalService;
+    private GcsDalService gcsDalService;
 
     @Resource
-    PilotDalService pilotDalService;
+    private PilotDalService pilotDalService;
 
     @Resource(name = "uavServiceImpl")
-    IUavService uavService;
+    private IUavService uavService;
 
     /**
      * 远程地面站注册
@@ -126,7 +127,7 @@ public class RcsServiceImpl implements IRcsService {
                             signOutResponse.setMessage("远程地面站注销时IP与注册时IP不一致，不可下线");
                         } else {
                             //(2)校验通过后更新gcs与Ip的mapping关系
-                            gcsDalService.updateGcsIpMappingStatusAndSubscribe(gcsIpMappingDO, MappingStatusEnum.INVALID, SubscribeDataEnum.UN_SUBSCRIBE);
+                            gcsDalService.updateGcsIpMappingStatusAndLinkStatusAndSubscribe(gcsIpMappingDO, MappingStatusEnum.INVALID, LinkStatusEnum.OFFLINE, SubscribeDataEnum.UN_SUBSCRIBE);
                             signOutResponse.success();
                         }
                     } else {
@@ -249,10 +250,10 @@ public class RcsServiceImpl implements IRcsService {
         response.fail();
         UavInfoDO uavInfo = uavDalService.queryUavInfo(uavId);
         if (uavInfo != null) {
-            if (uavInfo.getTypeId() == (uavInfo.getTypeId() & rcsInfo.getControllableUavType())) {
+            if (uavInfo.getUavType() == (uavInfo.getUavType() & rcsInfo.getControllableUavType())) {
                 PilotInfoDO pilotInfo = pilotDalService.queryPilotInfo(pilotId);
                 if (pilotInfo != null) {
-                    if (uavInfo.getTypeId() == (uavInfo.getTypeId() & pilotInfo.getControllableUavType())) {
+                    if (uavInfo.getUavType() == (uavInfo.getUavType() & pilotInfo.getControllableUavType())) {
                         response.success();
                     } else {
                         response.fail(ErrorCodeEnum.PILOT_MISMATCH_UAV);

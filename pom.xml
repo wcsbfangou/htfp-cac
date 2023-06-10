@@ -21,6 +21,10 @@
         <module>cac-router-biz</module>
         <module>cac-dao</module>
         <module>cac-common</module>
+        <module>oac-app</module>
+        <module>oac-biz</module>
+        <module>oac-front-biz</module>
+        <module>oac-common</module>
     </modules>
 
     <properties>
@@ -39,7 +43,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-quartz</artifactId>
-            <version>2.7.0</version>
         </dependency>
 
         <dependency>

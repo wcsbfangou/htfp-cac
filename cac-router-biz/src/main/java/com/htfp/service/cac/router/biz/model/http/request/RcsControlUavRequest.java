@@ -2,6 +2,7 @@ package com.htfp.service.cac.router.biz.model.http.request;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
 import com.htfp.service.cac.router.biz.model.BaseValidate;
+import com.htfp.service.cac.router.biz.model.http.request.param.CommandUavParam;
 import lombok.Data;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
