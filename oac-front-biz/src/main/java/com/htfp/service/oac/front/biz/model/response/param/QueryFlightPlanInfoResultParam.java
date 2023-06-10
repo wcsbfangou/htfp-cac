@@ -10,24 +10,29 @@ import java.util.List;
  * @Description 描述
  */
 @Data
-public class QueryFlightPlanInfoParam {
+public class QueryFlightPlanInfoResultParam {
 
     private String cpn;
-    private String uavName;
-    private String flightPlanId;
     private String shortCpn;
+    private String flightPlanId;
     private String shortFlightPlanId;
+    private String uavName;
+    private String routePointName;
+    private Integer routePointLength;
     private List<CoordinateParam> routePointCoordinates;
+    private String flightPlanStartTime;
+    private String flightPlanEndTime;
+    private String flightPlanApplyTime;
     private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;
     private String landingSite;
-    private String startTime;
-    private String endTime;
+    private Boolean isEmergency;
+    private Boolean isVlos;
     private Integer missionType;
     private String emergencyProcedure;
     private String operationScenarioType;
-    private Boolean isEmergency;
-    private Boolean isVlos;
-    private Integer planStatus;
+    private Integer uavPlanStatus;
+    private String pilotName;
+    private String operatorName;
 }

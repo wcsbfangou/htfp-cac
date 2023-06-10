@@ -10,7 +10,7 @@ import java.util.List;
  * @Description 描述
  */
 @Data
-public class QueryAlarmMessageInfoParam {
+public class QueryAlarmMessageInfoResultParam {
 
     private String alarmId;
     private String flyId;

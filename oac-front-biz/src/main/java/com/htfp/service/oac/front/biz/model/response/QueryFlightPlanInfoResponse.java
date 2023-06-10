@@ -1,9 +1,7 @@
 package com.htfp.service.oac.front.biz.model.response;
 
-import com.htfp.service.oac.front.biz.model.response.param.QueryFlightPlanInfoParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryFlightPlanInfoResultParam;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * @Author sunjipeng
@@ -13,5 +11,5 @@ import java.util.List;
 @Data
 public class QueryFlightPlanInfoResponse extends BaseResponse {
 
-    List<QueryFlightPlanInfoParam> queryFlightPlanInfoParamList;
+    private QueryFlightPlanInfoResultParam queryFlightPlanInfoResultParam;
 }

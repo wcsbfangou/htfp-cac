@@ -10,6 +10,7 @@ import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicFlightPlanRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
@@ -19,6 +20,7 @@ import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicFlightPlanResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
@@ -160,7 +162,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAlarmMessageInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryAlarmMessageInfoResponse.getCode(), queryAlarmMessageInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoParamList()));
+                httpResponse.setData(JsonUtils.object2Json(queryAlarmMessageInfoResponse.getQueryAlarmMessageInfoResultParamList()));
             }
         } catch (Exception e) {
             log.error("查询告警信息失败, queryAlarmMessageInfoRequest={}", queryAlarmMessageInfoRequest, e);
@@ -294,6 +296,37 @@ public class OacController {
     }
 
     /**
+     * 查询动态飞行计划信息
+     *
+     * @param queryUavDynamicFlightPlanRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/queryUavDynamicFlightPlan", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse queryFlightPlanInfo(@RequestBody QueryUavDynamicFlightPlanRequest queryUavDynamicFlightPlanRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(queryUavDynamicFlightPlanRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 查询动态飞行计划信息
+            QueryUavDynamicFlightPlanResponse queryUavDynamicFlightPlanResponse = frontPageService.queryUavDynamicFlightPlanInfo(queryUavDynamicFlightPlanRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryUavDynamicFlightPlanResponse.getCode())) {
+                return BaseHttpResponse.fail(queryUavDynamicFlightPlanResponse.getCode(), queryUavDynamicFlightPlanResponse.getMessage());
+            }else {
+                httpResponse.setData(JsonUtils.object2Json(queryUavDynamicFlightPlanResponse.getQueryUavDynamicFlightPlanResultParamList()));
+            }
+        } catch (Exception e) {
+            log.error("查询态飞行计划信息失败, queryUavDynamicFlightPlanRequest={}", queryUavDynamicFlightPlanRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
      * 查询飞行计划信息
      *
      * @param queryFlightPlanInfoRequest
@@ -310,15 +343,15 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }
-            // 查询无人机告警信息
-            QueryFlightPlanInfoResponse queryFlightPlanInfoResponse = frontPageService.queryFlightPlanInfo(queryFlightPlanInfoRequest);
+            // 查询飞行计划信息
+            QueryFlightPlanInfoResponse queryFlightPlanInfoResponse = frontPageService.queryUavFlightPlanInfo(queryFlightPlanInfoRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryFlightPlanInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryFlightPlanInfoResponse.getCode(), queryFlightPlanInfoResponse.getMessage());
             }else {
-                httpResponse.setData(JsonUtils.object2Json(queryFlightPlanInfoResponse.getQueryFlightPlanInfoParamList()));
+                httpResponse.setData(JsonUtils.object2Json(queryFlightPlanInfoResponse.getQueryFlightPlanInfoResultParam()));
             }
         } catch (Exception e) {
-            log.error("查询告警信息失败, queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest, e);
+            log.error("查询飞行计划信息失败, queryFlightPlanInfoRequest={}", queryFlightPlanInfoRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

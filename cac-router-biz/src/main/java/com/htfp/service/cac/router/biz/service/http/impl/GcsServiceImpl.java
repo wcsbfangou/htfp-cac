@@ -275,9 +275,6 @@ public class GcsServiceImpl implements IGcsService {
                 } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(flightPlanApplyRequest.getApplicantType())) && flightPlanApplyRequest.getApplicantPerson() != null) {
                     applicantSubject = JsonUtils.object2Json(flightPlanApplyRequest.getApplicantPerson());
                 }
-                // TODO: 2023/2/21 query routePointCoordinate
-                RouteInfoDO routeInfo = routeInfoDalService.queryRouteInfo(Long.valueOf(flightPlanApplyRequest.getRouteId()));
-                flightPlanApplyRequest.setRoutePointCoordinates(JsonUtils.json2List(routeInfo.getRoutePointCoordinates(), PositionParam.class));
                 ApplyFlightPlanLogDO applyFlightPlanLog = applyFlightPlanLogDalService.buildApplyFlightPlanLogDO(applyFlightPlanId, null, Long.valueOf(flightPlanApplyRequest.getGcsId()), Long.valueOf(flightPlanApplyRequest.getUavId()), queryUavInfo.getUavReg(), queryUavInfo.getCpn(), flightPlanApplyRequest.getApplicantType(), applicantSubject,
                         JsonUtils.object2Json(flightPlanApplyRequest.getPilots()), JsonUtils.object2Json(flightPlanApplyRequest.getAirspaceNumbers()), JsonUtils.object2Json(flightPlanApplyRequest.getRoutePointCoordinates()), flightPlanApplyRequest.getTakeoffAirportId(), flightPlanApplyRequest.getLandingAirportId(),
                         flightPlanApplyRequest.getTakeoffSite(), flightPlanApplyRequest.getLandingSite(), flightPlanApplyRequest.getMissionType(), flightPlanApplyRequest.getStartTime(), flightPlanApplyRequest.getEndTime(), flightPlanApplyRequest.getEmergencyProcedure(),

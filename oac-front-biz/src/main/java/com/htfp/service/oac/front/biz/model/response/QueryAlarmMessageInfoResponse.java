@@ -1,6 +1,6 @@
 package com.htfp.service.oac.front.biz.model.response;
 
-import com.htfp.service.oac.front.biz.model.response.param.QueryAlarmMessageInfoParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryAlarmMessageInfoResultParam;
 import lombok.Data;
 
 import java.util.List;
@@ -13,5 +13,5 @@ import java.util.List;
 @Data
 public class QueryAlarmMessageInfoResponse extends BaseResponse {
 
-    List<QueryAlarmMessageInfoParam> queryAlarmMessageInfoParamList;
+    List<QueryAlarmMessageInfoResultParam> queryAlarmMessageInfoResultParamList;
 }

@@ -98,7 +98,7 @@ public interface OacDynamicUavInfoMapper {
     int insertDynamicUavInfo(@Param(value = "dynamicUavInfoDO") DynamicUavInfoDO dynamicUavInfoDO);
 
     /**
-     * 根据replyFlightPlanId逻辑删除一条地面站记录
+     * 根据replyFlightPlanId逻辑删除一条记录
      *
      * @param replyFlightPlanId
      * @return
@@ -107,7 +107,7 @@ public interface OacDynamicUavInfoMapper {
     int deleteByReplyFlightPlanId(@Param(value = "replyFlightPlanId") Long replyFlightPlanId);
 
     /**
-     * 根据replyFlyId逻辑删除一条地面站记录
+     * 根据replyFlyId逻辑删除一条记录
      *
      * @param replyFlyId
      * @return
@@ -116,7 +116,7 @@ public interface OacDynamicUavInfoMapper {
     int deleteByReplyFlyId(@Param(value = "replyFlyId") Long replyFlyId);
 
     /**
-     * 根据id逻辑删除一条地面站记录
+     * 根据id逻辑删除一条记录
      *
      * @param id
      * @return
