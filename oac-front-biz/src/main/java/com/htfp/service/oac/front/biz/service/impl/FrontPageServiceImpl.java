@@ -766,7 +766,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     flightPlanInfoResultParam.setCpn(queryApplyFlightPlanLog.getCpn());
                     flightPlanInfoResultParam.setFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId().toString());
                     flightPlanInfoResultParam.setUavName(queryUavInfo.getUavName());
-                    flightPlanInfoResultParam.setRoutePointName("测试航线");
+                    flightPlanInfoResultParam.setRoutePointName(buildRoutePointName(queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId()));
                     flightPlanInfoResultParam.setRoutePointLength(calculateRouteLength(coordinateParamList));
                     flightPlanInfoResultParam.setRoutePointCoordinates(coordinateParamList);
                     flightPlanInfoResultParam.setFlightPlanStartTime(queryApplyFlightPlanLog.getStartTime());
@@ -801,7 +801,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
     }
 
     private Integer calculateRouteLength(List<CoordinateParam> coordinateParamList) {
-        Integer routeLength = 0;
+        int routeLength = 0;
         if (CollectionUtils.isNotEmpty(coordinateParamList)) {
             for (int index = 0; index < coordinateParamList.size() - 1; index++) {
                 Integer distance = GpsDistanceUtils.getDistance(coordinateParamList.get(index).getLng(), coordinateParamList.get(index).getLat(), coordinateParamList.get(index + 1).getLng(), coordinateParamList.get(index + 1).getLat());
@@ -809,5 +809,15 @@ public class FrontPageServiceImpl implements IFrontPageService {
             }
         }
         return routeLength;
+    }
+
+    private String buildRoutePointName(String takeoffAirportId, String landingAirportId) {
+        String routePointName = "测试航线";
+        AirportInfoDO takeoffAirportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(takeoffAirportId);
+        AirportInfoDO landingAirportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(landingAirportId);
+        if (takeoffAirportInfo != null && StringUtils.isNotBlank(takeoffAirportInfo.getAirportName()) && landingAirportId != null && StringUtils.isNotBlank(landingAirportInfo.getAirportName())) {
+            routePointName = takeoffAirportInfo.getAirportName() + "-" + landingAirportInfo.getAirportName();
+        }
+        return routePointName;
     }
 }
