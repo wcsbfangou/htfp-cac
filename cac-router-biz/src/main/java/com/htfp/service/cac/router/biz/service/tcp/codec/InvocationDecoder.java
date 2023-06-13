@@ -14,7 +14,7 @@ import java.util.List;
  * @Date 2023/6/12
  * @Description 描述
  */
-public class InvocationDecoder  extends ByteToMessageDecoder {
+public class InvocationDecoder extends ByteToMessageDecoder {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -40,7 +40,9 @@ public class InvocationDecoder  extends ByteToMessageDecoder {
         byte[] content = new byte[length];
         in.readBytes(content);
         // 解析成 Invocation
-        Invocation invocation = JSON.parseObject(content, Invocation.class);
+        //Invocation invocation = JSON.parseObject(content, Invocation.class);
+        Invocation invocation = null;
         out.add(invocation);
         logger.info("[decode][连接({}) 解析到一条消息({})]", ctx.channel().id(), invocation.toString());
     }
+}

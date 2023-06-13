@@ -13,6 +13,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicFlightPlanRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
@@ -23,6 +24,7 @@ import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicFlightPlanResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryVideoStreamAddressResponse;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -126,7 +128,7 @@ public class OacController {
             if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
                 return BaseHttpResponse.fail(errorCodeEnum);
             }
-            // 查询无人机动态信息
+            // 查询机场信息
             QueryAirportInfoResponse queryAirportInfoResponse = frontPageService.queryAirportInfoData(queryAirportInfoRequest);
             if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryAirportInfoResponse.getCode())) {
                 return BaseHttpResponse.fail(queryAirportInfoResponse.getCode(), queryAirportInfoResponse.getMessage());
@@ -135,6 +137,37 @@ public class OacController {
             }
         } catch (Exception e) {
             log.error("查询机场信息失败, queryAirportInfoDataRequest={}", queryAirportInfoRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 查询无人机视频拉流地址
+     *
+     * @param queryUavVideoStreamAddressRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/queryUavVideoStreamAddress", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse queryUavVideoStreamAddress(@RequestBody QueryUavVideoStreamAddressRequest queryUavVideoStreamAddressRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(queryUavVideoStreamAddressRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 查询无人机视频拉流地址
+            QueryVideoStreamAddressResponse queryVideoStreamAddressResponse = frontPageService.queryUavVideoStreamAddress(queryUavVideoStreamAddressRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(queryVideoStreamAddressResponse.getCode())) {
+                return BaseHttpResponse.fail(queryVideoStreamAddressResponse.getCode(), queryVideoStreamAddressResponse.getMessage());
+            }else {
+                httpResponse.setData(JsonUtils.object2Json(queryVideoStreamAddressResponse.getQueryVideoStreamAddressResultParam()));
+            }
+        } catch (Exception e) {
+            log.error("查询无人机视频拉流地址失败, queryUavVideoStreamAddressRequest={}", queryUavVideoStreamAddressRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

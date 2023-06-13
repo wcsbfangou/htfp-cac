@@ -34,6 +34,7 @@ public class UavInfoParam implements BaseValidate<ErrorCodeEnum> {
     private Integer maxFlyTime;
     private String operationScenarioType;
     private String operatorUniId;
+    private String videoStreamAddress;
 
     private Integer status;
 

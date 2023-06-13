@@ -10,6 +10,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicFlightPlanRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
@@ -20,6 +21,7 @@ import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicFlightPlanResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryVideoStreamAddressResponse;
 
 /**
  * @Author sunjipeng
@@ -47,6 +49,13 @@ public interface IFrontPageService {
      * @return
      */
     QueryAirportInfoResponse queryAirportInfoData(QueryAirportInfoRequest queryAirportInfoRequest);
+
+    /**
+     * 查询无人机视频拉流地址
+     * @param queryUavVideoStreamAddressRequest
+     * @return
+     */
+    QueryVideoStreamAddressResponse queryUavVideoStreamAddress(QueryUavVideoStreamAddressRequest queryUavVideoStreamAddressRequest);
 
     /**
      * 查询告警信息

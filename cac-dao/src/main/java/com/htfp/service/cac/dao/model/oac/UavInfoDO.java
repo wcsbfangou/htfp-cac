@@ -33,6 +33,7 @@ public class UavInfoDO implements Serializable {
     private Integer maxFlyTime;
     private String operationScenarioType;
     private String operatorUniId;
+    private String videoStreamAddress;
 
     private Integer status;
     private Integer isDel;

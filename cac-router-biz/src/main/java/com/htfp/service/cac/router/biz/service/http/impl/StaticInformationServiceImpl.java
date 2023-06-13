@@ -169,7 +169,7 @@ public class StaticInformationServiceImpl implements IStaticInformationService {
             if (queryOperatorInfo != null) {
                 UavInfoDO queryUavInfo = uavDalService.queryUavInfoByUavReg(uavInfoRequest.getUavReg());
                 if (queryUavInfo == null) {
-                    UavInfoDO uavInfo = uavDalService.buildUavInfoDO(uavInfoRequest.getUavReg(), uavInfoRequest.getUavName(), uavInfoRequest.getUavType(), null, uavInfoRequest.getVin(), uavInfoRequest.getPvin(), uavInfoRequest.getSn(), uavInfoRequest.getFlightControlSn(), uavInfoRequest.getImei(), uavInfoRequest.getImsi(), uavInfoRequest.getManufacturerName(), uavInfoRequest.getProductName(), uavInfoRequest.getProductType(), uavInfoRequest.getProductSizeType(), uavInfoRequest.getMaxFlyTime(), uavInfoRequest.getOperationScenarioType(), Long.valueOf(uavInfoRequest.getOperatorId()), StaticInfoStatusEnum.TYPE_IN.getCode());
+                    UavInfoDO uavInfo = uavDalService.buildUavInfoDO(uavInfoRequest.getUavReg(), uavInfoRequest.getUavName(), uavInfoRequest.getUavType(), null, uavInfoRequest.getVin(), uavInfoRequest.getPvin(), uavInfoRequest.getSn(), uavInfoRequest.getFlightControlSn(), uavInfoRequest.getImei(), uavInfoRequest.getImsi(), uavInfoRequest.getManufacturerName(), uavInfoRequest.getProductName(), uavInfoRequest.getProductType(), uavInfoRequest.getProductSizeType(), uavInfoRequest.getMaxFlyTime(), uavInfoRequest.getOperationScenarioType(), Long.valueOf(uavInfoRequest.getOperatorId()), uavInfoRequest.getVideoStreamAddress(), StaticInfoStatusEnum.TYPE_IN.getCode());
                     int id = uavDalService.insertUavInfo(uavInfo);
                     if (id > 0) {
                         insertUavInfoResponse.setData(uavInfo.getId().toString());
@@ -396,7 +396,7 @@ public class StaticInformationServiceImpl implements IStaticInformationService {
                 if (queryUavInfo.getUavReg().equals(uavInfoRequest.getUavReg())) {
                     StaticInfoStatusEnum uavStatus = StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus());
                     if (!StaticInfoStatusEnum.REGISTERING.equals(uavStatus)) {
-                        UavInfoDO uavInfo = uavDalService.buildUavInfoDO(uavInfoRequest.getUavReg(), uavInfoRequest.getUavName(), uavInfoRequest.getUavType(), null, uavInfoRequest.getVin(), uavInfoRequest.getPvin(), uavInfoRequest.getSn(), uavInfoRequest.getFlightControlSn(), uavInfoRequest.getImei(), uavInfoRequest.getImsi(), uavInfoRequest.getManufacturerName(), uavInfoRequest.getProductName(), uavInfoRequest.getProductType(), uavInfoRequest.getProductSizeType(), uavInfoRequest.getMaxFlyTime(), uavInfoRequest.getOperationScenarioType(), Long.valueOf(uavInfoRequest.getOperatorId()), null);
+                        UavInfoDO uavInfo = uavDalService.buildUavInfoDO(uavInfoRequest.getUavReg(), uavInfoRequest.getUavName(), uavInfoRequest.getUavType(), null, uavInfoRequest.getVin(), uavInfoRequest.getPvin(), uavInfoRequest.getSn(), uavInfoRequest.getFlightControlSn(), uavInfoRequest.getImei(), uavInfoRequest.getImsi(), uavInfoRequest.getManufacturerName(), uavInfoRequest.getProductName(), uavInfoRequest.getProductType(), uavInfoRequest.getProductSizeType(), uavInfoRequest.getMaxFlyTime(), uavInfoRequest.getOperationScenarioType(), Long.valueOf(uavInfoRequest.getOperatorId()), uavInfoRequest.getVideoStreamAddress(), null);
                         uavInfo.setId(Long.valueOf(uavInfoRequest.getUavId()));
                         int id = uavDalService.updateUavInfo(uavInfo);
                         if (id > 0) {
@@ -640,6 +640,7 @@ public class StaticInformationServiceImpl implements IStaticInformationService {
         uavInfoParam.setMaxFlyTime(uavInfo.getMaxFlyTime());
         uavInfoParam.setOperationScenarioType(uavInfo.getOperationScenarioType());
         uavInfoParam.setOperatorId(uavInfo.getOperatorId().toString());
+        uavInfoParam.setVideoStreamAddress(uavInfo.getVideoStreamAddress());
         uavInfoParam.setStatus(uavInfo.getStatus());
         return uavInfoParam;
     }
@@ -1162,6 +1163,7 @@ public class StaticInformationServiceImpl implements IStaticInformationService {
         oacRegisterUavInfoRequest.setMaxFlyTime(uavInfo.getMaxFlyTime());
         oacRegisterUavInfoRequest.setOperationScenarioType(uavInfo.getOperationScenarioType());
         oacRegisterUavInfoRequest.setOperatorUniId(operatorUniId);
+        oacRegisterUavInfoRequest.setVideoStreamAddress(uavInfo.getVideoStreamAddress());
         return oacRegisterUavInfoRequest;
     }
 

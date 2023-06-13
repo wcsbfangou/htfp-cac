@@ -5,7 +5,6 @@ import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.CommandResultEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
-import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
 import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
@@ -400,7 +399,7 @@ public class UavDalService {
         return commandAndControlLogDO;
     }
 
-    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, Integer status) {
+    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, String videoStreamAddress, Integer status) {
         UavInfoDO uavInfoDO = new UavInfoDO();
         uavInfoDO.setUavReg(uavReg);
         uavInfoDO.setUavName(uavName);
@@ -419,6 +418,7 @@ public class UavDalService {
         uavInfoDO.setMaxFlyTime(maxFlyTime);
         uavInfoDO.setOperationScenarioType(operationScenarioType);
         uavInfoDO.setOperatorId(operatorId);
+        uavInfoDO.setVideoStreamAddress(videoStreamAddress);
         uavInfoDO.setStatus(status);
         uavInfoDO.setGmtCreate(new Date());
         uavInfoDO.setGmtModify(new Date());

@@ -98,7 +98,7 @@ public class OacUavDalService {
         return oacUavInfoMapper.deleteById(id);
     }
 
-    public UavInfoDO buildUavInfoDO(String uavSourceId, String uavReg, String uavName, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, String operatorUniId, Integer status) {
+    public UavInfoDO buildUavInfoDO(String uavSourceId, String uavReg, String uavName, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, String operatorUniId, String videoStreamAddress, Integer status) {
         UavInfoDO uavInfoDO = new UavInfoDO();
         uavInfoDO.setUavSourceId(uavSourceId);
         uavInfoDO.setUavReg(uavReg);
@@ -117,6 +117,7 @@ public class OacUavDalService {
         uavInfoDO.setMaxFlyTime(maxFlyTime);
         uavInfoDO.setOperationScenarioType(operationScenarioType);
         uavInfoDO.setOperatorUniId(operatorUniId);
+        uavInfoDO.setVideoStreamAddress(videoStreamAddress);
         uavInfoDO.setStatus(status);
         uavInfoDO.setGmtCreate(new Date());
         uavInfoDO.setGmtModify(new Date());

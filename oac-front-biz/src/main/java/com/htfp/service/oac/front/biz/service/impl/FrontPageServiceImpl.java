@@ -47,6 +47,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryFlightPlanInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicFlightPlanRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavDynamicInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryUavRouteInfoRequest;
+import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRequest;
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
@@ -57,6 +58,7 @@ import com.htfp.service.oac.front.biz.model.response.QueryFlightPlanInfoResponse
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicFlightPlanResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavDynamicInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryUavRouteInfoResponse;
+import com.htfp.service.oac.front.biz.model.response.QueryVideoStreamAddressResponse;
 import com.htfp.service.oac.front.biz.model.response.param.CoordinateParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAirportInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryAlarmMessageInfoResultParam;
@@ -64,6 +66,7 @@ import com.htfp.service.oac.front.biz.model.response.param.QueryFlightPlanInfoRe
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicFlightPlanResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavDynamicInfoResultParam;
 import com.htfp.service.oac.front.biz.model.response.param.QueryUavRouteInfoResultParam;
+import com.htfp.service.oac.front.biz.model.response.param.QueryVideoStreamAddressResultParam;
 import com.htfp.service.oac.front.biz.service.IFrontPageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -324,6 +327,32 @@ public class FrontPageServiceImpl implements IFrontPageService {
         queryAirportInfoResultParam.setAlarmAreaRadius(airportInfo.getAlarmAreaRadius());
         queryAirportInfoResultParam.setLandingSites(JsonUtils.json2List(airportInfo.getLandingSites(), String.class));
         return queryAirportInfoResultParam;
+    }
+
+    /**
+     * 查询无人机视频拉流地址
+     *
+     * @param queryUavVideoStreamAddressRequest
+     * @return
+     */
+    @Override
+    public QueryVideoStreamAddressResponse queryUavVideoStreamAddress(QueryUavVideoStreamAddressRequest queryUavVideoStreamAddressRequest) {
+        QueryVideoStreamAddressResponse queryVideoStreamAddressResponse = new QueryVideoStreamAddressResponse();
+        queryVideoStreamAddressResponse.fail();
+        try {
+            log.info("[oac]查询无人机拉流地址start，queryUavVideoStreamAddressRequest={}", queryUavVideoStreamAddressRequest);
+            QueryVideoStreamAddressResultParam queryVideoStreamAddressResultParam = new QueryVideoStreamAddressResultParam();
+            UavInfoDO queryUavInfo = oacUavDalService.queryUavInfoByCpn(queryUavVideoStreamAddressRequest.getCpn());
+            queryVideoStreamAddressResultParam.setCpn(queryUavInfo.getCpn());
+            queryVideoStreamAddressResultParam.setUavVideoStreamAddress(queryUavInfo.getVideoStreamAddress());
+            queryVideoStreamAddressResponse.setQueryVideoStreamAddressResultParam(queryVideoStreamAddressResultParam);
+            queryVideoStreamAddressResponse.success();
+            log.info("[oac]查询无人机拉流地址end，queryUavVideoStreamAddressRequest={},queryVideoStreamAddressResponse={}", queryUavVideoStreamAddressRequest, JsonUtils.object2Json(queryVideoStreamAddressResponse));
+        } catch (Exception e) {
+            log.error("[oac]查询无人机拉流地址异常，queryUavVideoStreamAddressRequest={}", queryUavVideoStreamAddressRequest, e);
+            queryVideoStreamAddressResponse.fail(e.getMessage());
+        }
+        return queryVideoStreamAddressResponse;
     }
 
     /**

@@ -25,10 +25,10 @@ public class Invocation {
         this.message = message;
     }
 
-    public Invocation(String type, Message message) {
+/*    public Invocation(String type, Message message) {
         this.type = type;
         this.message = JSON.toJSONString(message);
-    }
+    }*/
 
     public String getType() {
         return type;
@@ -55,3 +55,4 @@ public class Invocation {
                 ", message='" + message + '\'' +
                 '}';
     }
+}
