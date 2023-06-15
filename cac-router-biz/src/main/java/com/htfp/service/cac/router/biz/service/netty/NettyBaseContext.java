@@ -1,4 +1,4 @@
-package com.htfp.service.cac.router.biz.service;
+package com.htfp.service.cac.router.biz.service.netty;
 
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import com.htfp.service.cac.router.biz.service.netty.codec.BaseDataFrame;

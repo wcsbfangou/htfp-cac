@@ -86,6 +86,8 @@ public enum ErrorCodeEnum {
     WRONG_GCS_ID(3304, "地面站编号错误"),
     LACK_OF_DATA_LINK_TYPE(3305, "数据链路缺失"),
     LACK_OF_GCS_TYPE(3306, "地面站类型缺失"),
+    WRONG_GCS_TOKEN(3307, "地面站token错误"),
+    LACK_OF_GCS_TOKEN(3308, "地面站Token缺失"),
 
     LACK_OF_OPERATOR_ID(3401, "运营主体编码缺失"),
     LACK_OF_OPERATOR_TYPE(3402, "运营主体类型缺失"),

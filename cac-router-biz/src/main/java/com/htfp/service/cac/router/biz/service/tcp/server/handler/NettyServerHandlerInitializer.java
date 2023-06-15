@@ -1,7 +1,8 @@
 package com.htfp.service.cac.router.biz.service.tcp.server.handler;
 
-import com.htfp.service.cac.router.biz.service.tcp.codec.InvocationDecoder;
-import com.htfp.service.cac.router.biz.service.tcp.codec.InvocationEncoder;
+import com.htfp.service.cac.router.biz.service.tcp.codec.GcsTcpBaseDataDecoder;
+import com.htfp.service.cac.router.biz.service.tcp.codec.GcsTcpBaseDataEncoder;
+import com.htfp.service.cac.router.biz.service.tcp.message.MessageDispatcher;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -9,6 +10,7 @@ import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -24,10 +26,10 @@ public class NettyServerHandlerInitializer  extends ChannelInitializer<Channel> 
      */
     private static final Integer READ_TIMEOUT_SECONDS = 3 * 60;
 
-    /*@Autowired
+    @Resource
     private MessageDispatcher messageDispatcher;
-    @Autowired
-    private NettyServerHandler nettyServerHandler;*/
+    @Resource
+    private NettyServerHandler nettyServerHandler;
 
     @Override
     protected void initChannel(Channel ch) {
@@ -38,13 +40,13 @@ public class NettyServerHandlerInitializer  extends ChannelInitializer<Channel> 
                 // 空闲检测
                 .addLast(new ReadTimeoutHandler(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS))
                 // 编码器
-                .addLast(new InvocationEncoder())
+                .addLast(new GcsTcpBaseDataEncoder())
                 // 解码器
-                .addLast(new InvocationDecoder())
+                .addLast(new GcsTcpBaseDataDecoder())
                 // 消息分发器
-                //.addLast(messageDispatcher)
+                .addLast(messageDispatcher)
                 // 服务端处理器
-                //.addLast(nettyServerHandler)
+                .addLast(nettyServerHandler)
         ;
     }
 }

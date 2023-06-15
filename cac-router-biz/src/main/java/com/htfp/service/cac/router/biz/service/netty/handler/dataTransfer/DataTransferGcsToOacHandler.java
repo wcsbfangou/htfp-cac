@@ -10,7 +10,7 @@ import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavOacMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
-import com.htfp.service.cac.router.biz.service.NettyBaseContext;
+import com.htfp.service.cac.router.biz.service.netty.NettyBaseContext;
 import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDataFrame;
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
 import com.htfp.service.oac.app.service.IFlyingService;

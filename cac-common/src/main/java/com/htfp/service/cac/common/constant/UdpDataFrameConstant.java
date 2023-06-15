@@ -7,7 +7,8 @@ package com.htfp.service.cac.common.constant;
  */
 public class UdpDataFrameConstant {
 
-    public static final int DATA_FRAME_MIN_LENGTH = 15;
+    public static final int UDP_DATA_FRAME_MIN_LENGTH = 14;
+    public static final int TCP_BASE_DATA_FRAME_MIN_LENGTH = 8;
     public static final String RESP = "receive:";
     public static final String GCS_IS_NOT_SIGN_IN = "gcs is not sign in";
     public static final String GCS_IS_DISCONNECT = "gcs is disconnect";

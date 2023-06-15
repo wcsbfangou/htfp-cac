@@ -60,11 +60,12 @@ public class GcsTcpDataTransferServer {
                 .childOption(ChannelOption.SO_KEEPALIVE, true) // TCP Keepalive 机制，实现 TCP 层级的心跳保活功能
                 .childOption(ChannelOption.TCP_NODELAY, true) // 允许较小的数据包的发送，降低延迟
                 .childHandler(nettyServerHandlerInitializer);
+        log.info("GcsTcpDataTransferServer starting");
         // 绑定端口，并同步等待成功，即启动服务端
         ChannelFuture future = bootstrap.bind().sync();
         if (future.isSuccess()) {
             channel = future.channel();
-            log.info("[start][GcsTcpDataTransferServer 启动在 {} 端口]", port);
+            log.info("[start][GcsTcpDataTransferServer started at port:{} ]", port);
         }
     }
 

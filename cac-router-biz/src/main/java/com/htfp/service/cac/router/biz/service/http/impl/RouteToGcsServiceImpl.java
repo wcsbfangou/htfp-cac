@@ -2,7 +2,12 @@ package com.htfp.service.cac.router.biz.service.http.impl;
 
 import com.google.common.collect.Maps;
 import com.htfp.service.cac.common.enums.DeliverTypeEnum;
+import com.htfp.service.cac.common.enums.dataFrame.DataFrameVersionEnum;
+import com.htfp.service.cac.common.enums.dataFrame.GcsTcpTypeEnum;
+import com.htfp.service.cac.common.enums.dataFrame.MagicCodeEnum;
+import com.htfp.service.cac.common.enums.dataFrame.SerializationAlgorithmEnum;
 import com.htfp.service.cac.common.utils.DateUtils;
+import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.log.ATCIssuedLogDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import com.htfp.service.cac.dao.service.ATCIssuedLogDalService;
@@ -32,11 +37,15 @@ import com.htfp.service.cac.dao.service.ApplyFlyLogDalService;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.service.http.IRouteToGcsService;
+import com.htfp.service.cac.router.biz.service.tcp.codec.GcsTcpBaseDataFrame;
+import com.htfp.service.cac.router.biz.service.tcp.message.request.TcpFlightPlanReplyRequest;
+import com.htfp.service.cac.router.biz.service.tcp.server.TcpNettyChannelManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.Map;
 
@@ -63,6 +72,9 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
 
     @Resource
     private ATCIssuedLogDalService atcIssuedLogDalService;
+
+    @Resource
+    private TcpNettyChannelManager tcpNettyChannelManager;
 
     /**
      * 飞行计划回复
@@ -92,6 +104,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
                             // TODO: 2023/2/17 请求地面站，记得修改回来
                             flightPlanReplyResponse.success();
+                            tcpFlightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId());
                             //flightPlanReplyResponse = flightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLIGHT_PLAN_REPLY);
                         } else {
                             flightPlanReplyResponse.fail("无人机系统未连接，飞行计划回复失败");
@@ -110,6 +123,41 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
             flightPlanReplyResponse.fail("飞行计划回复异常");
         }
         return flightPlanReplyResponse;
+    }
+
+    private void tcpFlightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId, Long gcsId) {
+        GcsInfoDO queryGcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = buildGcsTcpBaseDataFrame(uavId.toString(), gcsId.toString(), queryGcsInfo.getToken());
+        gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.FLIGHT_PLAN_REPLY_REQUEST.getType());
+        byte[] applyFlightPlanIdBytes = flightPlanReplyRequest.getApplyFlightPlanId().getBytes();
+        byte[] replyFlightPlanIdBytes = flightPlanReplyRequest.getReplyFlightPlanId().getBytes();
+        int readableDataBytesLength = 3 + applyFlightPlanIdBytes.length + replyFlightPlanIdBytes.length;
+        ByteBuffer readableDataBytesByteBuffer = ByteBuffer.allocate(readableDataBytesLength);
+        byte[] readableDataBytes = new byte[readableDataBytesLength];
+        readableDataBytesByteBuffer.put((byte) applyFlightPlanIdBytes.length);
+        readableDataBytesByteBuffer.put(applyFlightPlanIdBytes);
+        readableDataBytesByteBuffer.put((byte) replyFlightPlanIdBytes.length);
+        readableDataBytesByteBuffer.put(replyFlightPlanIdBytes);
+        readableDataBytesByteBuffer.put(flightPlanReplyRequest.getPass() ? (byte) 1 : (byte) 0);
+        readableDataBytesByteBuffer.flip();
+        readableDataBytesByteBuffer.get(readableDataBytes);
+        gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
+        gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
+        tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+    }
+
+    private GcsTcpBaseDataFrame buildGcsTcpBaseDataFrame(String uavId, String gcsId, String gcsToken) {
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = new GcsTcpBaseDataFrame();
+        gcsTcpBaseDataFrame.setMagicCode(MagicCodeEnum.DATA_TRANSFER.getCode());
+        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_0.getType());
+        gcsTcpBaseDataFrame.setSerializationAlgorithm(SerializationAlgorithmEnum.NO_ALGORITHM.getType());
+        gcsTcpBaseDataFrame.setGcsIdLength((byte) gcsId.getBytes().length);
+        gcsTcpBaseDataFrame.setGcsId(gcsId);
+        gcsTcpBaseDataFrame.setGcsTokenLength((byte) gcsToken.getBytes().length);
+        gcsTcpBaseDataFrame.setGcsToken(gcsToken);
+        gcsTcpBaseDataFrame.setUavIdLength((byte) uavId.getBytes().length);
+        gcsTcpBaseDataFrame.setUavId(uavId);
+        return gcsTcpBaseDataFrame;
     }
 
     public FlightPlanReplyResponse flightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId, Long gcsId, String url) {
@@ -144,7 +192,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return new CustomHttpConfig();
     }
 
-    com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest buildGcsFlightPlanReplyRequest(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId) {
+    private com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest buildGcsFlightPlanReplyRequest(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId) {
         com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest gcsFlightPlanReplyRequest = new com.htfp.service.cac.router.biz.model.http.request.FlightPlanReplyRequest();
         gcsFlightPlanReplyRequest.setFlightPlanPass(flightPlanReplyRequest.getPass());
         gcsFlightPlanReplyRequest.setUavId(uavId.toString());
@@ -163,7 +211,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         }
     }
 
-    FlightPlanReplyResponse buildFlightPlanReplyResponse(com.htfp.service.cac.router.biz.model.http.response.FlightPlanReplyResponse gcsFlightPlanReplyResponse) {
+    private FlightPlanReplyResponse buildFlightPlanReplyResponse(com.htfp.service.cac.router.biz.model.http.response.FlightPlanReplyResponse gcsFlightPlanReplyResponse) {
         FlightPlanReplyResponse flightPlanReplyResponse = new FlightPlanReplyResponse();
         flightPlanReplyResponse.setSuccess(gcsFlightPlanReplyResponse.getSuccess());
         flightPlanReplyResponse.setCode(gcsFlightPlanReplyResponse.getCode());
@@ -202,6 +250,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
                             // TODO: 2023/2/17 请求地面站记得修改回来
                             flyReplyResponse.success();
+                            tcpFlyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId());
                             // flyReplyResponse = flyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLY_REPLY);
                         } else {
                             flyReplyResponse.fail("无人机系统未连接，放飞申请回复失败");
@@ -238,6 +287,27 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return result;
     }
 
+    private void tcpFlyReplyToGcs(FlyReplyRequest flyReplyRequest, Long uavId, Long gcsId) {
+        GcsInfoDO queryGcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = buildGcsTcpBaseDataFrame(uavId.toString(), gcsId.toString(), queryGcsInfo.getToken());
+        gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.FLY_REPLY_REQUEST.getType());
+        byte[] applyFlyIdBytes = flyReplyRequest.getApplyFlyId().getBytes();
+        byte[] replyFlyIdBytes = flyReplyRequest.getReplyFlyId().getBytes();
+        int readableDataBytesLength = 3 + applyFlyIdBytes.length + replyFlyIdBytes.length;
+        ByteBuffer readableDataBytesByteBuffer = ByteBuffer.allocate(readableDataBytesLength);
+        byte[] readableDataBytes = new byte[readableDataBytesLength];
+        readableDataBytesByteBuffer.put((byte) applyFlyIdBytes.length);
+        readableDataBytesByteBuffer.put(applyFlyIdBytes);
+        readableDataBytesByteBuffer.put((byte) replyFlyIdBytes.length);
+        readableDataBytesByteBuffer.put(replyFlyIdBytes);
+        readableDataBytesByteBuffer.put(flyReplyRequest.getPass() ? (byte) 1 : (byte) 0);
+        readableDataBytesByteBuffer.flip();
+        readableDataBytesByteBuffer.get(readableDataBytes);
+        gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
+        gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
+        tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+    }
+
     public FlyReplyResponse flyReplyToGcs(FlyReplyRequest flyReplyRequest, Long uavId, Long gcsId, String url) {
         FlyReplyResponse flyReplyResponse = new FlyReplyResponse();
         flyReplyResponse.fail();
@@ -259,7 +329,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return flyReplyResponse;
     }
 
-    com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest buildGcsFlyReplyRequest(FlyReplyRequest flyReplyRequest, Long uavId) {
+    private com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest buildGcsFlyReplyRequest(FlyReplyRequest flyReplyRequest, Long uavId) {
         com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest gcsFlyReplyRequest = new com.htfp.service.cac.router.biz.model.http.request.FlyReplyRequest();
         gcsFlyReplyRequest.setFlyPass(flyReplyRequest.getPass());
         gcsFlyReplyRequest.setUavId(uavId.toString());
@@ -278,7 +348,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         }
     }
 
-    FlyReplyResponse buildFlyReplyResponse(com.htfp.service.cac.router.biz.model.http.response.FlyReplyResponse gcsFlyReplyResponse) {
+    private FlyReplyResponse buildFlyReplyResponse(com.htfp.service.cac.router.biz.model.http.response.FlyReplyResponse gcsFlyReplyResponse) {
         FlyReplyResponse flyReplyResponse = new FlyReplyResponse();
         flyReplyResponse.setSuccess(gcsFlyReplyResponse.getSuccess());
         flyReplyResponse.setCode(gcsFlyReplyResponse.getCode());
@@ -304,7 +374,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
             ApplyFlyLogDO queryApplyFlyLog = applyFlyLogDalService.queryApplyFlyLogByApplyFlyId(Long.valueOf(atcSendRequest.getApplyFlyId()));
             if (queryApplyFlyLog != null &&
                     queryApplyFlyLog.getReplyFlyId() != null &&
-                    queryApplyFlyLog.getReplyFlyId().equals(atcSendRequest.getReplyFlyId())&&
+                    queryApplyFlyLog.getReplyFlyId().equals(atcSendRequest.getReplyFlyId()) &&
                     ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(queryApplyFlyLog.getStatus()))) {
                 if (queryUavInfo != null &&
                         queryApplyFlyLog.getUavId() != null &&
@@ -322,7 +392,8 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 LinkStatusEnum.ONLINE.equals(LinkStatusEnum.getFromCode(queryGcsIpMapping.getLinkStatus()))) {
                             // TODO: 2023/2/17 请求地面站
                             atcSendResponse.success();
-                       } else {
+                            tcpAtcSendToGcs(atcSendRequest, queryUavInfo.getId(), queryGcsIpMapping.getGcsId());
+                        } else {
                             atcSendResponse.fail("无人机系统未连接，管制信息下发失败");
                         }
                     } else {
@@ -339,6 +410,22 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
             atcSendResponse.fail("管制信息下发异常");
         }
         return atcSendResponse;
+    }
+
+    private void tcpAtcSendToGcs(ATCSendRequest atcSendRequest, Long uavId, Long gcsId) {
+        GcsInfoDO queryGcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = buildGcsTcpBaseDataFrame(uavId.toString(), gcsId.toString(), queryGcsInfo.getToken());
+        gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.RECEIVE_ATC_REQUEST.getType());
+        int readableDataBytesLength = Integer.SIZE / Byte.SIZE + Long.SIZE / Byte.SIZE;
+        ByteBuffer readableDataBytesByteBuffer = ByteBuffer.allocate(readableDataBytesLength);
+        byte[] readableDataBytes = new byte[readableDataBytesLength];
+        readableDataBytesByteBuffer.putInt(atcSendRequest.getAtcType());
+        readableDataBytesByteBuffer.putLong(System.currentTimeMillis());
+        readableDataBytesByteBuffer.flip();
+        readableDataBytesByteBuffer.get(readableDataBytes);
+        gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
+        gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
+        tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
     }
 
     /**
