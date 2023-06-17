@@ -206,6 +206,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             queryUavDynamicInfoResultParam.setFlightPlanId(dynamicUavInfo.getReplyFlightPlanId().toString());
             queryUavDynamicInfoResultParam.setFlyId(dynamicUavInfo.getReplyFlyId().toString());
             queryUavDynamicInfoResultParam.setUavName(dynamicUavInfo.getUavName());
+            queryUavDynamicInfoResultParam.setUavProductType(dynamicUavInfo.getUavProductType());
             queryUavDynamicInfoResultParam.setUavOperatorName(dynamicUavInfo.getUavOperatorName());
             queryUavDynamicInfoResultParam.setLng(dynamicUavInfo.getLng());
             queryUavDynamicInfoResultParam.setLat(dynamicUavInfo.getLat());
@@ -481,7 +482,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             AirportInfoDO queryAirportInfo = oacAirportInfoDalService.queryAirportInfoByAirportId(queryApplyFlightPlanLog.getLandingAirportId());
             if (queryOperatorInfo != null && queryAirportInfo != null) {
                 String currentTime = DateUtils.getDateFormatString(new Date(), DateUtils.DATETIME_MSEC_PATTERN);
-                DynamicUavInfoDO dynamicUavInfo = oacDynamicUavInfoDalService.buildDynamicUavInfoDO(queryApplyFlightPlanLog.getReplyFlightPlanId(), null, queryUavInfo.getUavName(), cpn, queryOperatorInfo.getOperatorName(),
+                DynamicUavInfoDO dynamicUavInfo = oacDynamicUavInfoDalService.buildDynamicUavInfoDO(queryApplyFlightPlanLog.getReplyFlightPlanId(), null, queryUavInfo.getUavName(), cpn, queryUavInfo.getProductType(), queryOperatorInfo.getOperatorName(),
                         null, null, null, null, null, null, null, null, currentTime, queryApplyFlightPlanLog.getStartTime(), queryApplyFlightPlanLog.getEndTime(),
                         null, queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId(), queryApplyFlightPlanLog.getTakeoffSite(), queryApplyFlightPlanLog.getLandingSite(),
                         queryAirportInfo.getIdentificationAreaRadius(), queryAirportInfo.getAlarmAreaRadius(), queryAirportInfo.getLng(), queryAirportInfo.getLat(), queryAirportInfo.getAlt(),
@@ -795,6 +796,9 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     flightPlanInfoResultParam.setCpn(queryApplyFlightPlanLog.getCpn());
                     flightPlanInfoResultParam.setFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId().toString());
                     flightPlanInfoResultParam.setUavName(queryUavInfo.getUavName());
+                    flightPlanInfoResultParam.setUavProductName(queryUavInfo.getProductName());
+                    flightPlanInfoResultParam.setUavProductType(queryUavInfo.getProductType());
+                    flightPlanInfoResultParam.setUavProductSizeType(queryUavInfo.getProductSizeType());
                     flightPlanInfoResultParam.setRoutePointName(buildRoutePointName(queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId()));
                     flightPlanInfoResultParam.setRoutePointLength(calculateRouteLength(coordinateParamList));
                     flightPlanInfoResultParam.setRoutePointCoordinates(coordinateParamList);

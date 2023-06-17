@@ -16,6 +16,7 @@ public class QueryUavDynamicInfoResultParam {
     private String flightPlanId;
     private String flyId;
     private String uavName;
+    private Integer uavProductType;
     private String uavOperatorName;
     private Integer lng;
     private Integer lat;

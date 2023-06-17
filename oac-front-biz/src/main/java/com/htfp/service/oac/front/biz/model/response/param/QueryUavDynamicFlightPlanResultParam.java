@@ -15,6 +15,7 @@ public class QueryUavDynamicFlightPlanResultParam {
     private String flightPlanId;
     private String shortFlightPlanId;
     private String uavName;
+    private Integer uavType;
     private String pilotName;
     private String operatorName;
     private String flightPlanStartTime;

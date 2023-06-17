@@ -17,6 +17,10 @@ public class QueryFlightPlanInfoResultParam {
     private String flightPlanId;
     private String shortFlightPlanId;
     private String uavName;
+    private String uavProductName;
+    private Integer uavProductType;
+    private Integer uavProductSizeType;
+    private String uavManufactureName;
     private String routePointName;
     private Integer routePointLength;
     private List<CoordinateParam> routePointCoordinates;

@@ -54,7 +54,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_PILOT_INFO;
         } else if (CollectionUtils.isEmpty(airspaceNumbers)) {
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
-        } else if (CollectionUtils.isEmpty(routePointCoordinates)) {
+        } else if (StringUtils.isBlank(routeId)) {
             return ErrorCodeEnum.LACK_OF_ROUTE_POINT;
         } else if (StringUtils.isBlank(takeoffAirportId)) {
             return ErrorCodeEnum.LACK_OF_TAKE_OFF_AIRPORT;
