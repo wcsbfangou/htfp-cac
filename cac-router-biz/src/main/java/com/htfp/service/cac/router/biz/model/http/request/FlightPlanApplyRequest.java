@@ -29,6 +29,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     private List<PersonParam> pilots;
     private List<String> airspaceNumbers;
     private List<PositionParam> routePointCoordinates;
+    private String routeId;
     private String takeoffAirportId;
     private String landingAirportId;
     private String takeoffSite;
