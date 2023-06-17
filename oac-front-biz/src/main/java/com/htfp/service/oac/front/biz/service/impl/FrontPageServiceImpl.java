@@ -751,6 +751,11 @@ public class FrontPageServiceImpl implements IFrontPageService {
     private List<QueryUavDynamicFlightPlanResultParam> buildQueryUavDynamicFlightPlanInfoResultParamList(List<DynamicFlightPlanInfoDO> dynamicFlightPlanInfoList) {
         List<QueryUavDynamicFlightPlanResultParam> queryUavDynamicFlightPlanResultParamList = new ArrayList<>();
         for (DynamicFlightPlanInfoDO dynamicFlightPlanInfo : dynamicFlightPlanInfoList) {
+            Date flightPlanStartTime = DateUtils.getDateByStr(dynamicFlightPlanInfo.getFlightPlanStartTime(), DateUtils.DATETIME_MSEC_PATTERN);
+            Date currentTime = new Date();
+            if (currentTime.before(flightPlanStartTime)) {
+                continue;
+            }
             QueryUavDynamicFlightPlanResultParam queryUavDynamicFlightPlanResultParam = new QueryUavDynamicFlightPlanResultParam();
             queryUavDynamicFlightPlanResultParam.setShortCpn(dynamicFlightPlanInfo.getCpn().substring(dynamicFlightPlanInfo.getCpn().length() - 4));
             queryUavDynamicFlightPlanResultParam.setShortFlightPlanId(dynamicFlightPlanInfo.getReplyFlightPlanId().toString().substring(dynamicFlightPlanInfo.getReplyFlightPlanId().toString().length() - 4));

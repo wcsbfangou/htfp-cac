@@ -116,7 +116,7 @@ public class DateUtils {
         return dateFormat.format(date);
     }
 
-    public static Date dateConverDay(Date date, int afterDay) {
+    public static Date dateConvertDay(Date date, int afterDay) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         calendar.add(Calendar.DATE, afterDay); // 往后推afterDay天
@@ -307,7 +307,7 @@ public class DateUtils {
         return StringUtils.isBlank(dateStr) ? 0 : Integer.valueOf(dateStr);
     }
 
-    public static boolean checkDateIsBeofreToday(Date date) {
+    public static boolean checkDateIsBeforeToday(Date date) {
         Date today = today();
 
         if (date.before(today)) {
