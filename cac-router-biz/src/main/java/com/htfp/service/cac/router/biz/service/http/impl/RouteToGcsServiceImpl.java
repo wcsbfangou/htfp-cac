@@ -9,6 +9,7 @@ import com.htfp.service.cac.common.enums.dataFrame.SerializationAlgorithmEnum;
 import com.htfp.service.cac.common.utils.DateUtils;
 import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.model.log.ATCIssuedLogDO;
+import com.htfp.service.cac.dao.model.mapping.UavGcsMappingDO;
 import com.htfp.service.cac.dao.model.mapping.UavNavigationMappingDO;
 import com.htfp.service.cac.dao.service.ATCIssuedLogDalService;
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
@@ -97,6 +98,17 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                         queryUavInfo.getId().equals(queryApplyFlightPlanLog.getUavId())) {
                     int id = applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, flightPlanReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
                     if (id > 0) {
+                        // 查询uav与gcs的mapping关系
+                        UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(queryUavInfo.getId());
+                        if (queryUavGcsMapping != null &&
+                                queryUavGcsMapping.getGcsId() != null &&
+                                MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
+                            flightPlanReplyResponse.success();
+                            tcpFlightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId());
+                        } else {
+                            flightPlanReplyResponse.fail("无人机系统未连接，管制信息下发失败");
+                        }
+                        /* //查询gcs与ip的mapping关系
                         GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlightPlanLog.getGcsId());
                         if (queryGcsIpMapping != null &&
                                 queryGcsIpMapping.getGcsIp() != null &&
@@ -108,7 +120,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                             //flightPlanReplyResponse = flightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLIGHT_PLAN_REPLY);
                         } else {
                             flightPlanReplyResponse.fail("无人机系统未连接，飞行计划回复失败");
-                        }
+                        }*/
                     } else {
                         flightPlanReplyResponse.fail("写入飞行计划状态异常，飞行计划回复失败");
                     }
@@ -242,7 +254,17 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                     int id = applyFlyLogDalService.updateApplyFlyLogStatus(queryApplyFlyLog, flyReplyRequest.getPass() ? ApplyStatusEnum.APPROVED.getCode() : ApplyStatusEnum.UNAPPROVED.getCode());
                     boolean updateReportCodeResult = updateUavOacMappingReportCode(queryUavInfo.getId(), queryApplyFlyLog.getReplyFlyId(), flyReplyRequest.getPass());
                     if (id > 0 && updateReportCodeResult) {
-                        // 查询无人机信息
+                        // 查询uav与gcs的mapping关系
+                        UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(queryUavInfo.getId());
+                        if (queryUavGcsMapping != null &&
+                                queryUavGcsMapping.getGcsId() != null &&
+                                MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
+                            flyReplyResponse.success();
+                            tcpFlyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId());
+                        } else {
+                            flyReplyResponse.fail("无人机系统未连接，管制信息下发失败");
+                        }
+                        /*// 查询无人机信息
                         GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());
                         if (queryGcsIpMapping != null &&
                                 queryGcsIpMapping.getGcsIp() != null &&
@@ -254,7 +276,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                             // flyReplyResponse = flyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId(), queryGcsIpMapping.getGcsIp() + "/" + HttpUriConstant.FLY_REPLY);
                         } else {
                             flyReplyResponse.fail("无人机系统未连接，放飞申请回复失败");
-                        }
+                        }*/
                     } else {
                         flyReplyResponse.fail("写入放飞申请状态和上报编码异常，放飞申请回复失败");
                     }
@@ -384,8 +406,18 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                             currentTime, null, "oacSystem", DeliverTypeEnum.DELIVERING.getCode());
                     int id = atcIssuedLogDalService.insertATCIssuedLog(atcIssuedLog);
                     if (id > 0) {
-                        // 查询无人机信息
-                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryApplyFlyLog.getGcsId());
+                        // 查询uav与gcs的mapping关系
+                        UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(queryUavInfo.getId());
+                        if (queryUavGcsMapping != null &&
+                                queryUavGcsMapping.getGcsId() != null &&
+                                MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
+                            atcSendResponse.success();
+                            tcpAtcSendToGcs(atcSendRequest, queryUavInfo.getId(), queryUavGcsMapping.getGcsId());
+                        } else {
+                            atcSendResponse.fail("无人机系统未连接，管制信息下发失败");
+                        }
+                        /* //查询gcs与ip的mapping关系
+                        GcsIpMappingDO queryGcsIpMapping = gcsDalService.queryGcsIpMapping(queryUavGcsMapping.getGcsId());
                         if (queryGcsIpMapping != null &&
                                 queryGcsIpMapping.getGcsIp() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryGcsIpMapping.getStatus())) &&
@@ -395,7 +427,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                             tcpAtcSendToGcs(atcSendRequest, queryUavInfo.getId(), queryGcsIpMapping.getGcsId());
                         } else {
                             atcSendResponse.fail("无人机系统未连接，管制信息下发失败");
-                        }
+                        }*/
                     } else {
                         atcSendResponse.fail("写入放飞申请状态和上报编码异常，管制信息下发失败");
                     }
