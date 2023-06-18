@@ -136,7 +136,7 @@ public interface OacDynamicUavInfoMapper {
             + "<if test=\"dynamicUavInfoDO.replyFlyId != null\"> reply_fly_id = #{dynamicUavInfoDO.replyFlyId}, </if>"
             + "<if test=\"dynamicUavInfoDO.uavName != null\"> uav_name = #{dynamicUavInfoDO.uavName}, </if>"
             + "<if test=\"dynamicUavInfoDO.cpn != null\"> cpn = #{dynamicUavInfoDO.cpn}, </if>"
-            + "<if test=\"dynamicUavInfoDO.uacProductType != null\"> uav_product_type = #{dynamicUavInfoDO.uacProductType}, </if>"
+            + "<if test=\"dynamicUavInfoDO.uavProductType != null\"> uav_product_type = #{dynamicUavInfoDO.uavProductType}, </if>"
             + "<if test=\"dynamicUavInfoDO.uavOperatorName != null\"> uav_operator_name = #{dynamicUavInfoDO.uavOperatorName}, </if>"
             + "<if test=\"dynamicUavInfoDO.lng != null\"> lng = #{dynamicUavInfoDO.lng}, </if>"
             + "<if test=\"dynamicUavInfoDO.lat != null\"> lat = #{dynamicUavInfoDO.lat}, </if>"

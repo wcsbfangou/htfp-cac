@@ -753,7 +753,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
         for (DynamicFlightPlanInfoDO dynamicFlightPlanInfo : dynamicFlightPlanInfoList) {
             Date flightPlanStartTime = DateUtils.getDateByStr(dynamicFlightPlanInfo.getFlightPlanStartTime(), DateUtils.DATETIME_MSEC_PATTERN);
             Date currentTime = new Date();
-            if (currentTime.before(flightPlanStartTime)) {
+            if (currentTime.after(flightPlanStartTime)) {
                 continue;
             }
             QueryUavDynamicFlightPlanResultParam queryUavDynamicFlightPlanResultParam = new QueryUavDynamicFlightPlanResultParam();
