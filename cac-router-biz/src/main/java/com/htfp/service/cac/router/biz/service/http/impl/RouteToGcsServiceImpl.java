@@ -104,7 +104,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 queryUavGcsMapping.getGcsId() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
                             flightPlanReplyResponse.success();
-                            tcpFlightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryApplyFlightPlanLog.getGcsId());
+                            tcpFlightPlanReplyToGcs(flightPlanReplyRequest, queryApplyFlightPlanLog.getUavId(), queryUavGcsMapping.getGcsId());
                         } else {
                             flightPlanReplyResponse.fail("无人机系统未连接，管制信息下发失败");
                         }
@@ -260,7 +260,7 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
                                 queryUavGcsMapping.getGcsId() != null &&
                                 MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
                             flyReplyResponse.success();
-                            tcpFlyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryApplyFlyLog.getGcsId());
+                            tcpFlyReplyToGcs(flyReplyRequest, queryApplyFlyLog.getUavId(), queryUavGcsMapping.getGcsId());
                         } else {
                             flyReplyResponse.fail("无人机系统未连接，管制信息下发失败");
                         }

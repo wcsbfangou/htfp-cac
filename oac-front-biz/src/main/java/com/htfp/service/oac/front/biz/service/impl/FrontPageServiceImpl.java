@@ -804,6 +804,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
                     flightPlanInfoResultParam.setUavProductName(queryUavInfo.getProductName());
                     flightPlanInfoResultParam.setUavProductType(queryUavInfo.getProductType());
                     flightPlanInfoResultParam.setUavProductSizeType(queryUavInfo.getProductSizeType());
+                    flightPlanInfoResultParam.setUavManufactureName(queryUavInfo.getManufacturerName());
                     flightPlanInfoResultParam.setRoutePointName(buildRoutePointName(queryApplyFlightPlanLog.getTakeoffAirportId(), queryApplyFlightPlanLog.getLandingAirportId()));
                     flightPlanInfoResultParam.setRoutePointLength(calculateRouteLength(coordinateParamList));
                     flightPlanInfoResultParam.setRoutePointCoordinates(coordinateParamList);
