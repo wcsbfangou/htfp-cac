@@ -1168,7 +1168,6 @@ public class GcsServiceImpl implements IGcsService {
                 BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
                 if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(response.getCode()))) {
                     List<ATCIssuedLogDO> atcIssuedLogDOList = atcIssuedLogDalService.queryATCIssuedLogByApplyFlightPlanIdAndAtcDelivered(Long.valueOf(atcQueryRequest.getApplyFlightPlanId()), DeliverTypeEnum.DELIVERING.getCode());
-                    // TODO: 2023/2/22 适配地面站，待优化
                     if (CollectionUtils.isNotEmpty(atcIssuedLogDOList)) {
                         ATCIssuedLogDO atcIssuedLog = atcIssuedLogDOList.get(0);
                         atcQueryResponse.setAtcQueryResultParam(buildATCQueryResultParam(atcIssuedLog));

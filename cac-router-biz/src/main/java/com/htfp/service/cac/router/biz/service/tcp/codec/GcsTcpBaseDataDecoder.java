@@ -82,7 +82,6 @@ public class GcsTcpBaseDataDecoder extends ByteToMessageDecoder {
             gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
         }
         out.add(gcsTcpBaseDataFrame);
-        // TODO: 2023/6/14 测试之后记得删除此log
-        log.info("[GcsTcpBaseDataDecoder][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsTcpBaseDataFrame.toString());
+        // log.info("[GcsTcpBaseDataDecoder][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsTcpBaseDataFrame.toString());
     }
 }

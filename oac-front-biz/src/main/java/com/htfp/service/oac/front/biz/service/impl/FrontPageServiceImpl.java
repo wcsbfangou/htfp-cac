@@ -227,7 +227,7 @@ public class FrontPageServiceImpl implements IFrontPageService {
             queryUavDynamicInfoResultParam.setDistanceToLandingPoint(dynamicUavInfo.getDistanceToLandingPoint());
             queryUavDynamicInfoResultParam.setInAlarm(dynamicUavInfo.getInAlarm());
             List<String> alarmIdList = new ArrayList<>();
-            if (dynamicUavInfo.getInAlarm() && dynamicUavInfo.getAlarmIds() != null) {
+            if (dynamicUavInfo.getInAlarm() && StringUtils.isNotBlank(dynamicUavInfo.getAlarmIds())) {
                 alarmIdList = JsonUtils.json2List(dynamicUavInfo.getAlarmIds(), String.class);
             }
             queryUavDynamicInfoResultParam.setAlarmIds(alarmIdList);

@@ -37,8 +37,7 @@ public class GcsTcpBaseDataEncoder extends MessageToByteEncoder<GcsTcpBaseDataFr
             if (dataFrame.getReadableDataBytesLength() > 0) {
                 buf.writeBytes(dataFrame.getReadableDataBytes(), 0, dataFrame.getReadableDataBytesLength());
             }
-            // TODO: 2023/6/13 测试之后记得删除此log
-            log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
+            // log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
         }
     }
 
