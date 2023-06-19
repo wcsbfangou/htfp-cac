@@ -2,6 +2,8 @@ package com.htfp.service.oac.front.biz.model.response.param;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author sunjipeng
  * @Date 2023/2/17
@@ -36,7 +38,7 @@ public class QueryUavDynamicInfoResultParam {
     private String landingSite;
     private Integer distanceToLandingPoint;
     private Boolean inAlarm;
-    private String alarmIds;
+    private List<String> alarmIds;
     private Integer uavPlanStatus;
     private Integer uavStatus;
 }
