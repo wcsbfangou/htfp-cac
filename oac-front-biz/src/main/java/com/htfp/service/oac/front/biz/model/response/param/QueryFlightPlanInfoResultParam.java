@@ -16,6 +16,7 @@ public class QueryFlightPlanInfoResultParam {
     private String shortCpn;
     private String flightPlanId;
     private String shortFlightPlanId;
+    private String applyFlightPlanId;
     private String uavName;
     private String uavProductName;
     private Integer uavProductType;
