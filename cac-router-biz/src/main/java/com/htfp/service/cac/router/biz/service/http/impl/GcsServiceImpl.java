@@ -502,7 +502,7 @@ public class GcsServiceImpl implements IGcsService {
                     } else {
                         uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_HAS_VERIFIED);
                     }
-                }p
+                }
                 // 更新接入状态
                 if (uavVerifyApplyResponse.getSuccess()) {
                     if (queryUavOacMapping == null) {
