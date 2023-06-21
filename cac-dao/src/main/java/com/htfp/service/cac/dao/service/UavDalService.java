@@ -336,19 +336,19 @@ public class UavDalService {
         return updateUavOacMapping(uavOacMappingDO);
     }
 
-    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
-        uavOacMappingDO.setStatus(statusEnum.getCode());
+    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
         uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
         uavOacMappingDO.setGmtModify(new Date());
         return updateUavOacMapping(uavOacMappingDO);
     }
 
-    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode) {
+    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
         UavOacMappingDO uavOacMappingDO = new UavOacMappingDO();
         uavOacMappingDO.setUavId(uavId);
         uavOacMappingDO.setReportCode(reportCode);
-        uavOacMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
-        uavOacMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
         uavOacMappingDO.setGmtCreate(new Date());
         uavOacMappingDO.setGmtModify(new Date());
         return uavOacMappingDO;

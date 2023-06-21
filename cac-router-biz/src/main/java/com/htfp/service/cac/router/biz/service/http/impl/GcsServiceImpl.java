@@ -502,11 +502,11 @@ public class GcsServiceImpl implements IGcsService {
                     } else {
                         uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_HAS_VERIFIED);
                     }
-                }
+                }p
                 // 更新接入状态
                 if (uavVerifyApplyResponse.getSuccess()) {
                     if (queryUavOacMapping == null) {
-                        UavOacMappingDO uavOacMapping = uavDalService.buildUavOacMappingDO(uavId, queryUavInfo.getCpn());
+                        UavOacMappingDO uavOacMapping = uavDalService.buildUavOacMappingDO(uavId, queryUavInfo.getCpn(), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
                         uavDalService.insertUavOacMapping(uavOacMapping);
                     } else {
                         uavDalService.updateUavOacMappingStatusAndLinkStatus(queryUavOacMapping, MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
@@ -834,6 +834,7 @@ public class GcsServiceImpl implements IGcsService {
                     //(7)插入或更新uav与gcs的mapping关系表
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(gcsChangeControlUavResponse.getCode()))) {
                         insertOrUpdateUavGcsMapping(uavId, gcsId);
+                        insertUavOacMapping(uavId);
                         gcsChangeUavResponse.success();
                     } else {
                         gcsChangeUavResponse.fail(gcsChangeControlUavResponse.getCode(), gcsChangeControlUavResponse.getMessage());
@@ -1159,6 +1160,14 @@ public class GcsServiceImpl implements IGcsService {
         } else {
             uavGcsMapping = uavDalService.buildUavGcsMappingDO(uavId, gcsId, MappingStatusEnum.VALID);
             uavDalService.insertUavGcsMapping(uavGcsMapping);
+        }
+    }
+
+    public void insertUavOacMapping(Long uavId) {
+        UavOacMappingDO uavOacMapping = uavDalService.queryUavOacMapping(uavId);
+        if (uavOacMapping == null) {
+            uavOacMapping = uavDalService.buildUavOacMappingDO(uavId, null, MappingStatusEnum.INVALID, LinkStatusEnum.OFFLINE);
+            uavDalService.insertUavOacMapping(uavOacMapping);
         }
     }
 
