@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class QuartzConfig {
 
+    /*
     @Bean
     public JobDetail gcsPingJobQuartz() {
         return JobBuilder.newJob(GcsPingJob.class).withIdentity("gcsPingJob").storeDurably().build();
@@ -39,6 +40,20 @@ public class QuartzConfig {
         return TriggerBuilder.newTrigger().forJob(rcsPingJobQuartz())
                 .withIdentity("rcsPingJob")
                 .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 L * ?"))
+                .build();
+    }
+    */
+
+    @Bean
+    public JobDetail modifyDynamicInfoFlightPlanStatusJobJobQuartz() {
+        return JobBuilder.newJob(ModifyDynamicInfoFlightPlanStatusJob.class).withIdentity("modifyDynamicInfoFlightPlanStatusJob").storeDurably().build();
+    }
+
+    @Bean
+    public Trigger modifyDynamicInfoFlightPlanStatusJobQuartzTrigger() {
+        return TriggerBuilder.newTrigger().forJob(modifyDynamicInfoFlightPlanStatusJobJobQuartz())
+                .withIdentity("modifyDynamicInfoFlightPlanStatusJob")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * * * ?"))
                 .build();
     }
 }

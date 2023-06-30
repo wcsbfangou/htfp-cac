@@ -40,6 +40,7 @@ import com.htfp.service.cac.dao.service.oac.OacUavDalService;
 import com.htfp.service.oac.front.biz.model.request.ATCIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.AlarmIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
+import com.htfp.service.oac.front.biz.model.request.FlightPlanRevokeRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
@@ -51,6 +52,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRe
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
+import com.htfp.service.oac.front.biz.model.response.FlightPlanRevokeResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
@@ -413,46 +415,42 @@ public class FrontPageServiceImpl implements IFrontPageService {
         try {
             log.info("[oac]飞行计划下发start，flightPlanIssuedRequest={}", flightPlanIssuedRequest);
             ApplyFlightPlanLogDO queryApplyFlightPlanLog = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByReplyFlightPlanId(Long.valueOf(flightPlanIssuedRequest.getFlightPlanId()));
-            if (queryApplyFlightPlanLog != null) {
-                DynamicFlightPlanInfoDO queryDynamicFlightPlanInfoDO = oacDynamicFlightPlanInfoDalService.queryDynamicFlightPlanInfoByReplyFlightPlanId(queryApplyFlightPlanLog.getReplyFlightPlanId());
-                if (queryDynamicFlightPlanInfoDO != null) {
-                    Integer queryPlansStatus = queryDynamicFlightPlanInfoDO.getPlanStatus();
-                    Integer queryApplyFlightPlanLogStatus = queryApplyFlightPlanLog.getStatus();
-                    if (ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLogStatus))) {
-                        if (flightPlanIssuedRequest.getPass()) {
-                            // TODO: 2023/6/9 事务
-                            oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.APPROVED.getCode());
-                            oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.getCode());
-                            // 飞行计划通过,存储动态信息
-                            if (!initializeDynamicInfo(queryApplyFlightPlanLog, flightPlanIssuedRequest.getCpn(), FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.getCode())) {
-                                //ROLLBACK
-                                oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, queryApplyFlightPlanLogStatus);
-                                oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, queryPlansStatus);
-                                flightPlanIssuedResponse.fail();
-                            } else {
-                                flightPlanIssuedResponse.success();
-                            }
+            DynamicFlightPlanInfoDO queryDynamicFlightPlanInfoDO = oacDynamicFlightPlanInfoDalService.queryDynamicFlightPlanInfoByReplyFlightPlanId(Long.valueOf(flightPlanIssuedRequest.getFlightPlanId()));
+            if (queryApplyFlightPlanLog != null && queryDynamicFlightPlanInfoDO != null) {
+                Integer queryPlansStatus = queryDynamicFlightPlanInfoDO.getPlanStatus();
+                Integer queryApplyFlightPlanLogStatus = queryApplyFlightPlanLog.getStatus();
+                if (ApplyStatusEnum.PENDING.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLogStatus))) {
+                    if (flightPlanIssuedRequest.getPass()) {
+                        // TODO: 2023/6/9 事务
+                        oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.APPROVED.getCode());
+                        oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.getCode());
+                        // 飞行计划通过,存储动态信息
+                        if (!initializeDynamicInfo(queryApplyFlightPlanLog, flightPlanIssuedRequest.getCpn(), FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.getCode())) {
+                            //ROLLBACK
+                            oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, queryApplyFlightPlanLogStatus);
+                            oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, queryPlansStatus);
+                            flightPlanIssuedResponse.fail();
                         } else {
-                            // TODO: 2023/6/9 事务
-                            oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.UNAPPROVED.getCode());
-                            oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, FlightPlanStatusTypeEnum.FLIGHT_PLAN_UNAPPROVED.getCode());
                             flightPlanIssuedResponse.success();
                         }
-                        if (flightPlanIssuedResponse.getSuccess()) {
-                            FlightPlanReplyRequest cacFlightPlanReplyRequest = buildCacFlightPlanReplyRequest(flightPlanIssuedRequest, queryApplyFlightPlanLog.getApplyFlightPlanId());
-                            FlightPlanReplyResponse cacFlightPlanReplyResponse = oacService.flightPlanReply(cacFlightPlanReplyRequest);
-                            flightPlanIssuedResponse = buildFlightPlanIssuedResponse(cacFlightPlanReplyResponse, flightPlanIssuedRequest.getCpn());
-                        }
-                        log.info("[oac]飞行计划下发end，flightPlanIssuedRequest={},flightPlanIssuedResponse={}", flightPlanIssuedRequest, JsonUtils.object2Json(flightPlanIssuedResponse));
                     } else {
-                        flightPlanIssuedResponse.fail("飞行计划已下发，不允许重复下发");
+                        // TODO: 2023/6/9 事务
+                        oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.UNAPPROVED.getCode());
+                        oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, FlightPlanStatusTypeEnum.FLIGHT_PLAN_UNAPPROVED.getCode());
+                        flightPlanIssuedResponse.success();
+                    }
+                    if (flightPlanIssuedResponse.getSuccess()) {
+                        FlightPlanReplyRequest cacFlightPlanReplyRequest = buildCacFlightPlanReplyRequest(flightPlanIssuedRequest, queryApplyFlightPlanLog.getApplyFlightPlanId());
+                        FlightPlanReplyResponse cacFlightPlanReplyResponse = oacService.flightPlanReply(cacFlightPlanReplyRequest);
+                        flightPlanIssuedResponse = buildFlightPlanIssuedResponse(cacFlightPlanReplyResponse, flightPlanIssuedRequest.getCpn());
                     }
                 } else {
-                    flightPlanIssuedResponse.fail("无飞行计划动态信息，不允许下发");
+                    flightPlanIssuedResponse.fail("飞行计划已下发，不允许重复下发");
                 }
             } else {
                 flightPlanIssuedResponse.fail("未申请该飞行计划，不允许下发");
             }
+            log.info("[oac]飞行计划下发end，flightPlanIssuedRequest={},flightPlanIssuedResponse={}", flightPlanIssuedRequest, JsonUtils.object2Json(flightPlanIssuedResponse));
         } catch (Exception e) {
             log.error("[oac]飞行计划下发异常，flightPlanIssuedRequest={}", flightPlanIssuedRequest, e);
             flightPlanIssuedResponse.fail(e.getMessage());
@@ -504,6 +502,67 @@ public class FrontPageServiceImpl implements IFrontPageService {
         }
         return result;
     }
+
+
+    /**
+     * 飞行计划撤销
+     *
+     * @param flightPlanRevokeRequest
+     * @return
+     */
+    @Override
+    public FlightPlanRevokeResponse flightPlanRevoke(FlightPlanRevokeRequest flightPlanRevokeRequest) {
+        FlightPlanRevokeResponse flightPlanRevokeResponse = new FlightPlanRevokeResponse();
+        flightPlanRevokeResponse.fail();
+        try {
+            log.info("[oac]飞行计划撤销start，flightPlanRevokeRequest={}", flightPlanRevokeRequest);
+            ApplyFlightPlanLogDO queryApplyFlightPlanLog = oacApplyFlightPlanLogDalService.queryApplyFlightPlanLogByReplyFlightPlanId(Long.valueOf(flightPlanRevokeRequest.getFlightPlanId()));
+            if (queryApplyFlightPlanLog != null && ApplyStatusEnum.APPROVED.equals(ApplyStatusEnum.getFromCode(queryApplyFlightPlanLog.getStatus()))) {
+                DynamicFlightPlanInfoDO queryDynamicFlightPlanInfoDO = oacDynamicFlightPlanInfoDalService.queryDynamicFlightPlanInfoByReplyFlightPlanId(Long.valueOf(flightPlanRevokeRequest.getFlightPlanId()));
+                DynamicUavInfoDO queryDynamicUavInfo = oacDynamicUavInfoDalService.queryDynamicUavInfoByReplyFlightPlanId(Long.valueOf(flightPlanRevokeRequest.getFlightPlanId()));
+                DynamicRouteInfoDO queryDynamicRouteInfo = oacDynamicRouteInfoDalService.queryDynamicRouteInfoByReplyFlightPlanId(Long.valueOf(flightPlanRevokeRequest.getFlightPlanId()));
+                if (queryDynamicUavInfo != null && queryDynamicFlightPlanInfoDO != null && queryDynamicRouteInfo != null && FlightPlanStatusTypeEnum.FLIGHT_PLAN_APPROVED.equals(FlightPlanStatusTypeEnum.getFromCode(queryDynamicFlightPlanInfoDO.getPlanStatus()))) {
+                    // TODO: 2023/6/9 事务
+                    oacApplyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.REVOKE.getCode());
+                    oacDynamicFlightPlanInfoDalService.updateDynamicFlightPlanInfoPlanStatus(queryDynamicFlightPlanInfoDO, FlightPlanStatusTypeEnum.FLIGHT_PLAN_REVOKE.getCode());
+                    oacDynamicUavInfoDalService.updateDynamicUavInfoPlanStatus(queryDynamicUavInfo, FlightPlanStatusTypeEnum.FLIGHT_PLAN_REVOKE.getCode());
+                    oacDynamicRouteInfoDalService.updateDynamicRouteInfoPlanStatus(queryDynamicRouteInfo, FlightPlanStatusTypeEnum.FLIGHT_PLAN_REVOKE.getCode());
+
+                    com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest  cacFlightPlanRevokeRequest = buildCacFlightPlanRevokeRequest(flightPlanRevokeRequest, queryApplyFlightPlanLog.getApplyFlightPlanId());
+                    com.htfp.service.cac.router.biz.model.inner.response.FlightPlanRevokeResponse cacFlightPlanRevokeResponse = oacService.flightPlanRevoke(cacFlightPlanRevokeRequest);
+                    flightPlanRevokeResponse = buildFlightPlanRevokeResponse(cacFlightPlanRevokeResponse, flightPlanRevokeRequest.getCpn());
+                } else {
+                    flightPlanRevokeResponse.fail("飞行计划撤销失败");
+                }
+            } else {
+                flightPlanRevokeResponse.fail("未申请该飞行计划，不允许撤销");
+            }
+            log.info("[oac]飞行计划撤销end，flightPlanRevokeRequest={},flightPlanRevokeResponse={}", flightPlanRevokeRequest, JsonUtils.object2Json(flightPlanRevokeResponse));
+        } catch (Exception e) {
+            log.error("[oac]飞行计划撤销异常，flightPlanRevokeRequest={}", flightPlanRevokeRequest, e);
+            flightPlanRevokeResponse.fail(e.getMessage());
+        }
+        return flightPlanRevokeResponse;
+    }
+
+    private com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest buildCacFlightPlanRevokeRequest(FlightPlanRevokeRequest flightPlanRevokeRequest, String applyFlightPlanId) {
+        com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest cacFlightPlanRevokeRequest = new com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest();
+        cacFlightPlanRevokeRequest.setCpn(flightPlanRevokeRequest.getCpn());
+        cacFlightPlanRevokeRequest.setApplyFlightPlanId(applyFlightPlanId);
+        cacFlightPlanRevokeRequest.setReplyFlightPlanId(flightPlanRevokeRequest.getFlightPlanId());
+        cacFlightPlanRevokeRequest.setRevokeReason(flightPlanRevokeRequest.getRevokeReason());
+        return cacFlightPlanRevokeRequest;
+    }
+
+    private FlightPlanRevokeResponse buildFlightPlanRevokeResponse(com.htfp.service.cac.router.biz.model.inner.response.FlightPlanRevokeResponse cacFlightPlanRevokeResponse, String cpn) {
+        FlightPlanRevokeResponse flightPlanRevokeResponse = new FlightPlanRevokeResponse();
+        flightPlanRevokeResponse.setSuccess(cacFlightPlanRevokeResponse.getSuccess());
+        flightPlanRevokeResponse.setCode(cacFlightPlanRevokeResponse.getCode());
+        flightPlanRevokeResponse.setMessage(cacFlightPlanRevokeResponse.getMessage());
+        flightPlanRevokeResponse.setCpn(cpn);
+        return flightPlanRevokeResponse;
+    }
+
 
     /**
      * 放飞结果下发
@@ -757,7 +816,8 @@ public class FrontPageServiceImpl implements IFrontPageService {
         for (DynamicFlightPlanInfoDO dynamicFlightPlanInfo : dynamicFlightPlanInfoList) {
             Date flightPlanStartTime = DateUtils.getDateByStr(dynamicFlightPlanInfo.getFlightPlanStartTime(), DateUtils.DATETIME_MSEC_PATTERN);
             Date currentTime = new Date();
-            if (currentTime.after(flightPlanStartTime)) {
+            if (currentTime.after(flightPlanStartTime) &&
+                    FlightPlanStatusTypeEnum.FLIGHT_PLAN_SUBMITTED.equals(FlightPlanStatusTypeEnum.getFromCode(dynamicFlightPlanInfo.getPlanStatus()))) {
                 continue;
             }
             QueryUavDynamicFlightPlanResultParam queryUavDynamicFlightPlanResultParam = new QueryUavDynamicFlightPlanResultParam();

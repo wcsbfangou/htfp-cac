@@ -316,6 +316,18 @@ public class UavDalService {
         return id;
     }
 
+    public int updateUavOacReportCodeAndMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, String reportCode, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
     void uavReportCacheSaveReportCode(Long uavId, String reportCode) {
         if (StringUtils.isNotBlank(reportCode)) {
             uavReportCache.put(uavId, reportCode);
@@ -331,13 +343,6 @@ public class UavDalService {
     }
 
     public int updateUavOacMappingLinkStatus(UavOacMappingDO uavOacMappingDO, LinkStatusEnum linkStatusEnum) {
-        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
-        uavOacMappingDO.setGmtModify(new Date());
-        return updateUavOacMapping(uavOacMappingDO);
-    }
-
-    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
-        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
         uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
         uavOacMappingDO.setGmtModify(new Date());
         return updateUavOacMapping(uavOacMappingDO);

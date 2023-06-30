@@ -81,7 +81,6 @@ import com.htfp.service.oac.biz.model.inner.request.param.UavDynamicParam;
 import com.htfp.service.oac.biz.model.inner.request.param.UavStaticParam;
 import com.htfp.service.oac.app.service.IFlyingService;
 import com.htfp.service.oac.app.service.IPreFlightService;
-import com.htfp.service.oac.common.enums.AtcTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -267,7 +266,7 @@ public class GcsServiceImpl implements IGcsService {
             BaseResponse validateGcsResult = validateGcs(Long.valueOf(flightPlanApplyRequest.getGcsId()));
             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
                 BaseResponse validateUavGcsMappingResult = validateUavGcsMapping(Long.valueOf(flightPlanApplyRequest.getUavId()), Long.valueOf(flightPlanApplyRequest.getGcsId()));
-                if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))){
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))) {
                     UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(flightPlanApplyRequest.getUavId()));
                     if (StaticInfoStatusEnum.REGISTERED.equals(StaticInfoStatusEnum.getFromCode(queryUavInfo.getStatus()))) {
                         // TODO: 2022/12/22 IDC ID && 机器ID
@@ -499,23 +498,14 @@ public class GcsServiceImpl implements IGcsService {
                 UavInfoDO queryUavInfo = uavDalService.queryUavInfo(uavId);
                 UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(uavId);
                 // 无人机认证
-                if (queryUavOacMapping == null) {
+                if (LinkStatusEnum.OFFLINE.equals(LinkStatusEnum.getFromCode(queryUavOacMapping.getLinkStatus()))) {
                     uavVerifyApplyResponse = uavVerify(uavVerifyApplyRequest, queryUavInfo);
+                    // 更新接入状态
+                    if (uavVerifyApplyResponse.getSuccess()) {
+                        uavDalService.updateUavOacReportCodeAndMappingStatusAndLinkStatus(queryUavOacMapping, queryUavInfo.getCpn(), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
+                    }
                 } else {
-                    if (LinkStatusEnum.OFFLINE.equals(LinkStatusEnum.getFromCode(queryUavOacMapping.getLinkStatus()))) {
-                        uavVerifyApplyResponse = uavVerify(uavVerifyApplyRequest, queryUavInfo);
-                    } else {
-                        uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_HAS_VERIFIED);
-                    }
-                }
-                // 更新接入状态
-                if (uavVerifyApplyResponse.getSuccess()) {
-                    if (queryUavOacMapping == null) {
-                        UavOacMappingDO uavOacMapping = uavDalService.buildUavOacMappingDO(uavId, queryUavInfo.getCpn(), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
-                        uavDalService.insertUavOacMapping(uavOacMapping);
-                    } else {
-                        uavDalService.updateUavOacMappingStatusAndLinkStatus(queryUavOacMapping, MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
-                    }
+                    uavVerifyApplyResponse.fail(ErrorCodeEnum.UAV_HAS_VERIFIED);
                 }
             } else {
                 uavVerifyApplyResponse.fail(ErrorCodeEnum.FLIGHT_PLAN_NOT_APPROVED);
@@ -637,7 +627,7 @@ public class GcsServiceImpl implements IGcsService {
             BaseResponse validateGcsResult = validateGcs(Long.valueOf(flyApplyRequest.getGcsId()));
             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
                 BaseResponse validateUavGcsMappingResult = validateUavGcsMapping(Long.valueOf(flyApplyRequest.getUavId()), Long.valueOf(flyApplyRequest.getGcsId()));
-                if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))){
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))) {
                     List<ApplyFlyLogDO> queryApplyFlyLogList = applyFlyLogDalService.queryApplyFlyLogByUavId(Long.valueOf(flyApplyRequest.getUavId()));
                     if (!judgeUavHasApplyFly(queryApplyFlyLogList)) {
                         UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(flyApplyRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
@@ -843,7 +833,7 @@ public class GcsServiceImpl implements IGcsService {
                     //(7)插入或更新uav与gcs的mapping关系表
                     if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(gcsChangeControlUavResponse.getCode()))) {
                         insertOrUpdateUavGcsMapping(uavId, gcsId);
-                        insertUavOacMapping(uavId);
+                        insertOrUpdateUavOacMapping(uavId);
                         gcsChangeUavResponse.success();
                     } else {
                         gcsChangeUavResponse.fail(gcsChangeControlUavResponse.getCode(), gcsChangeControlUavResponse.getMessage());
@@ -879,7 +869,7 @@ public class GcsServiceImpl implements IGcsService {
             BaseResponse validateGcsResult = validateGcs(gcsId);
             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
                 BaseResponse validateUavGcsMappingResult = validateUavGcsMapping(Long.valueOf(uavStatusChangeRequest.getUavId()), Long.valueOf(uavStatusChangeRequest.getGcsId()));
-                if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))){
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))) {
                     Long uavId = Long.valueOf(uavStatusChangeRequest.getUavId());
                     //(2)校验无人机地面站mapping关系
                     BaseResponse response = validateUavStatusChangeParam(uavId, gcsId);
@@ -987,7 +977,7 @@ public class GcsServiceImpl implements IGcsService {
             BaseResponse validateGcsResult = validateGcs(Long.valueOf(finishFlightPlanRequest.getGcsId()));
             if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateGcsResult.getCode()))) {
                 BaseResponse validateUavGcsMappingResult = validateUavGcsMapping(Long.valueOf(finishFlightPlanRequest.getUavId()), Long.valueOf(finishFlightPlanRequest.getGcsId()));
-                if(ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))){
+                if (ErrorCodeEnum.SUCCESS.equals(ErrorCodeEnum.getFromCode(validateUavGcsMappingResult.getCode()))) {
                     UavInfoDO queryUavInfo = uavDalService.queryUavInfo(Long.valueOf(finishFlightPlanRequest.getUavId()));
                     UavOacMappingDO queryUavOacMapping = uavDalService.queryUavOacMapping(Long.valueOf(finishFlightPlanRequest.getUavId()), MappingStatusEnum.VALID, LinkStatusEnum.ONLINE);
                     ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(finishFlightPlanRequest.getApplyFlightPlanId()));
@@ -1102,8 +1092,8 @@ public class GcsServiceImpl implements IGcsService {
         BaseResponse baseResponse = new BaseResponse();
         baseResponse.fail();
         UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(uavId);
-        if(MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus())) &&
-                queryUavGcsMapping.getGcsId().equals(gcsId)){
+        if (MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus())) &&
+                queryUavGcsMapping.getGcsId().equals(gcsId)) {
             baseResponse.success();
         } else {
             baseResponse.fail(ErrorCodeEnum.LACK_OF_MAPPING);
@@ -1195,7 +1185,7 @@ public class GcsServiceImpl implements IGcsService {
         }
     }
 
-    public void insertUavOacMapping(Long uavId) {
+    public void insertOrUpdateUavOacMapping(Long uavId) {
         UavOacMappingDO uavOacMapping = uavDalService.queryUavOacMapping(uavId);
         if (uavOacMapping == null) {
             uavOacMapping = uavDalService.buildUavOacMappingDO(uavId, null, MappingStatusEnum.INVALID, LinkStatusEnum.OFFLINE);

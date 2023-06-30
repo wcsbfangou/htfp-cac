@@ -15,10 +15,12 @@ import com.htfp.service.cac.dao.service.ATCIssuedLogDalService;
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
+import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.FlyReplyRequest;
 import com.htfp.service.cac.router.biz.model.inner.response.ATCSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.AlarmSendResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanReplyResponse;
+import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanRevokeResponse;
 import com.htfp.service.cac.router.biz.model.inner.response.FlyReplyResponse;
 import com.htfp.service.cac.common.constant.HttpContentTypeConstant;
 import com.htfp.service.cac.common.enums.ApplyStatusEnum;
@@ -40,6 +42,7 @@ import com.htfp.service.cac.dao.service.UavDalService;
 import com.htfp.service.cac.router.biz.service.http.IRouteToGcsService;
 import com.htfp.service.cac.router.biz.service.tcp.codec.GcsTcpBaseDataFrame;
 import com.htfp.service.cac.router.biz.service.tcp.message.request.TcpFlightPlanReplyRequest;
+import com.htfp.service.cac.router.biz.service.tcp.message.request.TcpHeartBeatRequest;
 import com.htfp.service.cac.router.biz.service.tcp.server.TcpNettyChannelManager;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -156,12 +159,14 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
         gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
         tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+        TcpHeartBeatRequest tcpHeartBeatRequest = buildHeartBeatRequest(gcsId.toString(), queryGcsInfo.getToken());
+        tcpNettyChannelManager.send(gcsId.toString(), tcpHeartBeatRequest);
     }
 
     private GcsTcpBaseDataFrame buildGcsTcpBaseDataFrame(String uavId, String gcsId, String gcsToken) {
         GcsTcpBaseDataFrame gcsTcpBaseDataFrame = new GcsTcpBaseDataFrame();
         gcsTcpBaseDataFrame.setMagicCode(MagicCodeEnum.DATA_TRANSFER.getCode());
-        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_0.getType());
+        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_1.getType());
         gcsTcpBaseDataFrame.setSerializationAlgorithm(SerializationAlgorithmEnum.NO_ALGORITHM.getType());
         gcsTcpBaseDataFrame.setGcsIdLength((byte) gcsId.getBytes().length);
         gcsTcpBaseDataFrame.setGcsId(gcsId);
@@ -170,6 +175,24 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         gcsTcpBaseDataFrame.setUavIdLength((byte) uavId.getBytes().length);
         gcsTcpBaseDataFrame.setUavId(uavId);
         return gcsTcpBaseDataFrame;
+    }
+
+    private TcpHeartBeatRequest buildHeartBeatRequest(String gcsId, String gcsToken) {
+        TcpHeartBeatRequest tcpHeartBeatRequest = new TcpHeartBeatRequest();
+        tcpHeartBeatRequest.setMagicCode(MagicCodeEnum.DATA_TRANSFER.getCode());
+        tcpHeartBeatRequest.setVersion(DataFrameVersionEnum.VERSION_1.getType());
+        tcpHeartBeatRequest.setSerializationAlgorithm(SerializationAlgorithmEnum.NO_ALGORITHM.getType());
+        tcpHeartBeatRequest.setType(GcsTcpTypeEnum.HEART_BEAT_REQUEST.getType());
+        tcpHeartBeatRequest.setGcsIdLength((byte) gcsId.getBytes().length);
+        tcpHeartBeatRequest.setGcsId(gcsId);
+        tcpHeartBeatRequest.setGcsTokenLength((byte) gcsToken.getBytes().length);
+        tcpHeartBeatRequest.setGcsToken(gcsToken);
+        tcpHeartBeatRequest.setUavIdLength((byte) 0);
+        tcpHeartBeatRequest.setCurrentTime(System.currentTimeMillis());
+        byte[] readableDataBytes = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(tcpHeartBeatRequest.getCurrentTime()).array();
+        tcpHeartBeatRequest.setReadableDataBytesLength(Long.SIZE / Byte.SIZE);
+        tcpHeartBeatRequest.setReadableDataBytes(readableDataBytes);
+        return tcpHeartBeatRequest;
     }
 
     public FlightPlanReplyResponse flightPlanReplyToGcs(FlightPlanReplyRequest flightPlanReplyRequest, Long uavId, Long gcsId, String url) {
@@ -328,6 +351,8 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
         gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
         tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+        TcpHeartBeatRequest tcpHeartBeatRequest = buildHeartBeatRequest(gcsId.toString(), queryGcsInfo.getToken());
+        tcpNettyChannelManager.send(gcsId.toString(), tcpHeartBeatRequest);
     }
 
     public FlyReplyResponse flyReplyToGcs(FlyReplyRequest flyReplyRequest, Long uavId, Long gcsId, String url) {
@@ -458,6 +483,8 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
         gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
         tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+        TcpHeartBeatRequest tcpHeartBeatRequest = buildHeartBeatRequest(gcsId.toString(), queryGcsInfo.getToken());
+        tcpNettyChannelManager.send(gcsId.toString(), tcpHeartBeatRequest);
     }
 
     /**
@@ -471,4 +498,72 @@ public class RouteToGcsServiceImpl implements IRouteToGcsService {
         return null;
     }
 
+    /**
+     * 飞行计划撤销
+     *
+     * @param flightPlanRevokeRequest
+     * @return
+     */
+    @Override
+    public FlightPlanRevokeResponse flightPlanRevoke(FlightPlanRevokeRequest flightPlanRevokeRequest) {
+        FlightPlanRevokeResponse flightPlanRevokeResponse = new FlightPlanRevokeResponse();
+        flightPlanRevokeResponse.fail();
+        try {
+            UavInfoDO queryUavInfo = uavDalService.queryUavInfoByCpn(flightPlanRevokeRequest.getCpn());
+            ApplyFlightPlanLogDO queryApplyFlightPlanLog = applyFlightPlanLogDalService.queryApplyFlightPlanLogByApplyFlightPlanId(Long.valueOf(flightPlanRevokeRequest.getApplyFlightPlanId()));
+            if (queryApplyFlightPlanLog != null &&
+                    queryApplyFlightPlanLog.getReplyFlightPlanId() != null &&
+                    queryApplyFlightPlanLog.getReplyFlightPlanId().equals(flightPlanRevokeRequest.getReplyFlightPlanId())) {
+                if (queryUavInfo != null &&
+                        queryApplyFlightPlanLog.getUavId() != null &&
+                        queryUavInfo.getId().equals(queryApplyFlightPlanLog.getUavId())) {
+                    int id = applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.REVOKE.getCode());
+                    if (id > 0) {
+                        // 查询uav与gcs的mapping关系
+                        UavGcsMappingDO queryUavGcsMapping = uavDalService.queryUavGcsMapping(queryUavInfo.getId());
+                        if (queryUavGcsMapping != null &&
+                                queryUavGcsMapping.getGcsId() != null &&
+                                MappingStatusEnum.VALID.equals(MappingStatusEnum.getFromCode(queryUavGcsMapping.getStatus()))) {
+                            flightPlanRevokeResponse.success();
+                            tcpFlightPlanRevokeToGcs(flightPlanRevokeRequest, queryApplyFlightPlanLog.getUavId(), queryUavGcsMapping.getGcsId());
+                        } else {
+                            flightPlanRevokeResponse.fail("无人机系统未连接，管制信息下发失败");
+                        }
+                    } else {
+                        flightPlanRevokeResponse.fail("写入飞行计划状态异常，飞行计划撤销失败");
+                    }
+                } else {
+                    flightPlanRevokeResponse.fail("无人机信息异常，飞行计划撤销失败");
+                }
+            } else {
+                flightPlanRevokeResponse.fail("飞行计划信息异常，飞行计划撤销失败");
+            }
+        } catch (Exception e) {
+            log.error("飞行计划撤销异常, flightPlanRevokeRequest={}", flightPlanRevokeRequest, e);
+            flightPlanRevokeResponse.fail("飞行计划回复异常");
+        }
+        return flightPlanRevokeResponse;
+    }
+
+    private void tcpFlightPlanRevokeToGcs(FlightPlanRevokeRequest flightPlanRevokeRequest, Long uavId, Long gcsId) {
+        GcsInfoDO queryGcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = buildGcsTcpBaseDataFrame(uavId.toString(), gcsId.toString(), queryGcsInfo.getToken());
+        gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.FLIGHT_PLAN_REVOKE_REQUEST.getType());
+        byte[] applyFlightPlanIdBytes = flightPlanRevokeRequest.getApplyFlightPlanId().getBytes();
+        byte[] revokeReasonBytes = flightPlanRevokeRequest.getRevokeReason().getBytes();
+        int readableDataBytesLength = 2 + applyFlightPlanIdBytes.length + revokeReasonBytes.length;
+        ByteBuffer readableDataBytesByteBuffer = ByteBuffer.allocate(readableDataBytesLength);
+        byte[] readableDataBytes = new byte[readableDataBytesLength];
+        readableDataBytesByteBuffer.put((byte) applyFlightPlanIdBytes.length);
+        readableDataBytesByteBuffer.put(applyFlightPlanIdBytes);
+        readableDataBytesByteBuffer.put((byte) revokeReasonBytes.length);
+        readableDataBytesByteBuffer.put(revokeReasonBytes);
+        readableDataBytesByteBuffer.flip();
+        readableDataBytesByteBuffer.get(readableDataBytes);
+        gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
+        gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
+        tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+        TcpHeartBeatRequest tcpHeartBeatRequest = buildHeartBeatRequest(gcsId.toString(), queryGcsInfo.getToken());
+        tcpNettyChannelManager.send(gcsId.toString(), tcpHeartBeatRequest);
+    }
 }

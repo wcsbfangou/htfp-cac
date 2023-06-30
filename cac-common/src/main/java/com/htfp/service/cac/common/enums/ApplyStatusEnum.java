@@ -12,6 +12,8 @@ public enum ApplyStatusEnum {
     UNAPPROVED(2, "审批未通过"),
     COMPLETE(3, "完成"),
     OVERDUE(4, "过期"),
+    REVOKE(5, "撤销"),
+    CANCEL(6, "取消"),
     ;
 
 

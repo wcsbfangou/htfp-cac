@@ -3,6 +3,7 @@ package com.htfp.service.oac.front.biz.service;
 import com.htfp.service.oac.front.biz.model.request.ATCIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.AlarmIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
+import com.htfp.service.oac.front.biz.model.request.FlightPlanRevokeRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
@@ -14,6 +15,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRe
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
+import com.htfp.service.oac.front.biz.model.response.FlightPlanRevokeResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
@@ -70,6 +72,13 @@ public interface IFrontPageService {
      * @return
      */
     FlightPlanIssuedResponse flightPlanIssued(FlightPlanIssuedRequest flightPlanIssuedRequest);
+
+    /**
+     * 飞行计划撤销
+     * @param flightPlanRevokeRequest
+     * @return
+     */
+    FlightPlanRevokeResponse flightPlanRevoke(FlightPlanRevokeRequest flightPlanRevokeRequest);
 
     /**
      * 放飞结果下发

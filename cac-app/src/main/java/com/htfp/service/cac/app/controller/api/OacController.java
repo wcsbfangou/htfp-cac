@@ -6,6 +6,7 @@ import com.htfp.service.cac.common.utils.JsonUtils;
 import com.htfp.service.oac.front.biz.model.request.ATCIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.AlarmIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.FlightPlanIssuedRequest;
+import com.htfp.service.oac.front.biz.model.request.FlightPlanRevokeRequest;
 import com.htfp.service.oac.front.biz.model.request.FlyIssuedRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAirportInfoRequest;
 import com.htfp.service.oac.front.biz.model.request.QueryAlarmMessageInfoRequest;
@@ -17,6 +18,7 @@ import com.htfp.service.oac.front.biz.model.request.QueryUavVideoStreamAddressRe
 import com.htfp.service.oac.front.biz.model.response.ATCIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.AlarmIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.FlightPlanIssuedResponse;
+import com.htfp.service.oac.front.biz.model.response.FlightPlanRevokeResponse;
 import com.htfp.service.oac.front.biz.model.response.FlyIssuedResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAirportInfoResponse;
 import com.htfp.service.oac.front.biz.model.response.QueryAlarmMessageInfoResponse;
@@ -230,6 +232,37 @@ public class OacController {
             }
         } catch (Exception e) {
             log.error("飞行计划下发失败, flightPlanIssuedRequest={}", flightPlanIssuedRequest, e);
+            return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
+        }
+        return httpResponse;
+    }
+
+    /**
+     * 飞行计划撤销
+     *
+     * @param flightPlanRevokeRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @RequestMapping(value = "/revokeFlightPlan", method = RequestMethod.POST)
+    @ResponseBody
+    public BaseHttpResponse flightPlanRevoke(@RequestBody FlightPlanRevokeRequest flightPlanRevokeRequest, HttpServletRequest httpServletRequest) {
+        BaseHttpResponse httpResponse = BaseHttpResponse.success();
+        try {
+            // 校验
+            ErrorCodeEnum errorCodeEnum = ErrorCodeEnum.getFromCode(flightPlanRevokeRequest.validate().getCode());
+            if (!ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                return BaseHttpResponse.fail(errorCodeEnum);
+            }
+            // 飞行计划撤销
+            FlightPlanRevokeResponse flightPlanRevokeResponse = frontPageService.flightPlanRevoke(flightPlanRevokeRequest);
+            if (!ErrorCodeEnum.SUCCESS.getCode().equals(flightPlanRevokeResponse.getCode())) {
+                return BaseHttpResponse.fail(flightPlanRevokeResponse.getCode(), flightPlanRevokeResponse.getMessage());
+            }else {
+                httpResponse.setData(flightPlanRevokeResponse.getCpn());
+            }
+        } catch (Exception e) {
+            log.error("飞行计划撤销失败, flightPlanRevokeRequest={}", flightPlanRevokeRequest, e);
             return BaseHttpResponse.fail(ErrorCodeEnum.UNKNOWN_ERROR);
         }
         return httpResponse;

@@ -18,6 +18,8 @@ public enum GcsTcpTypeEnum {
     RECEIVE_ALARM_RESPONSE(10, (byte)10, "告警信息发送响应"),
     RECEIVE_ATC_REQUEST(11, (byte)11, "管制指令发送请求"),
     RECEIVE_ATC_RESPONSE(12, (byte)12, "管制指令发送响应"),
+    FLIGHT_PLAN_REVOKE_REQUEST(13, (byte)13, "飞行计划撤销通知请求"),
+    FLIGHT_PLAN_REVOKE_RESPONSE(14, (byte)14, "飞行计划撤销通知响应"),
     ;
 
     public final Integer dataFrameType;

@@ -254,7 +254,7 @@ public class TestController {
     private GcsTcpBaseDataFrame buildGcsTcpBaseDataFrame(String uavId, String gcsId, String gcsToken) {
         GcsTcpBaseDataFrame gcsTcpBaseDataFrame = new GcsTcpBaseDataFrame();
         gcsTcpBaseDataFrame.setMagicCode(MagicCodeEnum.DATA_TRANSFER.getCode());
-        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_0.getType());
+        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_1.getType());
         gcsTcpBaseDataFrame.setSerializationAlgorithm(SerializationAlgorithmEnum.NO_ALGORITHM.getType());
         gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.FLIGHT_PLAN_REPLY_REQUEST.getType());
         gcsTcpBaseDataFrame.setGcsIdLength((byte) gcsId.getBytes().length);

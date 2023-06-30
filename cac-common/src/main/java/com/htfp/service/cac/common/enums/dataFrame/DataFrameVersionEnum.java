@@ -8,6 +8,7 @@ package com.htfp.service.cac.common.enums.dataFrame;
 public enum DataFrameVersionEnum {
 
     VERSION_0((byte)0, "版本0"),
+    VERSION_1((byte)1, "版本1"),
     ;
 
     public final byte type;
