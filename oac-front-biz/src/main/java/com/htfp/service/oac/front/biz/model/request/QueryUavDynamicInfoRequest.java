@@ -1,7 +1,7 @@
 package com.htfp.service.oac.front.biz.model.request;
 
-import com.htfp.service.cac.common.enums.UavDynamicInfoQueryStatusEnum;
 import com.htfp.service.oac.common.enums.ErrorCodeEnum;
+import com.htfp.service.oac.common.enums.UavDynamicInfoQueryStatusEnum;
 import com.htfp.service.oac.front.biz.model.BaseValidate;
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package com.htfp.service.cac.router.biz.service.netty.server.dispatcher;
 
-import com.htfp.service.cac.router.biz.service.NettyBaseContext;
+import com.htfp.service.cac.router.biz.service.netty.NettyBaseContext;
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,14 +22,14 @@ public class GcsUdpDataFrameDispatcher extends SimpleChannelInboundHandler<Netty
     private DataFrameHandlerContainer dataFrameHandlerContainer;
 
     // TODO: 2022/6/20 线程池优化
-    private final ExecutorService executor = Executors.newFixedThreadPool(200);
+    private final ExecutorService udpExecutor = Executors.newFixedThreadPool(200);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, NettyBaseContext nettyBaseContext) throws Exception {
 
         IDataFrameHandler dataFrameHandler = dataFrameHandlerContainer.getDataFrameHandler(nettyBaseContext.getDataFrameTypeEnum() != null ? nettyBaseContext.getDataFrameTypeEnum().getName() : null);
         // 执行逻辑
-        executor.submit(new Runnable() {
+        udpExecutor.submit(new Runnable() {
 
             @Override
             public void run() {

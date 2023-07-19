@@ -78,12 +78,13 @@ public class GcsController {
             }
             // 请求体若无IP, 从请求头获取
             if (StringUtils.isBlank(signInRequest.getGcsIp())) {
-                String gcsIp = HttpUtils.getIpAddress(httpServletRequest);
+                /*String gcsIp = HttpUtils.getIpAddress(httpServletRequest);
                 if (StringUtils.isBlank(gcsIp)) {
                     return BaseHttpResponse.fail(ErrorCodeEnum.LACK_OF_GCS_IP);
                 } else {
                     signInRequest.setGcsIp(gcsIp);
-                }
+                }*/
+                signInRequest.setGcsIp("0.0.0.0");
             }
             // 地面站上线
             SignInResponse signInResponse = gcsService.gcsSignIn(signInRequest);
@@ -116,12 +117,13 @@ public class GcsController {
             }
             // 请求体若无IP, 从请求头获取
             if (StringUtils.isBlank(signOutRequest.getGcsIp())) {
-                String gcsIp = HttpUtils.getIpAddress(httpServletRequest);
+                /*String gcsIp = HttpUtils.getIpAddress(httpServletRequest);
                 if (StringUtils.isBlank(gcsIp)) {
                     return BaseHttpResponse.fail(ErrorCodeEnum.LACK_OF_GCS_IP);
                 } else {
                     signOutRequest.setGcsIp(gcsIp);
-                }
+                }*/
+                signOutRequest.setGcsIp("0.0.0.0");
             }
             // 注销地面站
             SignOutResponse signOutResponse = gcsService.gcsSignOut(signOutRequest);

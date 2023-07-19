@@ -35,14 +35,14 @@ import com.htfp.service.cac.router.biz.model.http.response.UavVerifyApplyRespons
 public interface IGcsService {
 
     /**
-     * 地面站注册
+     * 地面站上线
      * @param signInRequest
      * @return
      */
     SignInResponse gcsSignIn(SignInRequest signInRequest);
 
     /**
-     * 地面站注销
+     * 地面站下线
      * @param signOutRequest
      * @return
      */

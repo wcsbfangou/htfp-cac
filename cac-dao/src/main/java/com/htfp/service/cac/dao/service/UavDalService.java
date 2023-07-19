@@ -5,7 +5,6 @@ import com.google.common.cache.CacheBuilder;
 import com.htfp.service.cac.common.enums.CommandResultEnum;
 import com.htfp.service.cac.common.enums.LinkStatusEnum;
 import com.htfp.service.cac.common.enums.MappingStatusEnum;
-import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.dao.mapper.entity.UavInfoMapper;
 import com.htfp.service.cac.dao.mapper.log.CommandAndControlLogMapper;
 import com.htfp.service.cac.dao.mapper.log.UavStatusLogMapper;
@@ -317,6 +316,18 @@ public class UavDalService {
         return id;
     }
 
+    public int updateUavOacReportCodeAndMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, String reportCode, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
+        uavOacMappingDO.setReportCode(reportCode);
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
+        uavOacMappingDO.setGmtModify(new Date());
+        int id = updateUavOacMapping(uavOacMappingDO);
+        if (id > 0) {
+            uavReportCacheSaveReportCode(uavOacMappingDO.getUavId(), reportCode);
+        }
+        return id;
+    }
+
     void uavReportCacheSaveReportCode(Long uavId, String reportCode) {
         if (StringUtils.isNotBlank(reportCode)) {
             uavReportCache.put(uavId, reportCode);
@@ -337,19 +348,12 @@ public class UavDalService {
         return updateUavOacMapping(uavOacMappingDO);
     }
 
-    public int updateUavOacMappingStatusAndLinkStatus(UavOacMappingDO uavOacMappingDO, MappingStatusEnum statusEnum, LinkStatusEnum linkStatusEnum) {
-        uavOacMappingDO.setStatus(statusEnum.getCode());
-        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
-        uavOacMappingDO.setGmtModify(new Date());
-        return updateUavOacMapping(uavOacMappingDO);
-    }
-
-    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode) {
+    public UavOacMappingDO buildUavOacMappingDO(Long uavId, String reportCode, MappingStatusEnum mappingStatusEnum, LinkStatusEnum linkStatusEnum) {
         UavOacMappingDO uavOacMappingDO = new UavOacMappingDO();
         uavOacMappingDO.setUavId(uavId);
         uavOacMappingDO.setReportCode(reportCode);
-        uavOacMappingDO.setStatus(MappingStatusEnum.VALID.getCode());
-        uavOacMappingDO.setLinkStatus(LinkStatusEnum.ONLINE.getCode());
+        uavOacMappingDO.setStatus(mappingStatusEnum.getCode());
+        uavOacMappingDO.setLinkStatus(linkStatusEnum.getCode());
         uavOacMappingDO.setGmtCreate(new Date());
         uavOacMappingDO.setGmtModify(new Date());
         return uavOacMappingDO;
@@ -400,7 +404,7 @@ public class UavDalService {
         return commandAndControlLogDO;
     }
 
-    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, Integer status) {
+    public UavInfoDO buildUavInfoDO(String uavReg, String uavName, Integer uavType, String cpn, String vin, String pvin, String sn, String flightControlSn, String imei, String imsi, String manufacturerName, String productName, Integer productType, Integer productSizeType, Integer maxFlyTime, String operationScenarioType, Long operatorId, String videoStreamAddress, Integer status) {
         UavInfoDO uavInfoDO = new UavInfoDO();
         uavInfoDO.setUavReg(uavReg);
         uavInfoDO.setUavName(uavName);
@@ -419,6 +423,7 @@ public class UavDalService {
         uavInfoDO.setMaxFlyTime(maxFlyTime);
         uavInfoDO.setOperationScenarioType(operationScenarioType);
         uavInfoDO.setOperatorId(operatorId);
+        uavInfoDO.setVideoStreamAddress(videoStreamAddress);
         uavInfoDO.setStatus(status);
         uavInfoDO.setGmtCreate(new Date());
         uavInfoDO.setGmtModify(new Date());

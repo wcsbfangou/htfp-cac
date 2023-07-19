@@ -46,9 +46,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_APPLICANT_TYPE;
         } else if (StringUtils.isEmpty(applyFlightPlanId)) {
             return ErrorCodeEnum.LACK_OF_APPLY_FLIGHT_PLAN_ID;
-        }
-        // TODO: 2023/2/21 适配地面站无法发送结构体
-        /*else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganizationParam == null) {
+        } else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganizationParam == null) {
             return ErrorCodeEnum.LACK_OF_ORGANIZATION;
         } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantPersonParam == null) {
             return ErrorCodeEnum.LACK_OF_PERSON;
@@ -56,7 +54,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_PILOT_INFO;
         } else if (CollectionUtils.isEmpty(airspaceNumbers)) {
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
-        }*/ else if (CollectionUtils.isEmpty(routePointCoordinates)) {
+        } else if (CollectionUtils.isEmpty(routePointCoordinates)) {
             return ErrorCodeEnum.LACK_OF_ROUTE_POINT;
         } else if (StringUtils.isBlank(takeoffAirportId)) {
             return ErrorCodeEnum.LACK_OF_TAKE_OFF_AIRPORT;

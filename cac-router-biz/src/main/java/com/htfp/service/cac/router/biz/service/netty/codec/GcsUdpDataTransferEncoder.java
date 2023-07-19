@@ -1,7 +1,7 @@
 package com.htfp.service.cac.router.biz.service.netty.codec;
 
 import com.htfp.service.cac.common.constant.UdpDataFrameConstant;
-import com.htfp.service.cac.router.biz.service.NettyBaseContext;
+import com.htfp.service.cac.router.biz.service.netty.NettyBaseContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -24,7 +24,7 @@ public class GcsUdpDataTransferEncoder extends MessageToMessageEncoder<NettyBase
     protected void encode(ChannelHandlerContext ctx, NettyBaseContext baseContext, List<Object> list) throws Exception {
         GcsUdpDataTransferDataFrame dataFrame = (GcsUdpDataTransferDataFrame) baseContext.getDataFrame();
         try {
-            ByteBuf buf = ctx.alloc().buffer(UdpDataFrameConstant.DATA_FRAME_MIN_LENGTH + dataFrame.getGcsIdLength() + dataFrame.getGcsTokenLength() + dataFrame.getLength());
+            ByteBuf buf = ctx.alloc().buffer(UdpDataFrameConstant.UDP_DATA_FRAME_MIN_LENGTH + dataFrame.getGcsIdLength() + dataFrame.getGcsTokenLength() + dataFrame.getUavIdLength() + dataFrame.getLength());
             if (dataFrame != null) {
                 buf.writeShort(dataFrame.getMagicCode());
                 buf.writeByte(dataFrame.getVersion());
@@ -34,10 +34,11 @@ public class GcsUdpDataTransferEncoder extends MessageToMessageEncoder<NettyBase
                 buf.writeBytes(dataFrame.getGcsId().getBytes(), 0, dataFrame.getGcsIdLength());
                 buf.writeByte(dataFrame.getGcsTokenLength());
                 buf.writeBytes(dataFrame.getGcsToken().getBytes(), 0, dataFrame.getGcsTokenLength());
+                buf.writeByte(dataFrame.getUavIdLength());
+                buf.writeBytes(dataFrame.getUavId().getBytes(), 0, dataFrame.getUavIdLength());
                 buf.writeShort(dataFrame.getSequenceId());
                 buf.writeInt(dataFrame.getLength());
                 buf.writeBytes(dataFrame.getData().getBytes());
-                // TODO: 2022/6/13 测试之后记得删除此log
                 // log.info("[encode][连接({}) 编码了一条消息({})]", ctx.channel().id(), dataFrame.toString());
                 list.add(new DatagramPacket(buf, baseContext.getOriginSender()));
                 if (CollectionUtils.isNotEmpty(baseContext.getReceiverList())) {

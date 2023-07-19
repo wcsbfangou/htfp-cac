@@ -1,6 +1,8 @@
 package com.htfp.service.cac.router.biz.service.inner.impl;
 
 import com.htfp.service.cac.common.enums.ErrorCodeEnum;
+import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanRevokeRequest;
+import com.htfp.service.cac.router.biz.model.inner.response.FlightPlanRevokeResponse;
 import com.htfp.service.cac.router.biz.service.inner.IOacService;
 import com.htfp.service.cac.router.biz.model.inner.request.ATCSendRequest;
 import com.htfp.service.cac.router.biz.model.inner.request.AlarmSendRequest;
@@ -122,6 +124,30 @@ public class OacServiceImpl implements IOacService {
             alarmSendResponse.fail("告警信息下发异常");
         }
         return alarmSendResponse;
+    }
+
+    /**
+     * 飞行计划撤销
+     *
+     * @param flightPlanRevokeRequest
+     * @return
+     */
+    @Override
+    public FlightPlanRevokeResponse flightPlanRevoke(FlightPlanRevokeRequest flightPlanRevokeRequest) {
+        FlightPlanRevokeResponse flightPlanRevokeResponse = new FlightPlanRevokeResponse();
+        flightPlanRevokeResponse.fail();
+        try{
+            ErrorCodeEnum errorCodeEnum = flightPlanRevokeRequest.validate();
+            if (ErrorCodeEnum.SUCCESS.equals(errorCodeEnum)) {
+                flightPlanRevokeResponse = routeToGcsService.flightPlanRevoke(flightPlanRevokeRequest);
+            } else {
+                flightPlanRevokeResponse.fail(errorCodeEnum);
+            }
+        } catch (Exception e){
+            log.error("飞行计划撤销异常, flightPlanRevokeRequest={}", flightPlanRevokeRequest, e);
+            flightPlanRevokeResponse.fail("飞行计划撤销异常");
+        }
+        return flightPlanRevokeResponse;
     }
 
 }

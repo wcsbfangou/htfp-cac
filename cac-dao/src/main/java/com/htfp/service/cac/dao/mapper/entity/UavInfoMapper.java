@@ -98,9 +98,9 @@ public interface UavInfoMapper {
      * @param uavInfo
      * @return
      */
-    @Insert("INSERT INTO " + TABLE + " (uav_reg, uav_name, uav_type, cpn, vin, pvin, sn, flight_control_sn, imei, imsi, manufacturer_name, product_name, product_type, product_size_type, max_fly_time, operation_scenario_type, operator_id, status, gmt_create, gmt_modify) "
-            + "VALUES (#{uavInfo.uavReg}, #{uavInfo.uavName}, #{uavInfo.uavType}, #{uavInfo.cpn}, #{uavInfo.vin}, #{uavInfo.pvin}, #{uavInfo.sn}, #{uavInfo.flightControlSn}, #{uavInfo.imei}, #{uavInfo.imsi}, #{uavInfo.manufacturerName}, #{uavInfo.productName}, #{uavInfo.productType}, #{uavInfo.productSizeType}, #{uavInfo.maxFlyTime}, #{uavInfo.operationScenarioType}, #{uavInfo.operatorId}, #{uavInfo.status}, #{uavInfo.gmtCreate}, #{uavInfo.gmtModify})"
-            + " ON DUPLICATE KEY UPDATE uav_reg=#{uavInfo.uavReg}, uav_name=#{uavInfo.uavName}, uav_type=#{uavInfo.uavType}, cpn=#{uavInfo.cpn}, vin=#{uavInfo.vin}, pvin=#{uavInfo.pvin}, sn=#{uavInfo.sn}, flight_control_sn=#{uavInfo.flightControlSn}, imei=#{uavInfo.imei}, imsi=#{uavInfo.imsi}, manufacturer_name=#{uavInfo.manufacturerName}, product_name=#{uavInfo.productName}, product_type=#{uavInfo.productType}, product_size_type=#{uavInfo.productSizeType}, max_fly_time=#{uavInfo.maxFlyTime}, operation_scenario_type=#{uavInfo.operationScenarioType}, operator_id=#{uavInfo.operatorId}, status=#{uavInfo.status}, gmt_modify=#{uavInfo.gmtModify}, is_del = 0")
+    @Insert("INSERT INTO " + TABLE + " (uav_reg, uav_name, uav_type, cpn, vin, pvin, sn, flight_control_sn, imei, imsi, manufacturer_name, product_name, product_type, product_size_type, max_fly_time, operation_scenario_type, operator_id, video_stream_address, status, gmt_create, gmt_modify) "
+            + "VALUES (#{uavInfo.uavReg}, #{uavInfo.uavName}, #{uavInfo.uavType}, #{uavInfo.cpn}, #{uavInfo.vin}, #{uavInfo.pvin}, #{uavInfo.sn}, #{uavInfo.flightControlSn}, #{uavInfo.imei}, #{uavInfo.imsi}, #{uavInfo.manufacturerName}, #{uavInfo.productName}, #{uavInfo.productType}, #{uavInfo.productSizeType}, #{uavInfo.maxFlyTime}, #{uavInfo.operationScenarioType}, #{uavInfo.operatorId}, #{uavInfo.videoStreamAddress}, #{uavInfo.status}, #{uavInfo.gmtCreate}, #{uavInfo.gmtModify})"
+            + " ON DUPLICATE KEY UPDATE uav_reg=#{uavInfo.uavReg}, uav_name=#{uavInfo.uavName}, uav_type=#{uavInfo.uavType}, cpn=#{uavInfo.cpn}, vin=#{uavInfo.vin}, pvin=#{uavInfo.pvin}, sn=#{uavInfo.sn}, flight_control_sn=#{uavInfo.flightControlSn}, imei=#{uavInfo.imei}, imsi=#{uavInfo.imsi}, manufacturer_name=#{uavInfo.manufacturerName}, product_name=#{uavInfo.productName}, product_type=#{uavInfo.productType}, product_size_type=#{uavInfo.productSizeType}, max_fly_time=#{uavInfo.maxFlyTime}, operation_scenario_type=#{uavInfo.operationScenarioType}, operator_id=#{uavInfo.operatorId}, video_stream_address=#{uavInfo.videoStreamAddress}, status=#{uavInfo.status}, gmt_modify=#{uavInfo.gmtModify}, is_del = 0")
     @Options(useGeneratedKeys = true, keyProperty = "uavInfo.id")
     int insertUavInfo(@Param(value = "uavInfo") UavInfoDO uavInfo);
 
@@ -175,6 +175,7 @@ public interface UavInfoMapper {
             + "<if test=\"uavInfo.maxFlyTime != null\"> max_fly_time = #{uavInfo.maxFlyTime}, </if>"
             + "<if test=\"uavInfo.operationScenarioType != null\"> operation_scenario_type = #{uavInfo.operationScenarioType}, </if>"
             + "<if test=\"uavInfo.operatorId != null\"> operator_id = #{uavInfo.operatorId}, </if>"
+            + "<if test=\"uavInfo.videoStreamAddress != null\"> video_stream_address = #{uavInfo.videoStreamAddress}, </if>"
             + "<if test=\"uavInfo.status != null\"> status = #{uavInfo.status}, </if>"
             + "<if test=\"uavInfo.isDel != null\"> is_del = #{uavInfo.isDel}, </if>"
             + "<if test=\"uavInfo.gmtModify != null\"> gmt_modify = #{uavInfo.gmtModify} </if>"

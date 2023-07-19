@@ -8,6 +8,7 @@ import com.htfp.service.cac.router.biz.model.http.request.param.OrganizationPara
 import com.htfp.service.cac.router.biz.model.http.request.param.PersonParam;
 import com.htfp.service.cac.router.biz.model.http.request.param.PositionParam;
 import lombok.Data;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -27,7 +28,6 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     private PersonParam applicantPerson;
     private List<PersonParam> pilots;
     private List<String> airspaceNumbers;
-    // TODO: 2023/2/20 地面站转换麻烦,暂时用positionString替代一下,需要改回
     private List<PositionParam> routePointCoordinates;
     private String routeId;
     private String takeoffAirportId;
@@ -46,9 +46,7 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
     public ErrorCodeEnum validate() {
         if (ApplicantTypeEnum.getFromCode(applicantType) == null) {
             return ErrorCodeEnum.LACK_OF_APPLICANT_TYPE;
-        }
-        // TODO: 2023/2/21 适配地面站无法发送结构体
-        /* else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganization == null) {
+        } else if (ApplicantTypeEnum.ORGANIZATION.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantOrganization == null) {
             return ErrorCodeEnum.LACK_OF_ORGANIZATION;
         } else if (ApplicantTypeEnum.PERSON.equals(ApplicantTypeEnum.getFromCode(applicantType)) && applicantPerson == null) {
             return ErrorCodeEnum.LACK_OF_PERSON;
@@ -56,9 +54,9 @@ public class FlightPlanApplyRequest implements BaseValidate<ErrorCodeEnum> {
             return ErrorCodeEnum.LACK_OF_PILOT_INFO;
         } else if (CollectionUtils.isEmpty(airspaceNumbers)) {
             return ErrorCodeEnum.LACK_OF_AIRSPACE_NUM;
-        } else if (CollectionUtils.isEmpty(routePointCoordinates)) {
+        } else if (StringUtils.isBlank(routeId)) {
             return ErrorCodeEnum.LACK_OF_ROUTE_POINT;
-        } */else if (StringUtils.isBlank(takeoffAirportId)) {
+        } else if (StringUtils.isBlank(takeoffAirportId)) {
             return ErrorCodeEnum.LACK_OF_TAKE_OFF_AIRPORT;
         } else if (StringUtils.isBlank(landingAirportId)) {
             return ErrorCodeEnum.LACK_OF_LANDING_AIRPORT;

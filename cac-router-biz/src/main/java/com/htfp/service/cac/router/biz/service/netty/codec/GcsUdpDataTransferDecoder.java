@@ -2,7 +2,7 @@ package com.htfp.service.cac.router.biz.service.netty.codec;
 
 import com.htfp.service.cac.common.constant.UdpDataFrameConstant;
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
-import com.htfp.service.cac.router.biz.service.NettyBaseContext;
+import com.htfp.service.cac.router.biz.service.netty.NettyBaseContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
@@ -28,7 +28,7 @@ public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramP
             // 标记当前读取位置
             in.markReaderIndex();
             // 判断是否大于最小长度
-            if (in.readableBytes() <= UdpDataFrameConstant.DATA_FRAME_MIN_LENGTH) {
+            if (in.readableBytes() <= UdpDataFrameConstant.UDP_DATA_FRAME_MIN_LENGTH) {
                 in.resetReaderIndex();
                 log.error("[GcsUdpDataTransferDecoder][连接({}) 解析消息失败，数据可读长度小于数据帧最小长度in={}]", ctx.channel().id(), in.toString());
                 return;
@@ -101,7 +101,6 @@ public class GcsUdpDataTransferDecoder extends MessageToMessageDecoder<DatagramP
             nettyBaseContext.setDataFrame(gcsUdpDataTransferDataFrame);
             nettyBaseContext.setOriginSender(packet.sender());
             out.add(nettyBaseContext);
-            // TODO: 2022/6/13 测试之后记得删除此log
             // log.info("[GcsUdpDataTransferDecoder][连接({}) 解析到一条消息({})]", ctx.channel().id(), gcsUdpDataTransferDataFrame.toString());
         } catch (Exception e){
             log.error("GcsUdpDataTransferDecoder 发生异常, packet={}",packet, e);

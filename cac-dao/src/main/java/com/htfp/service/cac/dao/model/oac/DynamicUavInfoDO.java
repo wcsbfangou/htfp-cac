@@ -19,6 +19,7 @@ public class DynamicUavInfoDO implements Serializable {
     private Long replyFlyId;
     private String uavName;
     private String cpn;
+    private Integer uavProductType;
     private String uavOperatorName;
     private Integer lng;
     private Integer lat;

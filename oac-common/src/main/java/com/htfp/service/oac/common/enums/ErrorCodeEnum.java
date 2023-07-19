@@ -71,6 +71,8 @@ public enum ErrorCodeEnum {
     LACK_OF_UAV_IMSI(3115, "无人机IMSI码缺失"),
     LACK_OF_UAV_MANUFACTURER_NAME(3116, "无人机制造厂商缺失"),
     LACK_OF_UAV_PRODUCT_NAME(3117, "无人机产品名称缺失"),
+    WRONG_CPN(3118, "无人机CPN错误"),
+    LACK_OF_UAV_VIDEO_STREAM_ADDRESS(3119, "无人机视频流地址缺失"),
 
     LACK_OF_PILOT_ID(3201, "驾驶员编号缺失"),
     WRONG_PILOT_ID(3202, "驾驶员编号错误"),
@@ -84,6 +86,8 @@ public enum ErrorCodeEnum {
     WRONG_GCS_ID(3304, "地面站编号错误"),
     LACK_OF_DATA_LINK_TYPE(3305, "数据链路缺失"),
     LACK_OF_GCS_TYPE(3306, "地面站类型缺失"),
+    WRONG_GCS_TOKEN(3307, "地面站token错误"),
+    LACK_OF_GCS_TOKEN(3308, "地面站Token缺失"),
 
     LACK_OF_OPERATOR_ID(3401, "运营主体编码缺失"),
     LACK_OF_OPERATOR_TYPE(3402, "运营主体类型缺失"),

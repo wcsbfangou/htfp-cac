@@ -1,9 +1,17 @@
 package com.htfp.service.cac.app.controller.test;
 
+import com.htfp.service.cac.common.enums.dataFrame.DataFrameVersionEnum;
+import com.htfp.service.cac.common.enums.dataFrame.GcsTcpTypeEnum;
+import com.htfp.service.cac.common.enums.dataFrame.MagicCodeEnum;
+import com.htfp.service.cac.common.enums.dataFrame.SerializationAlgorithmEnum;
+import com.htfp.service.cac.dao.model.entity.GcsInfoDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
 import com.htfp.service.cac.dao.service.NavigationDalService;
 import com.htfp.service.cac.dao.service.PilotDalService;
 import com.htfp.service.cac.dao.service.UavDalService;
+import com.htfp.service.cac.router.biz.model.inner.request.FlightPlanReplyRequest;
+import com.htfp.service.cac.router.biz.service.tcp.codec.GcsTcpBaseDataFrame;
+import com.htfp.service.cac.router.biz.service.tcp.server.TcpNettyChannelManager;
 import com.htfp.service.oac.biz.model.inner.request.UavDataTransferRequest;
 import com.htfp.service.oac.biz.model.inner.response.UavDataTransferResponse;
 import com.htfp.service.oac.biz.service.IFlightManagementService;
@@ -18,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.nio.ByteBuffer;
 
 /**
  * @Author sunjipeng
@@ -42,6 +51,9 @@ public class TestController {
 
     @Resource(name="flightManagementServiceImpl")
     private IFlightManagementService flightManagementService;
+
+    @Resource
+    private TcpNettyChannelManager tcpNettyChannelManager;
 
 
     @RequestMapping(value = "/deleteGcsInfo", method = RequestMethod.POST)
@@ -215,4 +227,44 @@ public class TestController {
         }
         return uavDataTransferResponse;
     }
+
+    @RequestMapping(value = "/replyFlightPlanToGcsTest", method = RequestMethod.POST)
+    @ResponseBody
+    public String uavDataTransfer(@RequestBody FlightPlanReplyRequest flightPlanReplyRequest, @RequestParam(value = "uavId") Long uavId, @RequestParam(value = "gcsId") Long gcsId) {
+        GcsInfoDO queryGcsInfo = gcsDalService.queryGcsInfo(gcsId);
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = buildGcsTcpBaseDataFrame(uavId.toString(), gcsId.toString(), queryGcsInfo.getToken());
+        byte[] applyFlightPlanIdBytes = flightPlanReplyRequest.getApplyFlightPlanId().getBytes();
+        byte[] replyFlightPlanIdBytes = flightPlanReplyRequest.getReplyFlightPlanId().getBytes();
+        int readableDataBytesLength = 3 + applyFlightPlanIdBytes.length + replyFlightPlanIdBytes.length;
+        ByteBuffer readableDataBytesByteBuffer = ByteBuffer.allocate(readableDataBytesLength);
+        byte[] readableDataBytes = new byte[readableDataBytesLength];
+        readableDataBytesByteBuffer.put((byte) applyFlightPlanIdBytes.length);
+        readableDataBytesByteBuffer.put(applyFlightPlanIdBytes);
+        readableDataBytesByteBuffer.put((byte) replyFlightPlanIdBytes.length);
+        readableDataBytesByteBuffer.put(replyFlightPlanIdBytes);
+        readableDataBytesByteBuffer.put(flightPlanReplyRequest.getPass() ? (byte) 1 : (byte) 0);
+        readableDataBytesByteBuffer.flip();
+        readableDataBytesByteBuffer.get(readableDataBytes);
+        gcsTcpBaseDataFrame.setReadableDataBytesLength(readableDataBytesLength);
+        gcsTcpBaseDataFrame.setReadableDataBytes(readableDataBytes);
+        tcpNettyChannelManager.send(gcsId.toString(), gcsTcpBaseDataFrame);
+        return "success";
+    }
+
+    private GcsTcpBaseDataFrame buildGcsTcpBaseDataFrame(String uavId, String gcsId, String gcsToken) {
+        GcsTcpBaseDataFrame gcsTcpBaseDataFrame = new GcsTcpBaseDataFrame();
+        gcsTcpBaseDataFrame.setMagicCode(MagicCodeEnum.DATA_TRANSFER.getCode());
+        gcsTcpBaseDataFrame.setVersion(DataFrameVersionEnum.VERSION_1.getType());
+        gcsTcpBaseDataFrame.setSerializationAlgorithm(SerializationAlgorithmEnum.NO_ALGORITHM.getType());
+        gcsTcpBaseDataFrame.setType(GcsTcpTypeEnum.FLIGHT_PLAN_REPLY_REQUEST.getType());
+        gcsTcpBaseDataFrame.setGcsIdLength((byte) gcsId.getBytes().length);
+        gcsTcpBaseDataFrame.setGcsId(gcsId);
+        gcsTcpBaseDataFrame.setGcsTokenLength((byte) gcsToken.getBytes().length);
+        gcsTcpBaseDataFrame.setGcsToken(gcsToken);
+        gcsTcpBaseDataFrame.setUavIdLength((byte) uavId.getBytes().length);
+        gcsTcpBaseDataFrame.setUavId(uavId);
+        return gcsTcpBaseDataFrame;
+    }
+
+
 }

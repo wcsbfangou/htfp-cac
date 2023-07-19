@@ -5,7 +5,7 @@ import com.htfp.service.cac.common.enums.SubscribeDataEnum;
 import com.htfp.service.cac.common.enums.dataFrame.DataFrameTypeEnum;
 import com.htfp.service.cac.dao.model.mapping.GcsIpMappingDO;
 import com.htfp.service.cac.dao.service.GcsDalService;
-import com.htfp.service.cac.router.biz.service.NettyBaseContext;
+import com.htfp.service.cac.router.biz.service.netty.NettyBaseContext;
 import com.htfp.service.cac.router.biz.service.netty.codec.GcsUdpDataTransferDataFrame;
 import com.htfp.service.cac.router.biz.service.netty.handler.IDataFrameHandler;
 import io.netty.channel.Channel;

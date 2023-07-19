@@ -7,6 +7,8 @@ import com.htfp.service.cac.router.biz.model.BaseValidate;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
+
 /**
  * @Author sunjipeng
  * @Date 2022-06-08 10:44
@@ -33,6 +35,7 @@ public class UavInfoParam implements BaseValidate<ErrorCodeEnum> {
     private Integer maxFlyTime;
     private String operationScenarioType;
     private String operatorId;
+    private String videoStreamAddress;
     private Integer status;
 
     @Override
