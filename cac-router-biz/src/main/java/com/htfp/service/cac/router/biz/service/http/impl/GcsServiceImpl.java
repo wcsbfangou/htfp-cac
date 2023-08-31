@@ -886,7 +886,7 @@ public class GcsServiceImpl implements IGcsService {
                                     UavGcsMappingDO uavGcsMapping = uavDalService.queryValidUavGcsMapping(uavId, gcsId);
                                     UavOacMappingDO uavOacMapping = uavDalService.queryUavOacMapping(uavId);
                                     uavDalService.updateUavGcsMappingStatus(uavGcsMapping, MappingStatusEnum.INVALID);
-                                    uavDalService.updateUavOacMappingReportCodeAndStatus(uavOacMapping, null, MappingStatusEnum.INVALID);
+                                    uavDalService.updateUavOacReportCodeAndMappingStatusAndLinkStatus(uavOacMapping, null, MappingStatusEnum.INVALID, LinkStatusEnum.OFFLINE);
                                 }
                             } else {
                                 uavStatusChangeResponse.fail(uavChangeStatusResponse.getCode(), uavChangeStatusResponse.getMessage());
@@ -992,8 +992,8 @@ public class GcsServiceImpl implements IGcsService {
                                 com.htfp.service.oac.biz.model.inner.response.FinishFlightPlanResponse oacFinishFlightPlanResponse = flyingService.finishFlightPlan(oacFinishFlightPlanRequest);
                                 finishFlightPlanResponse = buildFinishFlightPlanResponse(oacFinishFlightPlanResponse);
                                 if (finishFlightPlanResponse.getSuccess()) {
-                                    // 更新reportCode和连接状态
-                                    uavDalService.updateUavOacMappingReportCodeAndLinkStatus(queryUavOacMapping, queryUavInfo.getCpn(), LinkStatusEnum.OFFLINE);
+                                    // 更新reportCode
+                                    uavDalService.updateUavOacMappingReportCode(queryUavOacMapping, queryUavInfo.getCpn());
                                     // 更新飞行计划状态
                                     applyFlightPlanLogDalService.updateApplyFlightPlanLogStatus(queryApplyFlightPlanLog, ApplyStatusEnum.COMPLETE.getCode());
                                     // 飞行计划处于通过状态，则结束飞行计划
